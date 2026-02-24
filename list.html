@@ -20,8 +20,11 @@
         }
 
         body { background: #1a1a1a; color: #eee; margin: 0; display: flex; font-family: 'Montserrat', 'Noto Sans JP', sans-serif; height: 100vh; overflow: hidden; }
-        .sidebar { width: 420px; background: var(--ui-bg); border-right: 1px solid var(--ui-border); flex-shrink: 0; display: flex; flex-direction: column; }
+        
+        /* サイドバー基本設定 */
+        .sidebar { width: 420px; background: var(--ui-bg); border-right: 1px solid var(--ui-border); flex-shrink: 0; display: flex; flex-direction: column; z-index: 1000; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .sidebar-scroll { flex: 1; overflow-y: auto; padding: 25px 20px; }
+        
         .back-link { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #888; font-size: 0.7rem; font-weight: 700; transition: 0.3s; margin-bottom: 20px; }
         .back-link:hover { color: var(--ui-accent); transform: translateX(-3px); }
         .ui-header { margin-bottom: 30px; border-bottom: 2px solid var(--ui-accent); padding-bottom: 15px; }
@@ -59,55 +62,39 @@
         .canvas-header-tag { position: absolute; top: 30px; right: 40px; font-family: 'Montserrat', sans-serif; font-size: 0.7rem; letter-spacing: 0.4em; font-weight: 900; color: var(--accent-color); }
         #list-container { flex: 1; }
 
-        .list-item { 
-            margin-bottom: 35px; 
-            padding-bottom: 25px; 
-            border-bottom: 1px dashed rgba(128,128,128,0.2); 
-        }
+        .list-item { margin-bottom: 35px; padding-bottom: 25px; border-bottom: 1px dashed rgba(128,128,128,0.2); }
         .list-item:last-child { border-bottom: none; }
-        .item-top { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: flex-end; 
-            border-left: 6px solid var(--accent-color); 
-            padding-left: 15px; 
-            margin-bottom: 12px; 
-        }
-        /* シナリオタイトルも念のため折り返し設定 */
+        .item-top { display: flex; justify-content: space-between; align-items: flex-end; border-left: 6px solid var(--accent-color); padding-left: 15px; margin-bottom: 12px; }
         .item-title { font-family: 'Montserrat', 'Noto Sans JP', sans-serif; font-weight: 900; font-size: 1.4rem; line-height: 1.2; word-break: break-all; }
         .item-date { font-family: 'Montserrat'; font-size: 0.8rem; opacity: 0.4; font-weight: 700; white-space: nowrap; margin-left: 10px; }
         .pc-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px 20px; }
         .pc-tag { font-size: 0.65rem; padding: 3px 12px; border-radius: 2px; border: 1px solid var(--accent-color); font-weight: bold; background: rgba(var(--ui-accent-rgb), 0.1); color: var(--accent-color); }
         .item-members { font-size: 0.7rem; font-weight: 900; margin: 0 0 10px 20px; letter-spacing: 0.05em; color: var(--accent-color); opacity: 0.8; word-break: break-all; }
-        
-        /* 感想（メモ）の折り返し設定を強化 */
-        .item-memo { 
-            font-size: 0.85rem; 
-            opacity: 0.8; 
-            line-height: 1.7; 
-            white-space: pre-wrap; /* 改行を反映 */
-            word-break: break-all; /* ← これが重要！英数字も強制改行します */
-            overflow-wrap: break-word; /* 念のためのバックアップ */
-            margin-left: 20px; 
-            border-left: 1px solid rgba(128,128,128,0.1); 
-            padding-left: 15px; 
-        }
+        .item-memo { font-size: 0.85rem; opacity: 0.8; line-height: 1.7; white-space: pre-wrap; word-break: break-all; overflow-wrap: break-word; margin-left: 20px; border-left: 1px solid rgba(128,128,128,0.1); padding-left: 15px; }
+        .canvas-footer { margin-top: 15px; font-size: 0.55rem; opacity: 0.2; text-align: center; font-family: 'Montserrat'; letter-spacing: 0.3em; font-weight: 700; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 20px; flex-shrink: 0; }
 
-        .canvas-footer { 
-            margin-top: 15px; 
-            font-size: 0.55rem; 
-            opacity: 0.2; 
-            text-align: center; 
-            font-family: 'Montserrat'; 
-            letter-spacing: 0.3em; 
-            font-weight: 700; 
-            border-top: 1px solid rgba(128,128,128,0.1); 
-            padding-top: 20px; 
-            flex-shrink: 0;
+        /* --- スマホ対応用追加パーツ --- */
+        .mobile-menu-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%; background: var(--ui-accent); color: white; border: none; z-index: 10001; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+
+        @media screen and (max-width: 1024px) {
+            body { overflow: hidden; }
+            .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); height: 100%; width: 85%; max-width: 380px; box-shadow: none; }
+            .sidebar.active { transform: translateX(0); box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+            .preview-area { padding: 20px; width: 100vw; box-sizing: border-box; }
+            #capture-canvas { width: 100%; min-width: auto; padding: 40px 25px 25px; }
+            .item-title { font-size: 1.1rem; }
+            .mobile-menu-btn { display: flex; }
+            /* スマホで入力時ズーム防止 */
+            input, textarea, select { font-size: 16px !important; }
         }
     </style>
 </head>
 <body>
+
+<button id="menu-toggle" class="mobile-menu-btn">
+    <span class="material-symbols-outlined">edit_note</span>
+</button>
+
 <div class="sidebar">
     <div class="sidebar-scroll">
         <a href="index.html" class="back-link">
@@ -169,6 +156,25 @@
     const root = document.documentElement;
     const defaultFooter = "IKATOOLBOX SCENARIO RECORD SYSTEM";
 
+    // --- メニュー開閉ロジック ---
+    const menuBtn = document.getElementById('menu-toggle');
+    const sidebar = document.querySelector('.sidebar');
+
+    menuBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        const icon = menuBtn.querySelector('.material-symbols-outlined');
+        icon.textContent = sidebar.classList.contains('active') ? 'close' : 'edit_note';
+    });
+
+    // プレビューエリアをタップでメニューを閉じる
+    document.querySelector('.preview-area').addEventListener('click', (e) => {
+        if (sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+            menuBtn.querySelector('.material-symbols-outlined').textContent = 'edit_note';
+        }
+    });
+
+    // --- 既存の機能 ---
     function setCanvasTheme(theme) {
         const isDark = theme === 'dark';
         root.style.setProperty('--canvas-bg', isDark ? '#050505' : '#ffffff');
@@ -231,8 +237,12 @@
             <div class="item-memo">${memo}</div>
         `;
         container.appendChild(item);
-        document.getElementById('in-title').value = '';
-        document.getElementById('in-memo').value = '';
+        
+        // 追加後にスマホならメニューを閉じる（任意）
+        if (window.innerWidth <= 1024) {
+            sidebar.classList.remove('active');
+            menuBtn.querySelector('.material-symbols-outlined').textContent = 'edit_note';
+        }
     }
 
     function saveImage() {
