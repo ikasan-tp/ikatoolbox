@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IKATOOLBOX | Display Generator</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦑</text></svg>">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&family=Montserrat:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --bg-rgb: 5, 5, 5; 
+            --bg-color: #050505; --text-color: #ffffff; --sub-text-color: #888888;
+            --accent-color: #C5373C; --border-color: rgba(255,255,255,0.1);
+            --img-shadow: drop-shadow(0 10px 40px rgba(0,0,0,0.8));
+            --img-x: 0px; --img-y: 0px; --img-scale: 1;
+            --v-x: 0px; --v-y: 0px; --v-scale: 1;
+            --stat-max: 100;
+        }
+
+        /* 戻るボタンのスタイル */
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--sub-text-color);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            transition: 0.3s;
+            margin-bottom: 20px;
+            padding: 5px 0;
+        }
+        .back-link:hover {
+            color: var(--accent-color);
+            transform: translateX(-3px);
+        }
+
+        body { background: #1a1a1a; color: #eee; margin: 0; display: flex; font-family: 'Montserrat', 'Noto Sans JP', sans-serif; height: 100vh; overflow: hidden; }
+        .sidebar { width: 420px; background: #222; padding: 20px; overflow-y: auto; border-right: 1px solid #444; flex-shrink: 0; }
+        
+        /* --- 以下、元のスタイルを維持 --- */
+        .control-group { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #333; }
+        h2 { font-size: 0.75rem; color: var(--accent-color); margin-bottom: 12px; letter-spacing: 0.05em; border-left: 4px solid var(--accent-color); padding-left: 10px; font-weight: 700; }
+        label { display: block; font-size: 0.65rem; margin-bottom: 2px; color: #aaa; font-weight: bold; }
+        textarea, input, select { width: 100%; background: #111; border: 1px solid #444; color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 0.8rem; box-sizing: border-box; font-family: inherit; margin-bottom: 6px; }
+        
+        .skill-manager { background: #111; border: 1px solid #444; border-radius: 4px; max-height: 180px; overflow-y: auto; padding: 5px; margin-top: 5px; }
+        .skill-manage-item { display: flex; align-items: center; gap: 8px; font-size: 0.7rem; padding: 4px 0; border-bottom: 1px solid #222; }
+        .skill-manage-item input[type="checkbox"] { width: auto; margin: 0; cursor: pointer; transform: scale(1.2); }
+
+        .grid-flex { display: flex; gap: 8px; flex-wrap: wrap; }
+        .grid-flex > div { flex: 1; min-width: 80px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .edition-btn { flex: 1; padding: 8px; cursor: pointer; border: 1px solid #444; background: #111; color: #888; font-size: 0.7rem; font-weight: bold; }
+        .edition-btn.active { background: var(--accent-color); color: #fff; border-color: var(--accent-color); }
+        .save-btn { width: 100%; padding: 18px; background: var(--accent-color); color: white; border: none; border-radius: 8px; font-weight: 900; font-size: 1rem; cursor: pointer; margin-top: 15px; transition: 0.3s; letter-spacing: 0.1em; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        
+        .preview-area { flex: 1; display: flex; justify-content: center; align-items: center; background: #151515; padding: 20px; overflow: auto; }
+        #display-canvas { width: 800px; height: 800px; background: var(--bg-color); color: var(--text-color); display: flex; position: relative; overflow: hidden; flex-shrink: 0; }
+        
+        #display-canvas::before {
+            content: "✦";
+            position: absolute;
+            top: 25%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+            font-size: 850px;
+            color: var(--accent-color);
+            opacity: 0.05;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .info-side { 
+            flex: 0 0 75%; padding: 45px 50px; display: flex; flex-direction: column; z-index: 10;
+            background: linear-gradient(to right, rgba(var(--bg-rgb), 1) 0%, rgba(var(--bg-rgb), 1) 50%, rgba(var(--bg-rgb), 0.8) 65%, rgba(var(--bg-rgb), 0) 85%);
+        }
+
+        .scenario-tag { align-self: flex-start; background: var(--accent-color); color: #fff; font-size: 0.7rem; font-weight: 900; padding: 4px 12px; margin-bottom: 10px; height: 1.2rem; display: flex; align-items: center; }
+        .name-area { position: relative; border-left: 10px solid var(--accent-color); padding-left: 20px; display: flex; flex-direction: column; justify-content: center; width: 100%; box-sizing: border-box; flex-shrink: 0; min-height: 100px; margin-bottom: 5px; }
+        
+        ruby { display: flex; flex-direction: column-reverse; width: 100%; align-items: flex-start; }
+        rt { font-size: 0.85rem; letter-spacing: 0.3em; color: var(--accent-color); margin-bottom: 2px; font-weight: 700; text-transform: uppercase; text-align: left; line-height: 1.2; }
+        #d-name-main { font-size: 3.8rem; font-weight: 900; line-height: 1; white-space: nowrap; display: inline-block; transform-origin: left center; }
+        .profile-sub { font-size: 0.85rem; color: var(--sub-text-color); margin: 8px 0 0 0; line-height: 1; }
+        .traits-display { font-size: 0.75rem; font-weight: 700; color: var(--accent-color); margin: 5px 0 0 20px; min-height: 1.2em; opacity: 0.9; }
+
+        .variants-row { display: flex; gap: 10px; margin: 15px 0 20px 0; flex-shrink: 0; height: 85px; }
+        .v-slot { width: 85px; height: 85px; background: rgba(var(--bg-rgb), 0.2); border: 1px solid var(--border-color); overflow: hidden; position: relative; }
+        .v-slot img { position: absolute; left: 50%; top: 50%; width: 100%; transform: translate(calc(-50% + var(--v-x)), calc(-50% + var(--v-y))) scale(var(--v-scale)); object-fit: contain; }
+
+        .status-grid { display: grid; grid-template-columns: repeat(2, 160px); gap: 12px 40px; margin-bottom: 12px; flex-shrink: 0; }
+        .stat-item { width: 100%; }
+        .stat-val-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; font-weight: 900; margin-bottom: 4px; height: 16px; }
+        .stat-label { display: inline-block; width: 45px; text-align: left; color: var(--sub-text-color); letter-spacing: 0.05em; text-transform: uppercase; flex-shrink: 0; line-height: 1; }
+        .stat-num { text-align: right; color: var(--text-color); font-variant-numeric: tabular-nums; line-height: 1; min-width: 28px; }
+        .stat-bar-bg { height: 2px; background: var(--border-color); width: 100%; }
+        .stat-bar-fill { height: 100%; background: var(--accent-color); transition: 0.6s ease-out; width: 0%; }
+
+        .sub-stats { display: flex; gap: 10px; margin-bottom: 15px; flex-shrink: 0; width: 360px; }
+        .sub-badge { flex: 1; padding: 10px 2px; background: rgba(var(--bg-rgb), 0.3); border-left: 3px solid var(--accent-color); text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        .sub-label { font-size: 0.6rem; color: var(--sub-text-color); font-weight: 700; display: block; margin-bottom: 2px; line-height: 1; }
+        .sub-val { font-size: 1.3rem; font-weight: 900; line-height: 1; }
+
+        .skills-container { padding-top: 5px; flex-grow: 1; width: 450px; }
+        .skills-header { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 900; color: var(--accent-color); margin-bottom: 12px; letter-spacing: 0.2em; }
+        .skills-header::after { content: ""; flex: 1; height: 1px; background: var(--accent-color); opacity: 0.4; }
+        
+        #skills-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 30px; }
+        .skill-item { font-size: 0.7rem; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 1px; align-items: center; }
+        .skill-name-group { display: flex; align-items: center; gap: 8px; overflow: hidden; }
+        .skill-check { width: 7px; height: 7px; border: 1.5px solid var(--accent-color); flex-shrink: 0; }
+        .skill-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px; }
+        .skill-val { color: var(--accent-color); font-weight: 900; font-size: 0.8rem; }
+        
+        .image-side { position: absolute; right: 0; top: 0; width: 100%; height: 100%; z-index: 1; display: flex; justify-content: flex-end; align-items: flex-end; }
+        .accent-bg { position: absolute; top: 0; right: 0; width: 55%; height: 100%; background: var(--accent-color); opacity: 0.35; clip-path: polygon(40% 0%, 100% 0%, 100% 100%, 0% 100%); z-index: 1; }
+        #main-img { height: 98%; z-index: 2; transform: translate(var(--img-x), var(--img-y)) scale(var(--img-scale)); filter: var(--img-shadow); display: none; pointer-events: none; }
+        
+        .theme-toggle-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .theme-btn { padding: 6px; cursor: pointer; border: 1px solid #444; background: #111; color: #fff; font-size: 0.65rem; border-radius: 4px; }
+    </style>
+</head>
+<body>
+<div class="sidebar">
+    <a href="index.html" class="back-link">
+        <span class="material-symbols-outlined" style="font-size: 1rem;">arrow_back_ios</span>
+        BACK TO TOOLBOX
+    </a>
+
+    <div class="control-group">
+        <h2>1. データ取り込み</h2>
+        <textarea id="json-input" placeholder="駒データを貼り付け"></textarea>
+        <div class="grid-2">
+            <button id="btn-7th" class="edition-btn active" onclick="setEdition(7)">7版</button>
+            <button id="btn-6th" class="edition-btn" onclick="setEdition(6)">6版</button>
+        </div>
+    </div>
+    <div class="control-group">
+        <h2>2. プロフィール</h2>
+        <div class="grid-2">
+            <div><label>名前</label><input type="text" id="in-name" oninput="updateNameDisp()"></div>
+            <div><label>フリガナ</label><input type="text" id="in-ruby" oninput="refreshProfileDisplay()"></div>
+        </div>
+        <div class="grid-flex">
+            <div style="flex: 2;"><label>シナリオ</label><input type="text" id="in-scenario" oninput="refreshScenarioDisplay()"></div>
+        </div>
+        <div class="grid-flex">
+            <div><label>年齢</label><input type="text" id="in-age" oninput="refreshProfileDisplay()"></div>
+            <div><label>性別</label><input type="text" id="in-sex" oninput="refreshProfileDisplay()"></div>
+            <div><label>職業</label><input type="text" id="in-job" oninput="refreshProfileDisplay()"></div>
+        </div>
+        <div class="grid-2" style="margin-top:5px;">
+            <div><label>特徴1</label><input type="text" id="in-t1-name" oninput="updateTrait()"></div>
+            <div><label>特徴2</label><input type="text" id="in-t2-name" oninput="updateTrait()"></div>
+        </div>
+    </div>
+    <div class="control-group">
+        <h2>3. ステータス & 技能</h2>
+        <div class="grid-flex">
+            <div><label>STR</label><input type="number" id="in-str" oninput="setBar('str', this.value)"></div>
+            <div><label>CON</label><input type="number" id="in-con" oninput="setBar('con', this.value)"></div>
+            <div><label>POW</label><input type="number" id="in-pow" oninput="setBar('pow', this.value)"></div>
+            <div><label>DEX</label><input type="number" id="in-dex" oninput="setBar('dex', this.value)"></div>
+        </div>
+        <div class="grid-flex">
+            <div><label>APP</label><input type="number" id="in-app" oninput="setBar('app', this.value)"></div>
+            <div><label>SIZ</label><input type="number" id="in-siz" oninput="setBar('siz', this.value)"></div>
+            <div><label>INT</label><input type="number" id="in-int" oninput="setBar('int', this.value)"></div>
+            <div><label>EDU</label><input type="number" id="in-edu" oninput="setBar('edu', this.value)"></div>
+        </div>
+        <div class="grid-flex" style="margin-top: 10px;">
+            <div><label>SAN</label><input type="number" id="in-san" oninput="updateVal('d-san', this.value, '0')"></div>
+            <div><label>幸運</label><input type="number" id="in-luk" oninput="updateVal('d-luk', this.value, '0')"></div>
+            <div><label>HP</label><input type="number" id="in-hp" oninput="updateVal('d-hp', this.value, '0')"></div>
+            <div><label>MP</label><input type="number" id="in-mp" oninput="updateVal('d-mp', this.value, '0')"></div>
+        </div>
+        <div style="margin-top:10px;">
+            <div class="grid-2">
+                <div><label>表示数上限</label><input type="number" id="skill-limit" value="16" max="20" oninput="refreshSkills()"></div>
+                <div><label>ソート</label><select id="skill-sort" onchange="refreshSkills()"><option value="desc" selected>高い順</option><option value="none">登録順</option></select></div>
+            </div>
+            <div id="skill-manager-list" class="skill-manager"></div>
+        </div>
+    </div>
+    <div class="control-group">
+        <h2>4. 立ち絵画像</h2>
+        <label>メイン立ち絵</label><input type="file" onchange="loadImg(this, 'main-img')">
+        <div class="grid-3">
+            <div><label>左右</label><input type="range" min="-600" max="600" value="0" oninput="setPos('--img-x', this.value)"></div>
+            <div><label>上下</label><input type="range" min="-600" max="600" value="0" oninput="setPos('--img-y', this.value)"></div>
+            <div><label>拡大</label><input type="range" min="0.1" max="4" step="0.01" value="1" oninput="setPos('--img-scale', this.value)"></div>
+        </div>
+        <label style="margin-top:10px;">差分（3つまで）</label>
+        <div class="grid-3"><input type="file" onchange="loadImg(this, 'v1-img')"><input type="file" onchange="loadImg(this, 'v2-img')"><input type="file" onchange="loadImg(this, 'v3-img')"></div>
+        <div class="grid-3">
+            <div><label>差分左右</label><input type="range" min="-150" max="150" value="0" oninput="setPos('--v-x', this.value)"></div>
+            <div><label>差分上下</label><input type="range" min="-150" max="150" value="0" oninput="setPos('--v-y', this.value)"></div>
+            <div><label>差分拡大</label><input type="range" min="0.1" max="5" step="0.01" value="1" oninput="setPos('--v-scale', this.value)"></div>
+        </div>
+    </div>
+    <div class="control-group">
+        <h2>5. アクセントカラー & テーマ</h2>
+        <input type="color" id="color-picker" value="#C5373C" style="height:40px; border:none; width:100%; cursor:pointer;">
+        
+        <div class="theme-toggle-btns">
+            <button class="theme-btn" onclick="applyTheme('dark')">ダークモード</button>
+            <button class="theme-btn" onclick="applyTheme('light')" style="background:#eee; color:#111;">ライトモード</button>
+        </div>
+        
+        <button class="save-btn" onclick="saveImage()">画像保存</button>
+    </div>
+</div>
+
+<div class="preview-area">
+    <div id="display-canvas">
+        <div class="info-side">
+            <div id="d-scenario" class="scenario-tag">CoC 7th: SCENARIO</div>
+            <div class="name-area">
+                <ruby><span id="d-name-main">NAME</span><rt id="d-name-ruby">INVESTIGATOR</rt></ruby>
+                <div id="d-profile-line" class="profile-sub">- / - / -</div>
+            </div>
+            <div id="d-traits" class="traits-display"></div>
+            <div class="variants-row">
+                <div class="v-slot"><img id="v1-img"></div>
+                <div class="v-slot"><img id="v2-img"></div>
+                <div class="v-slot"><img id="v3-img"></div>
+            </div>
+            <div class="status-grid">
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">STR</span><span class="stat-num" id="val-str">0</span></div><div class="stat-bar-bg"><div id="b-str" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">CON</span><span class="stat-num" id="val-con">0</span></div><div class="stat-bar-bg"><div id="b-con" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">POW</span><span class="stat-num" id="val-pow">0</span></div><div class="stat-bar-bg"><div id="b-pow" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">DEX</span><span class="stat-num" id="val-dex">0</span></div><div class="stat-bar-bg"><div id="b-dex" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">APP</span><span class="stat-num" id="val-app">0</span></div><div class="stat-bar-bg"><div id="b-app" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">SIZ</span><span class="stat-num" id="val-siz">0</span></div><div class="stat-bar-bg"><div id="b-siz" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">INT</span><span class="stat-num" id="val-int">0</span></div><div class="stat-bar-bg"><div id="b-int" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">EDU</span><span class="stat-num" id="val-edu">0</span></div><div class="stat-bar-bg"><div id="b-edu" class="stat-bar-fill"></div></div></div>
+            </div>
+            <div class="sub-stats">
+                <div class="sub-badge"><span class="sub-label">SAN</span><span class="sub-val" id="d-san">0</span></div>
+                <div class="sub-badge"><span class="sub-label">幸運</span><span class="sub-val" id="d-luk">0</span></div>
+                <div class="sub-badge"><span class="sub-label">HP</span><span class="sub-val" id="d-hp">0</span></div>
+                <div class="sub-badge"><span class="sub-label">MP</span><span class="sub-val" id="d-mp">0</span></div>
+            </div>
+            <div class="skills-container">
+                <div class="skills-header">SKILLS</div>
+                <div id="skills-list"></div>
+            </div>
+        </div>
+        <div class="image-side"><div class="accent-bg"></div><img id="main-img"></div>
+    </div>
+</div>
+
+<script>
+    /* JavaScript部分は変更なし */
+    const root = document.documentElement;
+    let allSkills = [];
+
+    document.getElementById('json-input').oninput = importData;
+    document.getElementById('color-picker').oninput = (e) => root.style.setProperty('--accent-color', e.target.value);
+
+    function updateNameDisp() {
+        const inputName = document.getElementById('in-name');
+        const inputRuby = document.getElementById('in-ruby');
+        const fullVal = inputName.value;
+        const match = fullVal.match(/^(.+?)\s*[（(\[](.*?)[）)\]]$/);
+        if (match) {
+            inputName.value = match[1].trim();
+            inputRuby.value = match[2].trim();
+        }
+        document.getElementById('d-name-main').innerText = inputName.value || 'NAME';
+        document.getElementById('d-name-ruby').innerText = inputRuby.value || 'INVESTIGATOR';
+        refreshProfileDisplay();
+    }
+
+    function updateTrait() {
+        const t1 = document.getElementById('in-t1-name').value.trim();
+        const t2 = document.getElementById('in-t2-name').value.trim();
+        document.getElementById('d-traits').innerText = (t1 && t2) ? `${t1} / ${t2}` : (t1 || t2 || "");
+    }
+
+    function refreshProfileDisplay() {
+        document.getElementById('d-name-ruby').innerText = document.getElementById('in-ruby').value.trim() || "INVESTIGATOR";
+        const age = document.getElementById('in-age').value.trim() || "-";
+        const sex = document.getElementById('in-sex').value.trim() || "-";
+        const job = document.getElementById('in-job').value.trim() || "-";
+        document.getElementById('d-profile-line').innerText = `${age} / ${sex} / ${job}`;
+        adjustNameFontSize();
+    }
+
+    function adjustNameFontSize() {
+        const nameEl = document.getElementById('d-name-main');
+        let fontSize = 3.8;
+        nameEl.style.fontSize = fontSize + "rem";
+        while (nameEl.offsetWidth > 380 && fontSize > 1.0) { fontSize -= 0.1; nameEl.style.fontSize = fontSize + "rem"; }
+    }
+
+    function refreshScenarioDisplay() {
+        const activeEd = document.getElementById('btn-7th').classList.contains('active') ? 7 : 6;
+        const sc = document.getElementById('in-scenario').value.trim() || "SCENARIO";
+        document.getElementById('d-scenario').innerText = `CoC ${activeEd}th: ${sc}`;
+    }
+
+    function updateVal(id, val, def) { document.getElementById(id).innerText = val || def; }
+
+    function importData() {
+        try {
+            const raw = document.getElementById('json-input').value;
+            if(!raw) return;
+            const json = JSON.parse(raw);
+            const d = json.data || json;
+            if (d.commands && d.commands.includes("CCB")) setEdition(6); else setEdition(7);
+            let nameTarget = d.name || "";
+            let rubyTarget = "";
+            if (d.memo) {
+                const pcMatch = d.memo.match(/PC：\s*(.+)/);
+                const rubyMatch = d.memo.match(/ふりがな：\s*(.+)/);
+                if (pcMatch) nameTarget = pcMatch[1].trim();
+                if (rubyMatch) rubyTarget = rubyMatch[1].trim();
+                if (!nameTarget) {
+                    const firstLine = d.memo.split('\n')[0].trim();
+                    if (firstLine) nameTarget = firstLine;
+                }
+            }
+            document.getElementById('in-name').value = nameTarget;
+            document.getElementById('in-ruby').value = rubyTarget;
+            updateNameDisp();
+            if (d.age) document.getElementById('in-age').value = d.age;
+            if (d.sex) document.getElementById('in-sex').value = d.sex;
+            if (d.job) document.getElementById('in-job').value = d.job;
+            const params = ["str","con","pow","dex","app","siz","int","edu"];
+            if (d.params) {
+                d.params.forEach(p => {
+                    const l = p.label.toLowerCase(); 
+                    if(params.includes(l)) { document.getElementById('in-'+l).value = p.value; setBar(l, p.value); }
+                });
+            } else {
+                params.forEach(p => { if (d[p] !== undefined) { document.getElementById('in-'+p).value = d[p]; setBar(p, d[p]); } });
+            }
+            const statusMap = {'hp':'hp','mp':'mp','san':'san','luck':'luk','幸運':'luk','こううん':'luk','san値':'san'};
+            if (d.status) {
+                d.status.forEach(s => {
+                    const id = statusMap[s.label.toLowerCase()] || statusMap[s.label];
+                    if(id) { document.getElementById('in-' + id).value = s.value; updateVal('d-' + id, s.value, '0'); }
+                });
+            } else {
+                Object.keys(statusMap).forEach(key => {
+                    const id = statusMap[key];
+                    if (d[key] !== undefined) { document.getElementById('in-' + id).value = d[key]; updateVal('d-' + id, d[key], '0'); }
+                });
+            }
+            allSkills = [];
+            if (d.commands) {
+                const lines = d.commands.split('\n');
+                lines.forEach(line => {
+                    const match = line.match(/CCB?\(?.*?\)?<=?(\d+)\s+【(.+?)】/);
+                    if (match) {
+                        const val = parseInt(match[1]);
+                        const label = match[2].trim();
+                        if (label === "幸運") { document.getElementById('in-luk').value = val; updateVal('d-luk', val, '0'); }
+                        else if (!statusMap[label.toLowerCase()] && !statusMap[label]) { allSkills.push({ label, value: val, visible: val > 40 }); }
+                    }
+                });
+            }
+            allSkills = allSkills.filter((v, i, a) => a.findIndex(t => t.label === v.label) === i);
+            buildSkillManager();
+            refreshSkills();
+            if (d.color) { root.style.setProperty('--accent-color', d.color); document.getElementById('color-picker').value = d.color; }
+            refreshScenarioDisplay();
+            refreshProfileDisplay();
+        } catch (e) { console.error(e); }
+    }
+
+    function buildSkillManager() {
+        const container = document.getElementById('skill-manager-list');
+        container.innerHTML = "";
+        allSkills.forEach((s, index) => {
+            const div = document.createElement('div');
+            div.className = 'skill-manage-item';
+            div.innerHTML = `<input type="checkbox" id="sm-${index}" ${s.visible ? 'checked' : ''} onchange="toggleSkillVisible(${index})"><label for="sm-${index}" style="margin:0; color:white; flex-grow:1; cursor:pointer;">${s.label}(${s.value})</label>`;
+            container.appendChild(div);
+        });
+    }
+
+    function toggleSkillVisible(index) { allSkills[index].visible = document.getElementById(`sm-${index}`).checked; refreshSkills(); }
+
+    function refreshSkills() {
+        const list = document.getElementById('skills-list');
+        list.innerHTML = "";
+        const limit = parseInt(document.getElementById('skill-limit').value) || 16;
+        let displayData = allSkills.filter(s => s.visible);
+        if (document.getElementById('skill-sort').value === "desc") displayData.sort((a, b) => b.value - a.value);
+        displayData.slice(0, limit).forEach(s => {
+            const item = document.createElement('div');
+            item.className = 'skill-item';
+            item.innerHTML = `<div class="skill-name-group"><div class="skill-check"></div><span class="skill-name">${s.label}</span></div><span class="skill-val">${s.value}</span>`;
+            list.appendChild(item);
+        });
+    }
+
+    function setBar(id, val) { 
+        const max = parseInt(getComputedStyle(root).getPropertyValue('--stat-max'));
+        const bar = document.getElementById('b-' + id);
+        if(bar) bar.style.width = Math.min((val / max) * 100, 100) + '%';
+        const num = document.getElementById('val-' + id);
+        if(num) num.innerText = val;
+    }
+
+    function setPos(p, v) { root.style.setProperty(p, p.includes('scale') ? v : v + 'px'); }
+    function loadImg(input, id) { 
+        const f = input.files[0]; 
+        if(f) { const el = document.getElementById(id); el.src = URL.createObjectURL(f); el.style.display = 'block'; }
+    }
+
+    function applyTheme(type) {
+        const isDark = type === 'dark';
+        root.style.setProperty('--bg-rgb', isDark ? '5, 5, 5' : '255, 255, 255');
+        root.style.setProperty('--bg-color', isDark ? '#050505' : '#ffffff');
+        root.style.setProperty('--text-color', isDark ? '#ffffff' : '#111111');
+        root.style.setProperty('--sub-text-color', isDark ? '#888888' : '#666666');
+        root.style.setProperty('--border-color', isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)');
+    }
+
+    function saveImage() {
+        html2canvas(document.getElementById('display-canvas'), { scale: 2, useCORS: true }).then(c => {
+            const a = document.createElement('a'); a.download = `display.png`; a.href = c.toDataURL(); a.click();
+        });
+    }
+
+    function setEdition(ed) {
+        root.style.setProperty('--stat-max', ed === 7 ? 100 : 25);
+        document.getElementById('btn-7th').classList.toggle('active', ed === 7);
+        document.getElementById('btn-6th').classList.toggle('active', ed === 6);
+        refreshScenarioDisplay();
+        ["str","con","pow","dex","app","siz","int","edu"].forEach(id => {
+            const v = document.getElementById('in-' + id).value;
+            if(v) setBar(id, v);
+        });
+    }
+</script>
+</body>
+</html>
