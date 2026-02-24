@@ -11,210 +11,324 @@
 
     <style>
         :root {
+            /* 出力キャンバス用 */
+            --accent-color: #C5373C; 
             --bg-rgb: 5, 5, 5; 
-            --bg-color: #050505; --text-color: #ffffff; --sub-text-color: #888888;
-            --accent-color: #C5373C; --border-color: rgba(255,255,255,0.1);
-            --img-shadow: drop-shadow(0 10px 40px rgba(0,0,0,0.8));
+            --bg-color: #050505; 
+            --text-color: #ffffff; 
+            --sub-text-color: #888888;
+            --border-color: rgba(255,255,255,0.1);
             --img-x: 0px; --img-y: 0px; --img-scale: 1;
             --v-x: 0px; --v-y: 0px; --v-scale: 1;
             --stat-max: 100;
-        }
 
-        /* 戻るボタンのスタイル */
-        .back-link {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            color: var(--sub-text-color);
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            transition: 0.3s;
-            margin-bottom: 20px;
-            padding: 5px 0;
-        }
-        .back-link:hover {
-            color: var(--accent-color);
-            transform: translateX(-3px);
+            /* UI固定用 */
+            --ui-accent: #C5373C; 
+            --ui-bg: #222222;
+            --ui-input: #111111;
+            --ui-border: #444444;
         }
 
         body { background: #1a1a1a; color: #eee; margin: 0; display: flex; font-family: 'Montserrat', 'Noto Sans JP', sans-serif; height: 100vh; overflow: hidden; }
-        .sidebar { width: 420px; background: #222; padding: 20px; overflow-y: auto; border-right: 1px solid #444; flex-shrink: 0; }
         
-        /* --- 以下、元のスタイルを維持 --- */
-        .control-group { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #333; }
-        h2 { font-size: 0.75rem; color: var(--accent-color); margin-bottom: 12px; letter-spacing: 0.05em; border-left: 4px solid var(--accent-color); padding-left: 10px; font-weight: 700; }
-        label { display: block; font-size: 0.65rem; margin-bottom: 2px; color: #aaa; font-weight: bold; }
-        textarea, input, select { width: 100%; background: #111; border: 1px solid #444; color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 0.8rem; box-sizing: border-box; font-family: inherit; margin-bottom: 6px; }
+        /* UI Sidebar */
+        .sidebar { width: 420px; background: var(--ui-bg); border-right: 1px solid var(--ui-border); flex-shrink: 0; display: flex; flex-direction: column; }
+        .sidebar-scroll { flex: 1; overflow-y: auto; padding: 25px 20px; }
+
+        .back-link { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #888; font-size: 0.7rem; font-weight: 700; transition: 0.3s; margin-bottom: 20px; }
+        .back-link:hover { color: var(--ui-accent); transform: translateX(-3px); }
+
+        .ui-header { margin-bottom: 30px; border-bottom: 2px solid var(--ui-accent); padding-bottom: 15px; }
+        .ui-brand { font-size: 0.7rem; font-weight: 900; color: var(--ui-accent); letter-spacing: 0.4em; display: block; margin-bottom: 2px; }
+        .ui-title { font-size: 1.4rem; font-weight: 900; color: #fff; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px; }
+
+        .control-group { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #333; }
+        h2 { font-size: 0.75rem; color: #aaa; margin-bottom: 12px; letter-spacing: 0.05em; font-weight: 700; text-transform: uppercase; }
+        label { display: block; font-size: 0.65rem; margin-bottom: 2px; color: #777; font-weight: bold; }
         
-        .skill-manager { background: #111; border: 1px solid #444; border-radius: 4px; max-height: 180px; overflow-y: auto; padding: 5px; margin-top: 5px; }
-        .skill-manage-item { display: flex; align-items: center; gap: 8px; font-size: 0.7rem; padding: 4px 0; border-bottom: 1px solid #222; }
-        .skill-manage-item input[type="checkbox"] { width: auto; margin: 0; cursor: pointer; transform: scale(1.2); }
+        textarea, input, select { width: 100%; background: var(--ui-input); border: 1px solid var(--ui-border); color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 0.8rem; box-sizing: border-box; font-family: inherit; margin-bottom: 6px; }
+        
+        .skill-manager { background: var(--ui-input); border: 1px solid var(--ui-border); border-radius: 4px; max-height: 200px; overflow-y: auto; padding: 2px; margin-top: 5px; }
+        .skill-manage-item { display: flex; align-items: center; padding: 6px 8px; border-bottom: 1px solid #222; cursor: pointer; transition: background 0.2s; }
+        .skill-manage-item:hover { background: #2a2a2a; }
+        .skill-manage-item input[type="checkbox"] { 
+            appearance: none; -webkit-appearance: none; width: 16px; height: 16px; border: 2px solid #555; border-radius: 3px;
+            margin-right: 10px; cursor: pointer; position: relative; flex-shrink: 0;
+        }
+        .skill-manage-item input[type="checkbox"]:checked { background: var(--ui-accent); border-color: var(--ui-accent); }
+        .skill-manage-item input[type="checkbox"]:checked::after {
+            content: "✔"; position: absolute; color: white; font-size: 10px; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        }
+        .skill-manage-item label { color: #eee; font-size: 0.75rem; cursor: pointer; margin-bottom: 0; flex-grow: 1; }
 
         .grid-flex { display: flex; gap: 8px; flex-wrap: wrap; }
         .grid-flex > div { flex: 1; min-width: 80px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-        .edition-btn { flex: 1; padding: 8px; cursor: pointer; border: 1px solid #444; background: #111; color: #888; font-size: 0.7rem; font-weight: bold; }
-        .edition-btn.active { background: var(--accent-color); color: #fff; border-color: var(--accent-color); }
-        .save-btn { width: 100%; padding: 18px; background: var(--accent-color); color: white; border: none; border-radius: 8px; font-weight: 900; font-size: 1rem; cursor: pointer; margin-top: 15px; transition: 0.3s; letter-spacing: 0.1em; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         
+        .theme-btn, .edition-btn { flex: 1; padding: 8px; cursor: pointer; border: 1px solid var(--ui-border); background: var(--ui-input); color: #888; font-size: 0.7rem; font-weight: bold; border-radius: 4px; }
+        .theme-btn.active, .edition-btn.active { background: #444; color: #fff; border-color: #666; }
+        
+        .save-btn { width: 100%; padding: 18px; background: var(--ui-accent); color: white; border: none; border-radius: 4px; font-weight: 900; font-size: 1rem; cursor: pointer; margin-top: 10px; transition: 0.3s; letter-spacing: 0.2em; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+
+        /* Preview Area */
         .preview-area { flex: 1; display: flex; justify-content: center; align-items: center; background: #151515; padding: 20px; overflow: auto; }
         #display-canvas { width: 800px; height: 800px; background: var(--bg-color); color: var(--text-color); display: flex; position: relative; overflow: hidden; flex-shrink: 0; }
-        
-        #display-canvas::before {
-            content: "✦";
-            position: absolute;
-            top: 25%;
-            left: 75%;
-            transform: translate(-50%, -50%);
-            font-size: 850px;
-            color: var(--accent-color);
-            opacity: 0.05;
-            z-index: 0;
-            pointer-events: none;
-        }
+        #display-canvas::before { content: "✦"; position: absolute; top: 25%; left: 75%; transform: translate(-50%, -50%); font-size: 850px; color: var(--accent-color); opacity: 0.05; z-index: 0; pointer-events: none; }
 
-        .info-side { 
-            flex: 0 0 75%; padding: 45px 50px; display: flex; flex-direction: column; z-index: 10;
-            background: linear-gradient(to right, rgba(var(--bg-rgb), 1) 0%, rgba(var(--bg-rgb), 1) 50%, rgba(var(--bg-rgb), 0.8) 65%, rgba(var(--bg-rgb), 0) 85%);
-        }
-
+        .info-side { flex: 0 0 75%; padding: 45px 50px; display: flex; flex-direction: column; z-index: 10; background: linear-gradient(to right, rgba(var(--bg-rgb), 1) 0%, rgba(var(--bg-rgb), 1) 50%, rgba(var(--bg-rgb), 0.8) 65%, rgba(var(--bg-rgb), 0) 85%); box-sizing: border-box; }
         .scenario-tag { align-self: flex-start; background: var(--accent-color); color: #fff; font-size: 0.7rem; font-weight: 900; padding: 4px 12px; margin-bottom: 10px; height: 1.2rem; display: flex; align-items: center; }
-        .name-area { position: relative; border-left: 10px solid var(--accent-color); padding-left: 20px; display: flex; flex-direction: column; justify-content: center; width: 100%; box-sizing: border-box; flex-shrink: 0; min-height: 100px; margin-bottom: 5px; }
+        .name-area { border-left: 10px solid var(--accent-color); padding-left: 20px; display: flex; flex-direction: column; justify-content: center; width: 100%; min-height: 100px; margin-bottom: 5px; }
         
         ruby { display: flex; flex-direction: column-reverse; width: 100%; align-items: flex-start; }
-        rt { font-size: 0.85rem; letter-spacing: 0.3em; color: var(--accent-color); margin-bottom: 2px; font-weight: 700; text-transform: uppercase; text-align: left; line-height: 1.2; }
-        #d-name-main { font-size: 3.8rem; font-weight: 900; line-height: 1; white-space: nowrap; display: inline-block; transform-origin: left center; }
-        .profile-sub { font-size: 0.85rem; color: var(--sub-text-color); margin: 8px 0 0 0; line-height: 1; }
+        rt { font-size: 0.85rem; letter-spacing: 0.3em; color: var(--accent-color); margin-bottom: 2px; font-weight: 700; text-transform: uppercase; text-align: left; }
+        #d-name-main { font-size: 3.8rem; font-weight: 900; line-height: 1; white-space: nowrap; transform-origin: left center; }
+        .profile-sub { font-size: 0.85rem; color: var(--sub-text-color); margin-top: 8px; }
         .traits-display { font-size: 0.75rem; font-weight: 700; color: var(--accent-color); margin: 5px 0 0 20px; min-height: 1.2em; opacity: 0.9; }
 
-        .variants-row { display: flex; gap: 10px; margin: 15px 0 20px 0; flex-shrink: 0; height: 85px; }
+        .variants-row { display: flex; gap: 10px; margin: 15px 0 20px 0; height: 85px; }
         .v-slot { width: 85px; height: 85px; background: rgba(var(--bg-rgb), 0.2); border: 1px solid var(--border-color); overflow: hidden; position: relative; }
-        .v-slot img { position: absolute; left: 50%; top: 50%; width: 100%; transform: translate(calc(-50% + var(--v-x)), calc(-50% + var(--v-y))) scale(var(--v-scale)); object-fit: contain; }
+        .v-slot img { position: absolute; left: 50%; top: 50%; width: 100%; transform: translate(calc(-50% + var(--v-x)), calc(-50% + var(--v-y))) scale(var(--v-scale)); object-fit: contain; display: none;}
 
-        .status-grid { display: grid; grid-template-columns: repeat(2, 160px); gap: 12px 40px; margin-bottom: 12px; flex-shrink: 0; }
-        .stat-item { width: 100%; }
-        .stat-val-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; font-weight: 900; margin-bottom: 4px; height: 16px; }
-        .stat-label { display: inline-block; width: 45px; text-align: left; color: var(--sub-text-color); letter-spacing: 0.05em; text-transform: uppercase; flex-shrink: 0; line-height: 1; }
-        .stat-num { text-align: right; color: var(--text-color); font-variant-numeric: tabular-nums; line-height: 1; min-width: 28px; }
+        .status-grid { display: grid; grid-template-columns: repeat(2, 160px); gap: 12px 40px; margin-bottom: 12px; }
+        .stat-val-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; font-weight: 900; margin-bottom: 4px; }
+        .stat-label { color: var(--sub-text-color); }
         .stat-bar-bg { height: 2px; background: var(--border-color); width: 100%; }
-        .stat-bar-fill { height: 100%; background: var(--accent-color); transition: 0.6s ease-out; width: 0%; }
+        .stat-bar-fill { height: 100%; background: var(--accent-color); transition: 0.6s ease-out; }
 
-        .sub-stats { display: flex; gap: 10px; margin-bottom: 15px; flex-shrink: 0; width: 360px; }
-        .sub-badge { flex: 1; padding: 10px 2px; background: rgba(var(--bg-rgb), 0.3); border-left: 3px solid var(--accent-color); text-align: center; display: flex; flex-direction: column; justify-content: center; }
-        .sub-label { font-size: 0.6rem; color: var(--sub-text-color); font-weight: 700; display: block; margin-bottom: 2px; line-height: 1; }
+        .sub-stats { display: flex; gap: 10px; margin-bottom: 15px; width: 360px; }
+        .sub-badge { flex: 1; padding: 10px 2px; background: rgba(var(--bg-rgb), 0.3); border-left: 3px solid var(--accent-color); text-align: center; }
+        .sub-label { font-size: 0.6rem; color: var(--sub-text-color); font-weight: 700; display: block; }
         .sub-val { font-size: 1.3rem; font-weight: 900; line-height: 1; }
 
-        .skills-container { padding-top: 5px; flex-grow: 1; width: 450px; }
+        .skills-container { padding-top: 5px; flex-grow: 1; width: 100%; max-width: 370px; margin-left: -10px; }
         .skills-header { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 900; color: var(--accent-color); margin-bottom: 12px; letter-spacing: 0.2em; }
         .skills-header::after { content: ""; flex: 1; height: 1px; background: var(--accent-color); opacity: 0.4; }
-        
-        #skills-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 30px; }
-        .skill-item { font-size: 0.7rem; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 1px; align-items: center; }
-        .skill-name-group { display: flex; align-items: center; gap: 8px; overflow: hidden; }
+	#skills-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 15px; }
+	.skill-item { font-size: 0.7rem; display: flex; justify-content: flex-start; gap: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 2px; }
         .skill-check { width: 7px; height: 7px; border: 1.5px solid var(--accent-color); flex-shrink: 0; }
-        .skill-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px; }
-        .skill-val { color: var(--accent-color); font-weight: 900; font-size: 0.8rem; }
-        
+	.skill-val { color: var(--accent-color); font-weight: 900; margin-left: auto; }
+
         .image-side { position: absolute; right: 0; top: 0; width: 100%; height: 100%; z-index: 1; display: flex; justify-content: flex-end; align-items: flex-end; }
         .accent-bg { position: absolute; top: 0; right: 0; width: 55%; height: 100%; background: var(--accent-color); opacity: 0.35; clip-path: polygon(40% 0%, 100% 0%, 100% 100%, 0% 100%); z-index: 1; }
-        #main-img { height: 98%; z-index: 2; transform: translate(var(--img-x), var(--img-y)) scale(var(--img-scale)); filter: var(--img-shadow); display: none; pointer-events: none; }
-        
-        .theme-toggle-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        .theme-btn { padding: 6px; cursor: pointer; border: 1px solid #444; background: #111; color: #fff; font-size: 0.65rem; border-radius: 4px; }
+        #main-img { height: 98%; z-index: 2; transform: translate(var(--img-x), var(--img-y)) scale(var(--img-scale)); display: none; pointer-events: none; }
+
+/* ファイル入力のおしゃれ化 */
+        .file-input-wrapper {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        /* 本物のinputは透明にして隠す */
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        /* 見た目用のラベル（ボタン） */
+        .custom-file-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--ui-input);
+            border: 1px dashed var(--ui-border);
+            color: #aaa;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .custom-file-btn:hover {
+            border-color: var(--ui-accent);
+            color: #fff;
+            background: #222;
+        }
+
+        /* 差分用の小さいボタン */
+        .custom-file-btn.mini {
+            padding: 6px;
+            font-size: 0.65rem;
+        }
+
+/* --- シークバー全体の設定 --- */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+            width: 100%;
+            height: 20px; /* クリックしやすい領域を確保 */
+            margin: 0;
+        }
+
+        /* 溝（トラック）の部分 - Chrome, Safari, Edge */
+        input[type="range"]::-webkit-slider-runnable-track {
+            background: #333; /* 溝の背景色 */
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        /* つまみ（ハンドル）の部分 - Chrome, Safari, Edge */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            margin-top: -6px; /* 溝の中央に配置 ( (つまみ16px - 溝4px) / 2 ) */
+            background-color: var(--ui-accent);
+            height: 16px;
+            width: 8px;
+            border-radius: 2px;
+            box-shadow: 0 0 10px rgba(197, 55, 60, 0.4);
+            transition: 0.2s;
+        }
+
+        /* ホバー時の演出 */
+        input[type="range"]:hover::-webkit-slider-thumb {
+            filter: brightness(1.2);
+            transform: scaleX(1.5); /* 横に少し太くなって「掴んでる感」を出す */
+        }
+
+        /* Firefox用の設定 */
+        input[type="range"]::-moz-range-track {
+            background: #333;
+            height: 4px;
+            border-radius: 2px;
+        }
+        input[type="range"]::-moz-range-thumb {
+            background-color: var(--ui-accent);
+            height: 16px;
+            width: 8px;
+            border: none;
+            border-radius: 2px;
+        }
+
     </style>
 </head>
 <body>
-<div class="sidebar">
-    <a href="index.html" class="back-link">
-        <span class="material-symbols-outlined" style="font-size: 1rem;">arrow_back_ios</span>
-        BACK TO TOOLBOX
-    </a>
 
-    <div class="control-group">
-        <h2>1. データ取り込み</h2>
-        <textarea id="json-input" placeholder="駒データを貼り付け"></textarea>
-        <div class="grid-2">
-            <button id="btn-7th" class="edition-btn active" onclick="setEdition(7)">7版</button>
-            <button id="btn-6th" class="edition-btn" onclick="setEdition(6)">6版</button>
-        </div>
-    </div>
-    <div class="control-group">
-        <h2>2. プロフィール</h2>
-        <div class="grid-2">
-            <div><label>名前</label><input type="text" id="in-name" oninput="updateNameDisp()"></div>
-            <div><label>フリガナ</label><input type="text" id="in-ruby" oninput="refreshProfileDisplay()"></div>
-        </div>
-        <div class="grid-flex">
-            <div style="flex: 2;"><label>シナリオ</label><input type="text" id="in-scenario" oninput="refreshScenarioDisplay()"></div>
-        </div>
-        <div class="grid-flex">
-            <div><label>年齢</label><input type="text" id="in-age" oninput="refreshProfileDisplay()"></div>
-            <div><label>性別</label><input type="text" id="in-sex" oninput="refreshProfileDisplay()"></div>
-            <div><label>職業</label><input type="text" id="in-job" oninput="refreshProfileDisplay()"></div>
-        </div>
-        <div class="grid-2" style="margin-top:5px;">
-            <div><label>特徴1</label><input type="text" id="in-t1-name" oninput="updateTrait()"></div>
-            <div><label>特徴2</label><input type="text" id="in-t2-name" oninput="updateTrait()"></div>
-        </div>
-    </div>
-    <div class="control-group">
-        <h2>3. ステータス & 技能</h2>
-        <div class="grid-flex">
-            <div><label>STR</label><input type="number" id="in-str" oninput="setBar('str', this.value)"></div>
-            <div><label>CON</label><input type="number" id="in-con" oninput="setBar('con', this.value)"></div>
-            <div><label>POW</label><input type="number" id="in-pow" oninput="setBar('pow', this.value)"></div>
-            <div><label>DEX</label><input type="number" id="in-dex" oninput="setBar('dex', this.value)"></div>
-        </div>
-        <div class="grid-flex">
-            <div><label>APP</label><input type="number" id="in-app" oninput="setBar('app', this.value)"></div>
-            <div><label>SIZ</label><input type="number" id="in-siz" oninput="setBar('siz', this.value)"></div>
-            <div><label>INT</label><input type="number" id="in-int" oninput="setBar('int', this.value)"></div>
-            <div><label>EDU</label><input type="number" id="in-edu" oninput="setBar('edu', this.value)"></div>
-        </div>
-        <div class="grid-flex" style="margin-top: 10px;">
-            <div><label>SAN</label><input type="number" id="in-san" oninput="updateVal('d-san', this.value, '0')"></div>
-            <div><label>幸運</label><input type="number" id="in-luk" oninput="updateVal('d-luk', this.value, '0')"></div>
-            <div><label>HP</label><input type="number" id="in-hp" oninput="updateVal('d-hp', this.value, '0')"></div>
-            <div><label>MP</label><input type="number" id="in-mp" oninput="updateVal('d-mp', this.value, '0')"></div>
-        </div>
-        <div style="margin-top:10px;">
+<div class="sidebar">
+    <div class="sidebar-scroll">
+        <a href="index.html" class="back-link">
+            <span class="material-symbols-outlined" style="font-size: 1rem;">arrow_back_ios</span>
+            BACK TO TOOLBOX
+        </a>
+        <div class="ui-header"><span class="ui-brand">IKATOOLBOX</span><div class="ui-title">DISPLAY GENERATOR</div></div>
+
+        <div class="control-group">
+            <h2>1. データ取り込み</h2>
+            <textarea id="json-input" placeholder="駒データを貼り付け" oninput="importData()"></textarea>
             <div class="grid-2">
-                <div><label>表示数上限</label><input type="number" id="skill-limit" value="16" max="20" oninput="refreshSkills()"></div>
-                <div><label>ソート</label><select id="skill-sort" onchange="refreshSkills()"><option value="desc" selected>高い順</option><option value="none">登録順</option></select></div>
+                <button id="btn-7th" class="edition-btn active" onclick="setEdition(7)">7版</button>
+                <button id="btn-6th" class="edition-btn" onclick="setEdition(6)">6版</button>
             </div>
-            <div id="skill-manager-list" class="skill-manager"></div>
         </div>
+
+        <div class="control-group">
+            <h2>2. プロフィール</h2>
+            <div class="grid-2">
+                <div><label>名前</label><input type="text" id="in-name" oninput="updateNameDisp()"></div>
+                <div><label>フリガナ</label><input type="text" id="in-ruby" oninput="updateRubyDisp()"></div>
+            </div>
+            <div><label>シナリオ</label><input type="text" id="in-scenario" oninput="refreshScenarioDisplay()"></div>
+            <div class="grid-3">
+                <div><label>年齢</label><input type="text" id="in-age" oninput="refreshProfileDisplay()"></div>
+                <div><label>性別</label><input type="text" id="in-sex" oninput="refreshProfileDisplay()"></div>
+                <div><label>職業</label><input type="text" id="in-job" oninput="refreshProfileDisplay()"></div>
+            </div>
+            <div class="grid-2" style="margin-top:5px;">
+                <div><label>特徴1</label><input type="text" id="in-t1-name" oninput="updateTrait()"></div>
+                <div><label>特徴2</label><input type="text" id="in-t2-name" oninput="updateTrait()"></div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <h2>3. ステータス & 技能</h2>
+            <div class="grid-flex">
+                <div><label>STR</label><input type="number" id="in-str" oninput="setBar('str', this.value)"></div>
+                <div><label>CON</label><input type="number" id="in-con" oninput="setBar('con', this.value)"></div>
+                <div><label>POW</label><input type="number" id="in-pow" oninput="setBar('pow', this.value)"></div>
+                <div><label>DEX</label><input type="number" id="in-dex" oninput="setBar('dex', this.value)"></div>
+            </div>
+            <div class="grid-flex">
+                <div><label>APP</label><input type="number" id="in-app" oninput="setBar('app', this.value)"></div>
+                <div><label>SIZ</label><input type="number" id="in-siz" oninput="setBar('siz', this.value)"></div>
+                <div><label>INT</label><input type="number" id="in-int" oninput="setBar('int', this.value)"></div>
+                <div><label>EDU</label><input type="number" id="in-edu" oninput="setBar('edu', this.value)"></div>
+            </div>
+            <div class="grid-flex" style="margin-top:10px;">
+                <div><label>SAN</label><input type="number" id="in-san" oninput="updateVal('d-san', this.value, '0')"></div>
+                <div><label>幸運</label><input type="number" id="in-luk" oninput="updateVal('d-luk', this.value, '0')"></div>
+                <div><label>HP</label><input type="number" id="in-hp" oninput="updateVal('d-hp', this.value, '0')"></div>
+                <div><label>MP</label><input type="number" id="in-mp" oninput="updateVal('d-mp', this.value, '0')"></div>
+            </div>
+            <div style="margin-top:10px;">
+                <div class="grid-2">
+                    <div><label>表示数</label><input type="number" id="skill-limit" value="16" oninput="refreshSkills()"></div>
+                    <div><label>ソート</label><select id="skill-sort" onchange="refreshSkills()"><option value="desc">高い順</option><option value="none">登録順</option></select></div>
+                </div>
+                <div id="skill-manager-list" class="skill-manager"></div>
+            </div>
+        </div>
+
+<div class="control-group">
+            <h2>4. 立ち絵調整</h2>
+            
+            <label>メイン立ち絵</label>
+            <div class="file-input-wrapper">
+                <label for="main-file" class="custom-file-btn">
+                    <span class="material-symbols-outlined">image</span> 画像を選択
+                </label>
+                <input type="file" id="main-file" onchange="loadImg(this, 'main-img')">
+            </div>
+
+            <div class="grid-3">
+                <div><label>左右</label><input type="range" min="-600" max="600" value="0" oninput="setPos('--img-x', this.value)"></div>
+                <div><label>上下</label><input type="range" min="-600" max="600" value="0" oninput="setPos('--img-y', this.value)"></div>
+                <div><label>拡大</label><input type="range" min="0.1" max="4" step="0.01" value="1" oninput="setPos('--img-scale', this.value)"></div>
+            </div>
+
+            <label style="margin-top:10px;">差分スロット (1~3)</label>
+            <div class="grid-3">
+                <div class="file-input-wrapper">
+                    <label for="v1-file" class="custom-file-btn mini">#1</label>
+                    <input type="file" id="v1-file" onchange="loadImg(this, 'v1-img')">
+                </div>
+                <div class="file-input-wrapper">
+                    <label for="v2-file" class="custom-file-btn mini">#2</label>
+                    <input type="file" id="v2-file" onchange="loadImg(this, 'v2-img')">
+                </div>
+                <div class="file-input-wrapper">
+                    <label for="v3-file" class="custom-file-btn mini">#3</label>
+                    <input type="file" id="v3-file" onchange="loadImg(this, 'v3-img')">
+                </div>
+            </div>
+            
+            <div class="grid-3">
+                <div><label>左右</label><input type="range" min="-150" max="150" value="0" oninput="setPos('--v-x', this.value)"></div>
+                <div><label>上下</label><input type="range" min="-150" max="150" value="0" oninput="setPos('--v-y', this.value)"></div>
+                <div><label>拡大</label><input type="range" min="0.1" max="5" step="0.01" value="1" oninput="setPos('--v-scale', this.value)"></div>
+            </div>
+        </div>
+
+<div class="control-group">
+	    <h2>5. カスタマイズ</h2>
+    <label>キャンバス背景</label>
+  	  <div class="grid-2" style="margin-bottom:10px;">
+        <button id="btn-dark" class="theme-btn active" onclick="setCanvasTheme('dark')">DARK</button>
+        <button id="btn-light" class="theme-btn" onclick="setCanvasTheme('light')">LIGHT</button>
     </div>
-    <div class="control-group">
-        <h2>4. 立ち絵画像</h2>
-        <label>メイン立ち絵</label><input type="file" onchange="loadImg(this, 'main-img')">
-        <div class="grid-3">
-            <div><label>左右</label><input type="range" min="-600" max="600" value="0" oninput="setPos('--img-x', this.value)"></div>
-            <div><label>上下</label><input type="range" min="-600" max="600" value="0" oninput="setPos('--img-y', this.value)"></div>
-            <div><label>拡大</label><input type="range" min="0.1" max="4" step="0.01" value="1" oninput="setPos('--img-scale', this.value)"></div>
-        </div>
-        <label style="margin-top:10px;">差分（3つまで）</label>
-        <div class="grid-3"><input type="file" onchange="loadImg(this, 'v1-img')"><input type="file" onchange="loadImg(this, 'v2-img')"><input type="file" onchange="loadImg(this, 'v3-img')"></div>
-        <div class="grid-3">
-            <div><label>差分左右</label><input type="range" min="-150" max="150" value="0" oninput="setPos('--v-x', this.value)"></div>
-            <div><label>差分上下</label><input type="range" min="-150" max="150" value="0" oninput="setPos('--v-y', this.value)"></div>
-            <div><label>差分拡大</label><input type="range" min="0.1" max="5" step="0.01" value="1" oninput="setPos('--v-scale', this.value)"></div>
-        </div>
-    </div>
-    <div class="control-group">
-        <h2>5. アクセントカラー & テーマ</h2>
-        <input type="color" id="color-picker" value="#C5373C" style="height:40px; border:none; width:100%; cursor:pointer;">
-        
-        <div class="theme-toggle-btns">
-            <button class="theme-btn" onclick="applyTheme('dark')">ダークモード</button>
-            <button class="theme-btn" onclick="applyTheme('light')" style="background:#eee; color:#111;">ライトモード</button>
-        </div>
-        
-        <button class="save-btn" onclick="saveImage()">画像保存</button>
+    <label>アクセントカラー</label>
+    <input type="color" id="color-picker" value="#C5373C" oninput="root.style.setProperty('--accent-color', this.value)" style="height:40px; cursor:pointer; border:none;">
+    <button class="save-btn" onclick="saveImage()">画像を保存する</button>
+	</div>
     </div>
 </div>
 
@@ -233,215 +347,226 @@
                 <div class="v-slot"><img id="v3-img"></div>
             </div>
             <div class="status-grid">
-                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">STR</span><span class="stat-num" id="val-str">0</span></div><div class="stat-bar-bg"><div id="b-str" class="stat-bar-fill"></div></div></div>
-                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">CON</span><span class="stat-num" id="val-con">0</span></div><div class="stat-bar-bg"><div id="b-con" class="stat-bar-fill"></div></div></div>
-                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">POW</span><span class="stat-num" id="val-pow">0</span></div><div class="stat-bar-bg"><div id="b-pow" class="stat-bar-fill"></div></div></div>
-                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">DEX</span><span class="stat-num" id="val-dex">0</span></div><div class="stat-bar-bg"><div id="b-dex" class="stat-bar-fill"></div></div></div>
-                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">APP</span><span class="stat-num" id="val-app">0</span></div><div class="stat-bar-bg"><div id="b-app" class="stat-bar-fill"></div></div></div>
-                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">SIZ</span><span class="stat-num" id="val-siz">0</span></div><div class="stat-bar-bg"><div id="b-siz" class="stat-bar-fill"></div></div></div>
-                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">INT</span><span class="stat-num" id="val-int">0</span></div><div class="stat-bar-bg"><div id="b-int" class="stat-bar-fill"></div></div></div>
-                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">EDU</span><span class="stat-num" id="val-edu">0</span></div><div class="stat-bar-bg"><div id="b-edu" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">STR</span><span id="val-str">0</span></div><div class="stat-bar-bg"><div id="b-str" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">CON</span><span id="val-con">0</span></div><div class="stat-bar-bg"><div id="b-con" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">POW</span><span id="val-pow">0</span></div><div class="stat-bar-bg"><div id="b-pow" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">DEX</span><span id="val-dex">0</span></div><div class="stat-bar-bg"><div id="b-dex" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">APP</span><span id="val-app">0</span></div><div class="stat-bar-bg"><div id="b-app" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">SIZ</span><span id="val-siz">0</span></div><div class="stat-bar-bg"><div id="b-siz" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">INT</span><span id="val-int">0</span></div><div class="stat-bar-bg"><div id="b-int" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">EDU</span><span id="val-edu">0</span></div><div class="stat-bar-bg"><div id="b-edu" class="stat-bar-fill"></div></div></div>
             </div>
             <div class="sub-stats">
-                <div class="sub-badge"><span class="sub-label">SAN</span><span class="sub-val" id="d-san">0</span></div>
-                <div class="sub-badge"><span class="sub-label">幸運</span><span class="sub-val" id="d-luk">0</span></div>
-                <div class="sub-badge"><span class="sub-label">HP</span><span class="sub-val" id="d-hp">0</span></div>
-                <div class="sub-badge"><span class="sub-label">MP</span><span class="sub-val" id="d-mp">0</span></div>
+                <div class="sub-badge"><span class="sub-label">SAN</span><span id="d-san" class="sub-val">0</span></div>
+                <div class="sub-badge"><span class="sub-label">幸運</span><span id="d-luk" class="sub-val">0</span></div>
+                <div class="sub-badge"><span class="sub-label">HP</span><span id="d-hp" class="sub-val">0</span></div>
+                <div class="sub-badge"><span class="sub-label">MP</span><span id="d-mp" class="sub-val">0</span></div>
             </div>
-            <div class="skills-container">
-                <div class="skills-header">SKILLS</div>
-                <div id="skills-list"></div>
-            </div>
+            <div class="skills-container"><div class="skills-header">SKILLS</div><div id="skills-list"></div></div>
         </div>
         <div class="image-side"><div class="accent-bg"></div><img id="main-img"></div>
     </div>
 </div>
 
 <script>
-    /* JavaScript部分は変更なし */
     const root = document.documentElement;
     let allSkills = [];
 
-    document.getElementById('json-input').oninput = importData;
-    document.getElementById('color-picker').oninput = (e) => root.style.setProperty('--accent-color', e.target.value);
+function setCanvasTheme(theme) {
+    const isDark = theme === 'dark';
+    // キャンバス内の配色を切り替え
+    root.style.setProperty('--bg-rgb', isDark ? '5, 5, 5' : '255, 255, 255');
+    root.style.setProperty('--bg-color', isDark ? '#050505' : '#ffffff');
+    root.style.setProperty('--text-color', isDark ? '#ffffff' : '#111111');
+    root.style.setProperty('--sub-text-color', isDark ? '#888888' : '#666666');
+    root.style.setProperty('--border-color', isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)');
+
+    // ボタンの「active」クラスを切り替え
+    document.getElementById('btn-dark').classList.toggle('active', isDark);
+    document.getElementById('btn-light').classList.toggle('active', !isDark);
+}
 
     function updateNameDisp() {
-        const inputName = document.getElementById('in-name');
-        const inputRuby = document.getElementById('in-ruby');
-        const fullVal = inputName.value;
-        const match = fullVal.match(/^(.+?)\s*[（(\[](.*?)[）)\]]$/);
-        if (match) {
-            inputName.value = match[1].trim();
-            inputRuby.value = match[2].trim();
+        const ni = document.getElementById('in-name'); 
+        const ri = document.getElementById('in-ruby');
+        // 名前欄に「名前（フリガナ）」の形式がある場合は自動分離
+        const m = ni.value.match(/^(.+?)\s*[（(\[](.*?)[）)\]]$/);
+        if (m) { 
+            ni.value = m[1].trim(); 
+            ri.value = m[2].trim(); 
         }
-        document.getElementById('d-name-main').innerText = inputName.value || 'NAME';
-        document.getElementById('d-name-ruby').innerText = inputRuby.value || 'INVESTIGATOR';
-        refreshProfileDisplay();
+        document.getElementById('d-name-main').innerText = ni.value || 'NAME';
+        updateRubyDisp(); // 分離後、キャンバスのフリガナも更新
+    }
+
+    function updateRubyDisp() {
+        const ri = document.getElementById('in-ruby');
+        document.getElementById('d-name-ruby').innerText = ri.value || 'INVESTIGATOR';
+        adjustNameFontSize();
     }
 
     function updateTrait() {
-        const t1 = document.getElementById('in-t1-name').value.trim();
-        const t2 = document.getElementById('in-t2-name').value.trim();
+        const t1 = document.getElementById('in-t1-name').value;
+        const t2 = document.getElementById('in-t2-name').value;
         document.getElementById('d-traits').innerText = (t1 && t2) ? `${t1} / ${t2}` : (t1 || t2 || "");
     }
 
     function refreshProfileDisplay() {
-        document.getElementById('d-name-ruby').innerText = document.getElementById('in-ruby').value.trim() || "INVESTIGATOR";
-        const age = document.getElementById('in-age').value.trim() || "-";
-        const sex = document.getElementById('in-sex').value.trim() || "-";
-        const job = document.getElementById('in-job').value.trim() || "-";
-        document.getElementById('d-profile-line').innerText = `${age} / ${sex} / ${job}`;
+        const a = document.getElementById('in-age').value || "-";
+        const s = document.getElementById('in-sex').value || "-";
+        const j = document.getElementById('in-job').value || "-";
+        document.getElementById('d-profile-line').innerText = `${a} / ${s} / ${j}`;
         adjustNameFontSize();
     }
 
     function adjustNameFontSize() {
-        const nameEl = document.getElementById('d-name-main');
-        let fontSize = 3.8;
-        nameEl.style.fontSize = fontSize + "rem";
-        while (nameEl.offsetWidth > 380 && fontSize > 1.0) { fontSize -= 0.1; nameEl.style.fontSize = fontSize + "rem"; }
+        const el = document.getElementById('d-name-main');
+        let size = 3.8; el.style.fontSize = size + "rem";
+        while (el.offsetWidth > 380 && size > 1.0) { size -= 0.1; el.style.fontSize = size + "rem"; }
     }
 
     function refreshScenarioDisplay() {
-        const activeEd = document.getElementById('btn-7th').classList.contains('active') ? 7 : 6;
-        const sc = document.getElementById('in-scenario').value.trim() || "SCENARIO";
-        document.getElementById('d-scenario').innerText = `CoC ${activeEd}th: ${sc}`;
+        const ed = document.getElementById('btn-7th').classList.contains('active') ? 7 : 6;
+        document.getElementById('d-scenario').innerText = `CoC ${ed}th: ${document.getElementById('in-scenario').value || 'SCENARIO'}`;
     }
 
-    function updateVal(id, val, def) { document.getElementById(id).innerText = val || def; }
+    function updateVal(id, v, d) { document.getElementById(id).innerText = v || d; }
 
-    function importData() {
-        try {
-            const raw = document.getElementById('json-input').value;
-            if(!raw) return;
-            const json = JSON.parse(raw);
-            const d = json.data || json;
-            if (d.commands && d.commands.includes("CCB")) setEdition(6); else setEdition(7);
-            let nameTarget = d.name || "";
-            let rubyTarget = "";
-            if (d.memo) {
-                const pcMatch = d.memo.match(/PC：\s*(.+)/);
-                const rubyMatch = d.memo.match(/ふりがな：\s*(.+)/);
-                if (pcMatch) nameTarget = pcMatch[1].trim();
-                if (rubyMatch) rubyTarget = rubyMatch[1].trim();
-                if (!nameTarget) {
-                    const firstLine = d.memo.split('\n')[0].trim();
-                    if (firstLine) nameTarget = firstLine;
+function importData() {
+    try {
+        const raw = document.getElementById('json-input').value;
+        if(!raw) return;
+        const d = (JSON.parse(raw)).data || JSON.parse(raw);
+        if (d.color) { root.style.setProperty('--accent-color', d.color); document.getElementById('color-picker').value = d.color; }
+        setEdition(d.commands && d.commands.includes("CCB") ? 6 : 7);
+        
+        // --- 名前とフリガナの処理 ---
+        document.getElementById('in-name').value = d.name || ""; 
+        updateNameDisp(); // 既存の分離ロジックを実行
+
+        // いあきゃら/キャラハブ等の memo 欄からフリガナを補完
+        if (d.memo) {
+            const rubyInput = document.getElementById('in-ruby');
+            // フリガナがまだ空、かつ memo がある場合
+            if (!rubyInput.value) {
+                const firstLine = d.memo.split('\n')[0]; // 1行目を取得
+                const match = firstLine.match(/[（(](.+?)[）)]/); // カッコ内を抽出
+                if (match && match[1]) {
+                    rubyInput.value = match[1].trim();
+                    updateRubyDisp();
                 }
             }
-            document.getElementById('in-name').value = nameTarget;
-            document.getElementById('in-ruby').value = rubyTarget;
-            updateNameDisp();
-            if (d.age) document.getElementById('in-age').value = d.age;
-            if (d.sex) document.getElementById('in-sex').value = d.sex;
-            if (d.job) document.getElementById('in-job').value = d.job;
-            const params = ["str","con","pow","dex","app","siz","int","edu"];
-            if (d.params) {
-                d.params.forEach(p => {
-                    const l = p.label.toLowerCase(); 
-                    if(params.includes(l)) { document.getElementById('in-'+l).value = p.value; setBar(l, p.value); }
-                });
-            } else {
-                params.forEach(p => { if (d[p] !== undefined) { document.getElementById('in-'+p).value = d[p]; setBar(p, d[p]); } });
+
+		// memoの3行目に「22歳 / ♀ / 158cm」などがある場合の抽出
+            const profileLine = d.memo.split('\n')[2]; // 3行目を取得
+            if (profileLine && profileLine.includes('/')) {
+                const parts = profileLine.split('/').map(p => p.trim());
+                // 年齢と性別だけをセット（職業は無視）
+                if (parts[0]) document.getElementById('in-age').value = parts[0];
+                if (parts[1]) document.getElementById('in-sex').value = parts[1];
+                
+                refreshProfileDisplay(); // プレビュー更新
             }
-            const statusMap = {'hp':'hp','mp':'mp','san':'san','luck':'luk','幸運':'luk','こううん':'luk','san値':'san'};
-            if (d.status) {
-                d.status.forEach(s => {
-                    const id = statusMap[s.label.toLowerCase()] || statusMap[s.label];
-                    if(id) { document.getElementById('in-' + id).value = s.value; updateVal('d-' + id, s.value, '0'); }
-                });
-            } else {
-                Object.keys(statusMap).forEach(key => {
-                    const id = statusMap[key];
-                    if (d[key] !== undefined) { document.getElementById('in-' + id).value = d[key]; updateVal('d-' + id, d[key], '0'); }
-                });
-            }
-            allSkills = [];
-            if (d.commands) {
-                const lines = d.commands.split('\n');
-                lines.forEach(line => {
-                    const match = line.match(/CCB?\(?.*?\)?<=?(\d+)\s+【(.+?)】/);
-                    if (match) {
-                        const val = parseInt(match[1]);
-                        const label = match[2].trim();
-                        if (label === "幸運") { document.getElementById('in-luk').value = val; updateVal('d-luk', val, '0'); }
-                        else if (!statusMap[label.toLowerCase()] && !statusMap[label]) { allSkills.push({ label, value: val, visible: val > 40 }); }
+        }
+
+        // --- 以下、既存のステータス処理 ---
+        if (d.age) document.getElementById('in-age').value = d.age;
+        if (d.sex) document.getElementById('in-sex').value = d.sex;
+        if (d.job) document.getElementById('in-job').value = d.job;
+        
+        const ps = ["str","con","pow","dex","app","siz","int","edu"];
+        if (d.params) d.params.forEach(p => {
+            const l = p.label.toLowerCase();
+            if(ps.includes(l)) { document.getElementById('in-'+l).value = p.value; setBar(l, p.value); }
+        });
+        const sm = {'hp':'hp','mp':'mp','san':'san','luck':'luk','幸運':'luk'};
+        if (d.status) d.status.forEach(s => {
+            const id = sm[s.label.toLowerCase()] || sm[s.label];
+            if(id) { document.getElementById('in-'+id).value = s.value; updateVal('d-'+id, s.value, '0'); }
+        });
+
+        // スキル処理（以下略）
+        allSkills = [];
+	if (d.commands) {
+                d.commands.split('\n').forEach(line => {
+                    const m = line.match(/CCB?\(?.*?\)?<=?(\d+)\s+【(.+?)】/);
+                    if (m) {
+                        const v = parseInt(m[1]); 
+                        const l = m[2].trim();
+
+                        // 1. 除外したい技能（ぴえん回避）
+                        const ignoreSkills = ["知識", "アイデア", "母国語"];
+                        if (ignoreSkills.includes(l)) return; 
+
+                        if (l === "幸運") { 
+                            document.getElementById('in-luk').value = v; 
+                            updateVal('d-luk', v, '0'); 
+                        }
+                        else if (!sm[l.toLowerCase()] && !sm[l]) {
+                            // 2. 最初からチェックを入れておきたい技能
+                            const prioritySkills = ["回避", "目星", "聞き耳", "図書館"]; 
+                            const isVisible = prioritySkills.includes(l) || v > 40;
+
+                            allSkills.push({ label: l, value: v, visible: isVisible });
+                        }
                     }
-                });
-            }
+                }); // lineごとの処理終了
+            } // d.commandsの処理終了
+            
+            // 重複削除と画面更新
             allSkills = allSkills.filter((v, i, a) => a.findIndex(t => t.label === v.label) === i);
-            buildSkillManager();
-            refreshSkills();
-            if (d.color) { root.style.setProperty('--accent-color', d.color); document.getElementById('color-picker').value = d.color; }
-            refreshScenarioDisplay();
+            buildSkillManager(); 
+            refreshSkills(); 
+            refreshScenarioDisplay(); 
             refreshProfileDisplay();
-        } catch (e) { console.error(e); }
-    }
+
+        } catch (e) { 
+            console.error("データの読み込みに失敗しました:", e); 
+            alert("データの形式が正しくないか、コードにエラーがあります。");
+        }
+}
 
     function buildSkillManager() {
-        const container = document.getElementById('skill-manager-list');
-        container.innerHTML = "";
-        allSkills.forEach((s, index) => {
-            const div = document.createElement('div');
-            div.className = 'skill-manage-item';
-            div.innerHTML = `<input type="checkbox" id="sm-${index}" ${s.visible ? 'checked' : ''} onchange="toggleSkillVisible(${index})"><label for="sm-${index}" style="margin:0; color:white; flex-grow:1; cursor:pointer;">${s.label}(${s.value})</label>`;
-            container.appendChild(div);
+        const c = document.getElementById('skill-manager-list'); c.innerHTML = "";
+        allSkills.forEach((s, i) => {
+            const div = document.createElement('div'); div.className = 'skill-manage-item';
+            div.onclick = (e) => { if(e.target.tagName !== 'INPUT') { const cb = div.querySelector('input'); cb.checked = !cb.checked; allSkills[i].visible = cb.checked; refreshSkills(); } };
+            div.innerHTML = `<input type="checkbox" id="sm-${i}" ${s.visible ? 'checked' : ''} onchange="allSkills[${i}].visible=this.checked;refreshSkills()"><label for="sm-${i}">${s.label}(${s.value})</label>`;
+            c.appendChild(div);
         });
     }
 
-    function toggleSkillVisible(index) { allSkills[index].visible = document.getElementById(`sm-${index}`).checked; refreshSkills(); }
-
     function refreshSkills() {
-        const list = document.getElementById('skills-list');
-        list.innerHTML = "";
+        const list = document.getElementById('skills-list'); list.innerHTML = "";
         const limit = parseInt(document.getElementById('skill-limit').value) || 16;
-        let displayData = allSkills.filter(s => s.visible);
-        if (document.getElementById('skill-sort').value === "desc") displayData.sort((a, b) => b.value - a.value);
-        displayData.slice(0, limit).forEach(s => {
-            const item = document.createElement('div');
-            item.className = 'skill-item';
-            item.innerHTML = `<div class="skill-name-group"><div class="skill-check"></div><span class="skill-name">${s.label}</span></div><span class="skill-val">${s.value}</span>`;
+        let data = allSkills.filter(s => s.visible);
+        if (document.getElementById('skill-sort').value === "desc") data.sort((a, b) => b.value - a.value);
+        data.slice(0, limit).forEach(s => {
+            const item = document.createElement('div'); item.className = 'skill-item';
+            item.innerHTML = `<div style="display:flex;align-items:center;gap:6px;"><div class="skill-check"></div>${s.label}</div><span class="skill-val">${s.value}</span>`;
             list.appendChild(item);
         });
     }
 
-    function setBar(id, val) { 
+    function setBar(id, val) {
         const max = parseInt(getComputedStyle(root).getPropertyValue('--stat-max'));
         const bar = document.getElementById('b-' + id);
         if(bar) bar.style.width = Math.min((val / max) * 100, 100) + '%';
-        const num = document.getElementById('val-' + id);
-        if(num) num.innerText = val;
+        const num = document.getElementById('val-' + id); if(num) num.innerText = val;
     }
 
     function setPos(p, v) { root.style.setProperty(p, p.includes('scale') ? v : v + 'px'); }
-    function loadImg(input, id) { 
-        const f = input.files[0]; 
-        if(f) { const el = document.getElementById(id); el.src = URL.createObjectURL(f); el.style.display = 'block'; }
-    }
 
-    function applyTheme(type) {
-        const isDark = type === 'dark';
-        root.style.setProperty('--bg-rgb', isDark ? '5, 5, 5' : '255, 255, 255');
-        root.style.setProperty('--bg-color', isDark ? '#050505' : '#ffffff');
-        root.style.setProperty('--text-color', isDark ? '#ffffff' : '#111111');
-        root.style.setProperty('--sub-text-color', isDark ? '#888888' : '#666666');
-        root.style.setProperty('--border-color', isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)');
-    }
+    function loadImg(i, id) { const f = i.files[0]; if(f) { const el = document.getElementById(id); el.src = URL.createObjectURL(f); el.style.display = 'block'; } }
 
-    function saveImage() {
-        html2canvas(document.getElementById('display-canvas'), { scale: 2, useCORS: true }).then(c => {
-            const a = document.createElement('a'); a.download = `display.png`; a.href = c.toDataURL(); a.click();
-        });
-    }
+    function saveImage() { html2canvas(document.getElementById('display-canvas'), { scale: 2 }).then(c => { const a = document.createElement('a'); a.download = `investigator.png`; a.href = c.toDataURL(); a.click(); }); }
 
     function setEdition(ed) {
         root.style.setProperty('--stat-max', ed === 7 ? 100 : 25);
         document.getElementById('btn-7th').classList.toggle('active', ed === 7);
         document.getElementById('btn-6th').classList.toggle('active', ed === 6);
         refreshScenarioDisplay();
-        ["str","con","pow","dex","app","siz","int","edu"].forEach(id => {
-            const v = document.getElementById('in-' + id).value;
-            if(v) setBar(id, v);
-        });
+        ["str","con","pow","dex","app","siz","int","edu"].forEach(id => { const v = document.getElementById('in-' + id).value; if(v) setBar(id, v); });
     }
 </script>
 </body>
