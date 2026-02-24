@@ -125,6 +125,14 @@
             #display-canvas { transform: scale(0.45); transform-origin: center center; }
             .preview-area { padding: 0; overflow: hidden; }
         }
+/* アイコンの回転アニメーション */
+.mobile-menu-btn span {
+    transition: transform 0.3s ease;
+}
+
+.sidebar.active ~ #menu-toggle span {
+    transform: rotate(180deg); /* 180度回転 */
+}
     </style>
 </head>
 <body>
