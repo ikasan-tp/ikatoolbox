@@ -61,7 +61,7 @@
         #display-canvas { width: 800px; height: 800px; background: var(--bg-color); color: var(--text-color); display: flex; position: relative; overflow: hidden; flex-shrink: 0; }
         #display-canvas::before { content: "✦"; position: absolute; top: 25%; left: 75%; transform: translate(-50%, -50%); font-size: 850px; color: var(--accent-color); opacity: 0.05; z-index: 0; pointer-events: none; }
 
-        .info-side { flex: 0 0 75%; padding: 45px 50px; display: flex; flex-direction: column; z-index: 10; background: linear-gradient(to right, rgba(var(--bg-rgb), 1) 0%, rgba(var(--bg-rgb), 1) 50%, rgba(var(--bg-rgb), 0.8) 65%, rgba(var(--bg-rgb), 0) 85%); box-sizing: border-box; }
+        .info-side { flex: 0 0 75%; padding: 45px 50px; display: flex; flex-direction: column; z-index: 10; background: linear-gradient(to right, rgba(var(--bg-rgb), 1) 0%, rgba(var(--bg-rgb), 1) 50%, rgba(var(--bg-rgb), 0.8) 65%, rgba(var(--bg-rgb), 0) 85%); box-sizing: border-box; position: relative; }
         .scenario-tag { align-self: flex-start; background: var(--accent-color); color: #fff; font-size: 0.7rem; font-weight: 900; padding: 4px 12px; margin-bottom: 10px; height: 1.2rem; display: flex; align-items: center; }
         .name-area { border-left: 10px solid var(--accent-color); padding-left: 20px; display: flex; flex-direction: column; justify-content: center; width: 100%; min-height: 100px; margin-bottom: 5px; }
         
@@ -94,11 +94,15 @@
         .skill-check { width: 7px; height: 7px; border: 1.5px solid var(--accent-color); flex-shrink: 0; }
         .skill-val { color: var(--accent-color); font-weight: 900; margin-left: auto; }
 
-        .image-side { position: absolute; right: 0; top: 0; width: 100%; height: 100%; z-index: 1; display: flex; justify-content: flex-end; align-items: flex-end; }
-        .accent-bg { position: absolute; top: 0; right: 0; width: 55%; height: 100%; background: var(--accent-color); opacity: 0.35; clip-path: polygon(40% 0%, 100% 0%, 100% 100%, 0% 100%); z-index: 1; }
+        .image-side { position: absolute; right: 0; top: 0; width: 100%; height: 100%; z-index: 1; display: flex; justify-content: flex-end; align-items: flex-end; overflow: hidden; }
+        /* 背景のアクセントを強調（不透明度 0.5 -> 0.7） */
+        .accent-bg { 
+            position: absolute; top: 0; right: 0; width: 100%; height: 100%; 
+            background: radial-gradient(circle at 110% 100%, var(--accent-color) 0%, transparent 70%); 
+            opacity: 0.7; z-index: 1; pointer-events: none; 
+        }
         #main-img { height: 98%; z-index: 2; transform: translate(var(--img-x), var(--img-y)) scale(var(--img-scale)); display: none; pointer-events: none; }
 
-        /* 追加パーツのデザイン */
         .file-input-wrapper { position: relative; margin-bottom: 10px; }
         .file-input-wrapper input[type="file"] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
         .custom-file-btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--ui-input); border: 1px dashed var(--ui-border); color: #aaa; padding: 10px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; transition: 0.2s; cursor: pointer; }
@@ -110,14 +114,12 @@
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; margin-top: -6px; background-color: var(--ui-accent); height: 16px; width: 8px; border-radius: 2px; box-shadow: 0 0 10px rgba(197, 55, 60, 0.4); transition: 0.2s; }
         input[type="range"]:hover::-webkit-slider-thumb { filter: brightness(1.2); transform: scaleX(1.5); }
 
-        /* スマホ用ボタン */
         .mobile-menu-btn {
             position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; border-radius: 50%;
             background: var(--ui-accent); color: white; display: none; align-items: center; justify-content: center;
             border: none; z-index: 3000; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
-        /* レスポンシブ設定：ここだけで完結 */
         @media screen and (max-width: 1024px) {
             .mobile-menu-btn { display: flex; }
             .sidebar { position: fixed; left: 0; top: 0; height: 100vh; transform: translateX(-100%); }
@@ -125,14 +127,6 @@
             #display-canvas { transform: scale(0.45); transform-origin: center center; }
             .preview-area { padding: 0; overflow: hidden; }
         }
-/* アイコンの回転アニメーション */
-.mobile-menu-btn span {
-    transition: transform 0.3s ease;
-}
-
-.sidebar.active ~ #menu-toggle span {
-    transform: rotate(180deg); /* 180度回転 */
-}
     </style>
 </head>
 <body>
@@ -188,7 +182,7 @@
             </div>
             <div class="grid-flex" style="margin-top:10px;">
                 <div><label>SAN</label><input type="number" id="in-san" oninput="updateVal('d-san', this.value, '0')"></div>
-                <div><label>幸運</label><input type="number" id="in-luk" oninput="updateVal('d-luk', this.value, '0')"></div>
+                <div><label>LUK</label><input type="number" id="in-luk" oninput="updateVal('d-luk', this.value, '0')"></div>
                 <div><label>HP</label><input type="number" id="in-hp" oninput="updateVal('d-hp', this.value, '0')"></div>
                 <div><label>MP</label><input type="number" id="in-mp" oninput="updateVal('d-mp', this.value, '0')"></div>
             </div>
@@ -275,7 +269,7 @@
             </div>
             <div class="sub-stats">
                 <div class="sub-badge"><span class="sub-label">SAN</span><span id="d-san" class="sub-val">0</span></div>
-                <div class="sub-badge"><span class="sub-label">幸運</span><span id="d-luk" class="sub-val">0</span></div>
+                <div class="sub-badge"><span class="sub-label">LUK</span><span id="d-luk" class="sub-val">0</span></div>
                 <div class="sub-badge"><span class="sub-label">HP</span><span id="d-hp" class="sub-val">0</span></div>
                 <div class="sub-badge"><span class="sub-label">MP</span><span id="d-mp" class="sub-val">0</span></div>
             </div>
@@ -291,7 +285,6 @@
     const root = document.documentElement;
     let allSkills = [];
 
-    // メニュー開閉
     document.getElementById('menu-toggle').onclick = function() {
         const sidebar = document.querySelector('.sidebar');
         sidebar.classList.toggle('active');
@@ -440,7 +433,36 @@
 
     function setPos(p, v) { root.style.setProperty(p, p.includes('scale') ? v : v + 'px'); }
     function loadImg(i, id) { const f = i.files[0]; if(f) { const el = document.getElementById(id); el.src = URL.createObjectURL(f); el.style.display = 'block'; } }
-    function saveImage() { html2canvas(document.getElementById('display-canvas'), { scale: 2 }).then(c => { const a = document.createElement('a'); a.download = `investigator.png`; a.href = c.toDataURL(); a.click(); }); }
+    
+    function saveImage() { 
+        const canvas = document.getElementById('display-canvas');
+        /* 修正箇所: ファイル名をキャラクター名に変更 */
+        const charName = document.getElementById('in-name').value || 'investigator';
+        
+        html2canvas(canvas, { 
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: getComputedStyle(root).getPropertyValue('--bg-color').trim(),
+            onclone: (clonedDoc) => {
+                const info = clonedDoc.querySelector('.info-side');
+                const img = clonedDoc.querySelector('.image-side');
+                const accent = clonedDoc.querySelector('.accent-bg');
+                if(info) info.style.zIndex = "10";
+                if(img) img.style.zIndex = "1";
+                if(accent) {
+                    accent.style.clipPath = "none";
+                    accent.style.background = `radial-gradient(circle at 110% 100%, ${getComputedStyle(root).getPropertyValue('--accent-color')} 0%, transparent 70%)`;
+                    accent.style.opacity = "0.7";
+                }
+            }
+        }).then(c => { 
+            const a = document.createElement('a'); 
+            a.download = `${charName}.png`; 
+            a.href = c.toDataURL('image/png'); 
+            a.click(); 
+        }); 
+    }
 
     function setEdition(ed) {
         root.style.setProperty('--stat-max', ed === 7 ? 100 : 25);
