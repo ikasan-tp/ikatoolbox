@@ -109,6 +109,50 @@
             color: #444;
             letter-spacing: 0.1em;
         }
+
+/* スマホ表示用の設定（画面幅768px以下の場合） */
+@media screen and (max-width: 768px) {
+    body {
+        overflow-y: auto; /* 縦に並ぶのでスクロールを許可 */
+        padding: 40px 20px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+        margin-bottom: 30px;
+    }
+
+    .menu-container {
+        flex-direction: column; /* 縦に並べる */
+        width: 100%;
+        max-width: 400px; /* 広がりすぎないように制限 */
+    }
+
+    .tool-card {
+        width: 100%;     /* 横幅いっぱい */
+        height: 100px;   /* 高さを抑えて横長に */
+        flex-direction: row; /* 中身を横並びにする */
+        justify-content: flex-start; /* 左寄せ */
+        padding: 0 20px;
+        box-sizing: border-box;
+    }
+
+    .icon {
+        font-size: 2.2rem; /* アイコンを少し小さく */
+        margin-bottom: 0;  /* 下余白を消す */
+        margin-right: 20px; /* 横余白を足す */
+    }
+
+    .title {
+        font-size: 1rem;
+        margin-bottom: 2px;
+        text-align: left; /* 文字を左揃え */
+    }
+
+    .desc {
+        display: none; /* 説明文はスマホでは隠すとスッキリします */
+    }
+}
     </style>
 </head>
 <body>
@@ -121,7 +165,7 @@
                 <span class="material-symbols-outlined" style="font-size: inherit;">image</span>
             </div>
             <div class="title">Display Generator</div>
-            <div class="desc">駒データから<br>ディスプレイ画像を生成</div>
+            <div class="desc">駒データから<br>ディスプレイ画像を自動生成</div>
         </a>
 
         <a href="list.html" class="tool-card">
@@ -129,7 +173,7 @@
                 <span class="material-symbols-outlined" style="font-size: inherit;">format_list_bulleted</span>
             </div>
             <div class="title">Scenario List</div>
-            <div class="desc">通過済みシナリオを記録し<br>画像を生成</div>
+            <div class="desc">通過済みシナリオを記録し<br>一覧画像を生成</div>
         </a>
 
         <a href="converter.html" class="tool-card">
@@ -145,4 +189,3 @@
 
 </body>
 </html>
-
