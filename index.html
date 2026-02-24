@@ -52,13 +52,15 @@
 
         .menu-container {
             display: flex;
-            gap: 30px;
+            gap: 20px; /* カードが増えたので隙間を少し詰めました */
             z-index: 10;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .tool-card {
-            width: 280px;
-            height: 380px;
+            width: 260px; /* 3枚並びを考慮して少し幅を調整 */
+            height: 360px;
             background: var(--card-bg);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 15px;
@@ -90,10 +92,10 @@
 
         .tool-card:hover::before { opacity: 1; }
 
-        .icon { font-size: 4rem; margin-bottom: 20px; }
-        .title { font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; }
+        .icon { font-size: 3.5rem; margin-bottom: 20px; color: var(--accent); }
+        .title { font-size: 1.1rem; font-weight: bold; margin-bottom: 10px; text-align: center; }
         .desc { 
-            font-size: 0.8rem; 
+            font-size: 0.75rem; 
             color: #888; 
             text-align: center; 
             padding: 0 20px; 
@@ -122,11 +124,19 @@
             <div class="desc">駒データから<br>ディスプレイ画像を自動生成</div>
         </a>
 
+        <a href="list.html" class="tool-card">
+            <div class="icon">
+                <span class="material-symbols-outlined" style="font-size: inherit;">format_list_bulleted</span>
+            </div>
+            <div class="title">Scenario List</div>
+            <div class="desc">通過済みシナリオを記録し<br>一覧画像を生成</div>
+        </a>
+
         <a href="converter.html" class="tool-card">
             <div class="icon">
                 <span class="material-symbols-outlined" style="font-size: inherit;">contract_edit</span>
             </div>
-            <div class="title">Log Cleaner</div>
+            <div class="title">Log Tool</div>
             <div class="desc">セッションログの整理や<br>統計の作成</div>
         </a>
     </div>
