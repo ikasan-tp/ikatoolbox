@@ -27,13 +27,16 @@
             overflow: hidden;
         }
 
-        /* 背景の装飾：肋骨アイコン */
+        /* 背景の装飾：下端に固定して配置 */
         body::before {
-            content: "rib_cage";
+            content: "";
             position: absolute;
-            font-family: 'Material Symbols Outlined';
-            font-size: 40vw;
-            color: var(--accent);
+            width: 100vw;
+            height: 100vh;
+            background-image: url('tenta.png');
+            background-repeat: no-repeat;
+            background-size: 80%; 
+            background-position: center bottom -100px; /* 下端からさらに100px下に沈める設定 */
             opacity: 0.03;
             z-index: -1;
             display: flex;
