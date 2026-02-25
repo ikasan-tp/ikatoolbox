@@ -173,7 +173,7 @@
 
         <div class="control-group">
             <h2>1. データ取り込み</h2>
-            <textarea id="json-input" placeholder="駒データを貼り付け" oninput="importData()"></textarea>
+            <textarea id="json-input" placeholder="駒データを貼り付け(変更された技能のみを推奨)" oninput="importData()"></textarea>
             <div class="grid-2">
                 <button id="btn-7th" class="edition-btn active" onclick="setEdition(7)">7版</button>
                 <button id="btn-6th" class="edition-btn" onclick="setEdition(6)">6版</button>
@@ -261,7 +261,7 @@
             </div>
         </div>
 
-        <div class="control-group">
+<div class="control-group">
             <h2>5. カスタマイズ</h2>
             <label>キャンバス背景</label>
             <div class="grid-2" style="margin-bottom:10px;">
@@ -270,18 +270,21 @@
             </div>
             <label>アクセントカラー</label>
             <input type="color" id="color-picker" value="#C5373C" oninput="root.style.setProperty('--accent-color', this.value)" style="height:40px; cursor:pointer; border:none; width:100%; background:none;">
-<div class="secret-mode-controls" style="margin-top: 10px;">
-    <label>秘匿モード</label>
-    <div style="display: flex; gap: 5px;">
-        <button id="btn-secret-off" class="theme-btn active" onclick="setSecretMode(false)">OFF</button>
-        <button id="btn-secret-on" class="theme-btn" onclick="setSecretMode(true)">ON</button>
-    </div>
+            <div class="secret-mode-controls" style="margin-top: 10px;">
+                <label>秘匿モード</label>
+                <div style="display: flex; gap: 5px;">
+                    <button id="btn-secret-off" class="theme-btn active" onclick="setSecretMode(false)">OFF</button>
+                    <button id="btn-secret-on" class="theme-btn" onclick="setSecretMode(true)">ON</button>
+		</div>
+	</div>
 </div>
+        <div class="control-group"> <h2>6. 出力</h2>
             <button class="save-btn" onclick="saveImage()">画像を保存する</button>
-<button onclick="location.reload()" style="width:100%; background:none; border:none; color:#555; font-size:0.7rem; font-weight:bold; cursor:pointer; margin-top:15px; text-decoration:underline;">入力をクリア</button>
-        </div>
-    </div>
-</div>
+            <button onclick="location.reload()" style="width:100%; background:none; border:none; color:#555; font-size:0.7rem; font-weight:bold; cursor:pointer; margin-top:15px; text-decoration:underline;">入力をクリア</button>
+	</div>
+	</div>
+	</div>
+	</div>
 
 <div class="preview-area">
     <div id="display-canvas">
