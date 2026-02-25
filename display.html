@@ -270,6 +270,13 @@
             </div>
             <label>アクセントカラー</label>
             <input type="color" id="color-picker" value="#C5373C" oninput="root.style.setProperty('--accent-color', this.value)" style="height:40px; cursor:pointer; border:none; width:100%; background:none;">
+<div class="secret-mode-controls" style="margin-top: 10px;">
+    <label>秘匿モード</label>
+    <div style="display: flex; gap: 5px;">
+        <button id="btn-secret-off" class="theme-btn active" onclick="setSecretMode(false)">OFF</button>
+        <button id="btn-secret-on" class="theme-btn" onclick="setSecretMode(true)">ON</button>
+    </div>
+</div>
             <button class="save-btn" onclick="saveImage()">画像を保存する</button>
 <button onclick="location.reload()" style="width:100%; background:none; border:none; color:#555; font-size:0.7rem; font-weight:bold; cursor:pointer; margin-top:15px; text-decoration:underline;">入力をクリア</button>
         </div>
@@ -458,11 +465,18 @@
         });
     }
 
-    function setBar(id, val) {
+	function setBar(id, val) {
         const max = parseInt(getComputedStyle(root).getPropertyValue('--stat-max'));
         const bar = document.getElementById('b-' + id);
         if(bar) bar.style.width = Math.min((val / max) * 100, 100) + '%';
-        const num = document.getElementById('val-' + id); if(num) num.innerText = val;
+        
+        const bOn = document.getElementById('btn-secret-on');
+        const isSecret = bOn && bOn.classList.contains('active');
+        
+        if(!isSecret) {
+            const num = document.getElementById('val-' + id); 
+            if(num) num.innerText = val;
+        }
     }
 
     function setPos(p, v) { root.style.setProperty(p, p.includes('scale') ? v : v + 'px'); }
@@ -470,7 +484,6 @@
     
     function saveImage() { 
         const canvas = document.getElementById('display-canvas');
-        /* 修正箇所: ファイル名をキャラクター名に変更 */
         const charName = document.getElementById('in-name').value || 'investigator';
         
         html2canvas(canvas, { 
@@ -505,6 +518,49 @@
         refreshScenarioDisplay();
         ["str","con","pow","dex","app","siz","int","edu"].forEach(id => { const v = document.getElementById('in-' + id).value; if(v) setBar(id, v); });
     }
+window.setSecretMode = function(isOn) {
+    const bOn = document.getElementById('btn-secret-on');
+    const bOff = document.getElementById('btn-secret-off');
+    if (bOn) bOn.classList.toggle('active', isOn);
+    if (bOff) bOff.classList.toggle('active', !isOn);
+
+const statIds = ["str","con","pow","dex","app","siz","int","edu","san","luk","hp","mp"];
+    statIds.forEach(id => {
+        const input = document.getElementById('in-' + id);
+        const displayId = (id==='san'||id==='luk'||id==='hp'||id==='mp') ? 'd-'+id : 'val-'+id;
+        const el = document.getElementById(displayId);
+        
+        if (el && input) {
+            el.innerText = isOn ? "??" : (input.value || "0");
+            
+            if (typeof setBar === 'function') {
+                setBar(id, isOn ? 0 : (input.value || 0));
+            }
+        }
+    });
+    const skillsList = document.getElementById('skills-list');
+    if (skillsList) {
+        if (isOn) {
+            if (!skillsList.dataset.saved) skillsList.dataset.saved = skillsList.innerHTML;
+skillsList.innerHTML = `<div style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; height: 100px; margin-top: 40px; color: var(--accent-color); font-size: 1.2rem; font-weight: 900; letter-spacing: 5px; opacity: 0.6;">[ RESTRICTED ]</div>`;
+        } else {
+            if (typeof refreshSkills === 'function') {
+                refreshSkills();
+            } else if (skillsList.dataset.saved) {
+                skillsList.innerHTML = skillsList.dataset.saved;
+            }
+        }
+    }
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+    const statIds = ["str","con","pow","dex","app","siz","int","edu","san","luk","hp","mp"];
+    statIds.forEach(id => {
+        if (typeof setBar === 'function') {
+            setBar(id, 0);
+        }
+    });
+});
 </script>
 </body>
 </html>
