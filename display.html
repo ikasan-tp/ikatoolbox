@@ -122,13 +122,34 @@
 
         @media screen and (max-width: 1024px) {
             .mobile-menu-btn { display: flex; }
-.sidebar { 
-                position: fixed; left: 0; top: 0; height: 100vh; 
-                width: 100%; box-sizing: border-box; 
+@media screen and (max-width: 1024px) {
+            .mobile-menu-btn { display: flex; }
+            
+            .sidebar { 
+                position: fixed; 
+                left: 0; 
+                top: 0; 
+                height: 100vh; 
+                width: 100%; 
+                box-sizing: border-box; 
                 transform: translateX(-100%); 
-            }            .sidebar.active { transform: translateX(0); box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
-            #display-canvas { transform: scale(0.45); transform-origin: center center; }
-            .preview-area { padding: 0; overflow: hidden; }
+                transition: transform 0.3s ease-out;
+                z-index: 2000;
+                padding-bottom: env(safe-area-inset-bottom, 30px);
+            }
+
+            .sidebar.active { 
+                transform: translateX(0); 
+                box-shadow: 10px 0 30px rgba(0,0,0,0.5); 
+            }
+            #display-canvas { 
+                transform: scale(0.45); 
+                transform-origin: center center; 
+            }
+            .preview-area { 
+                padding: 0; 
+                overflow: hidden; 
+            }
         }
 .mobile-menu-btn span { 
     transition: transform 0.3s ease; 
