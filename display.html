@@ -95,7 +95,6 @@
         .skill-val { color: var(--accent-color); font-weight: 900; margin-left: auto; }
 
         .image-side { position: absolute; right: 0; top: 0; width: 100%; height: 100%; z-index: 1; display: flex; justify-content: flex-end; align-items: flex-end; overflow: hidden; }
-        /* 背景のアクセントを強調（不透明度 0.5 -> 0.7） */
         .accent-bg { 
             position: absolute; top: 0; right: 0; width: 100%; height: 100%; 
             background: radial-gradient(circle at 110% 100%, var(--accent-color) 0%, transparent 70%); 
@@ -122,7 +121,7 @@
 
         @media screen and (max-width: 1024px) {
             .mobile-menu-btn { display: flex; }
-@media screen and (max-width: 1024px) {
+	@media screen and (max-width: 1024px) {
             .mobile-menu-btn { display: flex; }
             
             .sidebar { 
@@ -186,7 +185,10 @@
                 <div><label>名前</label><input type="text" id="in-name" oninput="updateNameDisp()"></div>
                 <div><label>フリガナ</label><input type="text" id="in-ruby" oninput="updateRubyDisp()"></div>
             </div>
-            <div><label>シナリオ</label><input type="text" id="in-scenario" oninput="refreshScenarioDisplay()"></div>
+		<div class="grid-2" style="margin-top:5px;">
+                <div><label>シナリオ名</label><input type="text" id="in-scenario" oninput="refreshScenarioDisplay()"></div>
+                <div><label>HO名(PC/KPC)</label><input type="text" id="in-ho" oninput="refreshScenarioDisplay()"></div>
+            </div>
             <div class="grid-3">
                 <div><label>年齢</label><input type="text" id="in-age" oninput="refreshProfileDisplay()"></div>
                 <div><label>性別</label><input type="text" id="in-sex" oninput="refreshProfileDisplay()"></div>
@@ -236,7 +238,7 @@
             </div>
             <div class="grid-3">
                 <div><label>左右</label><input type="range" min="-600" max="600" value="0" oninput="setPos('--img-x', this.value)"></div>
-                <div><label>上下</label><input type="range" min="-600" max="600" value="0" oninput="setPos('--img-y', this.value)"></div>
+		<div><label>上下</label><input type="range" min="-1500" max="1500" step="0.5" value="0" oninput="setPos('--img-y', this.value)"></div>
                 <div><label>拡大</label><input type="range" min="0.1" max="4" step="0.01" value="1" oninput="setPos('--img-scale', this.value)"></div>
             </div>
             <label style="margin-top:10px;">差分スロット (1~3)</label>
@@ -289,8 +291,11 @@
 <div class="preview-area">
     <div id="display-canvas">
         <div class="info-side">
-            <div id="d-scenario" class="scenario-tag">CoC 7th: SCENARIO</div>
-            <div class="name-area">
+<div class="scenario-container" style="display: flex; gap: 6px; align-items: center;">
+    <div id="d-scenario" class="scenario-tag" style="display: flex; align-items: center; justify-content: center; height: 1.6em; padding: 0 10px; line-height: 1; font-size: 0.9em; font-weight: 800; letter-spacing: -0.02em;">❚ CoC 7th : SCENARIO</div>
+    
+    <div id="d-ho" class="scenario-tag" style="display: none; align-items: center; justify-content: center; height: 1.6em; min-width: 3em; padding: 0 6px; line-height: 1; font-size: 0.75em; font-weight: 900; letter-spacing: 0.05em; text-shadow: 0.5px 0 0 currentColor;">HO</div>
+</div>     <div class="name-area">
                 <ruby><span id="d-name-main">NAME</span><rt id="d-name-ruby">INVESTIGATOR</rt></ruby>
                 <div id="d-profile-line" class="profile-sub">- / - / -</div>
             </div>
@@ -324,6 +329,8 @@
 
 <button id="menu-toggle" class="mobile-menu-btn"><span class="material-symbols-outlined">settings</span></button>
 
+<div style="position: absolute; bottom: 10px; right: 15px; font-family: sans-serif; font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; font-weight: bold; pointer-events: none;">✦ IKATOOLBOX</div>
+
 <script>
     const root = document.documentElement;
     let allSkills = [];
@@ -336,15 +343,17 @@
             sidebar.classList.contains('active') ? 'close' : 'settings';
     };
 
-    function setCanvasTheme(theme) {
+function setCanvasTheme(theme) {
         const isDark = theme === 'dark';
         root.style.setProperty('--bg-rgb', isDark ? '5, 5, 5' : '255, 255, 255');
         root.style.setProperty('--bg-color', isDark ? '#050505' : '#ffffff');
         root.style.setProperty('--text-color', isDark ? '#ffffff' : '#111111');
         root.style.setProperty('--sub-text-color', isDark ? '#888888' : '#666666');
         root.style.setProperty('--border-color', isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)');
+        
         document.getElementById('btn-dark').classList.toggle('active', isDark);
         document.getElementById('btn-light').classList.toggle('active', !isDark);
+        refreshScenarioDisplay();
     }
 
     function updateNameDisp() {
@@ -382,9 +391,28 @@
         while (el.offsetWidth > 380 && size > 1.0) { size -= 0.1; el.style.fontSize = size + "rem"; }
     }
 
-    function refreshScenarioDisplay() {
+function refreshScenarioDisplay() {
         const ed = document.getElementById('btn-7th').classList.contains('active') ? 7 : 6;
-        document.getElementById('d-scenario').innerText = `CoC ${ed}th: ${document.getElementById('in-scenario').value || 'SCENARIO'}`;
+        const scn = document.getElementById('in-scenario').value || 'SCENARIO';
+        const ho = document.getElementById('in-ho').value;
+        
+        const displayElem = document.getElementById('d-scenario');
+        const hoElem = document.getElementById('d-ho');
+        
+        displayElem.innerText = `❚ CoC ${ed}th : ${scn}`;
+
+        if (ho) {
+            hoElem.innerText = ho;
+            hoElem.style.display = 'flex';
+        } else {
+            hoElem.style.display = 'none';
+        }
+
+        const isDark = document.getElementById('btn-dark').classList.contains('active');
+        const textColor = isDark ? '#000000' : '#ffffff';
+
+        displayElem.style.setProperty('color', textColor, 'important');
+        hoElem.style.setProperty('color', textColor, 'important');
     }
 
     function updateVal(id, v, d) { document.getElementById(id).innerText = v || d; }
@@ -564,6 +592,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+refreshScenarioDisplay()
 </script>
 </body>
 </html>
