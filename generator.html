@@ -37,7 +37,6 @@
         .sidebar-scroll { flex: 1; overflow-y: auto; padding: 25px 20px; }
         .sidebar-footer { padding: 20px; border-top: 1px solid var(--ui-border); background: var(--card-bg); }
 
-        /* 他のツールと統一した戻るボタン */
         .back-link { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #888; font-size: 0.7rem; font-weight: 700; transition: 0.3s; margin-bottom: 20px; }
         .back-link:hover { color: #C5373C; transform: translateX(-3px); }
 
@@ -82,21 +81,24 @@
         .search-btns button:hover { background: #444; }
 
         .main-content { flex: 1; background: #0a0a0a; overflow-y: auto; padding: 40px 0; scroll-behavior: smooth; }
-.log-row { position: relative; width: 85%; max-width: 800px; margin: 0 auto; padding: 15px 20px 15px 60px; border-bottom: 1px solid #222; transition: 0.1s; border-left: 4px solid transparent; box-sizing: border-box; }        .log-row:hover { background: rgba(255,255,255,0.02); }
-        .log-row.selected { background: var(--selection-bg); border-left: 4px solid var(--accent); }
+        .log-row { position: relative; width: 100%; max-width: 900px; margin: 0 auto; padding: 20px 15px; border-bottom: 1px solid #222; transition: 0.1s; border-left: 4px solid transparent; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px; }
         .log-row.search-hit { outline: 2px solid rgba(255, 235, 59, 0.3); background: rgba(255, 235, 59, 0.05); }
-        
         .log-row.preview-info, .log-row.preview-secret, .log-row.preview-chat { background: #151515; }
         .log-row.preview-chat .row-content { color: #555; }
         .log-row.preview-chat .row-name { opacity: 0.5; }
         .log-row.preview-info { border-left: 4px solid #444; }
 
-        .col-select { position: absolute; left: 10px; top: 15px; display: flex; flex-direction: column; gap: 4px; align-items: center; }
-        .select-label { font-size: 0.5rem; font-weight: 900; color: #444; text-transform: uppercase; margin-bottom: 2px; }
-        .row-checkbox { width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent); margin-bottom: 10px; }
+        .col-select { display: flex; align-items: center; gap: 12px; padding-top: 10px; border-top: 1px dashed #333; }
+        .row-checkbox { display: none; }
+        .select-label { font-size: 0.65rem; font-weight: 900; color: #666; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; padding: 4px 10px; border: 1px solid #444; border-radius: 4px; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+        .select-label::before { content: ''; display: inline-block; width: 8px; height: 8px; border: 1px solid #666; border-radius: 2px; }
+        .row-checkbox:checked + .select-label { background: var(--accent); border-color: var(--accent); color: #fff; }
+        .row-checkbox:checked + .select-label::before { background: #fff; border-color: #fff; }
+
+        .action-group { margin-left: auto; display: flex; gap: 8px; }
         .move-btn { background: none; border: none; color: #555; cursor: pointer; padding: 4px; transition: 0.2s; border-radius: 4px; }
         .move-btn:hover { color: var(--accent); background: rgba(255,255,255,0.05); }
-        .del-btn { background: none; border: none; color: #444; cursor: pointer; padding: 4px; transition: 0.2s; border-radius: 4px; margin-top: 4px; }
+        .del-btn { background: none; border: none; color: #444; cursor: pointer; padding: 4px; transition: 0.2s; border-radius: 4px; }
         .del-btn:hover { color: #ff8a8a; background: rgba(255,255,255,0.05); }
 
         .row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 10px; }
@@ -134,10 +136,12 @@
             .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); height: 100%; width: 85%; max-width: 380px; }
             .sidebar.active { transform: translateX(0); box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
             .mobile-menu-btn { display: flex; }
-            .log-row { width: calc(100% - 20px); padding: 15px 15px 15px 55px; margin: 0 10px; }
+            .log-row { width: calc(100% - 20px); padding: 15px 15px 15px 55px; margin: 0 10px; min-height: 160px; }
             .col-select { left: 8px; }
             .guide-grid { grid-template-columns: 1fr; }
             input, textarea, some_select { font-size: 16px !important; }
+            .log-row { min-height: 130px; } 
+             .del-btn { padding: 8px; margin-top: 8px; }
         }
     </style>
 </head>
@@ -442,7 +446,7 @@
         });
     }
 
-    function renderEditor(fullInit = false) {
+function renderEditor(fullInit = false) {
         const container = document.getElementById('logEditor');
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         searchMatches = [];
@@ -450,33 +454,35 @@
             container.innerHTML = '';
             const fragment = document.createDocumentFragment();
             logData.forEach((item, index) => {
-                const char = charSettings[item.charKey];
+                const char = charSettings[item.charKey] || { displayName: "Unknown", color: "#888" };
                 const row = document.createElement('div');
                 row.className = `log-row`;
                 row.id = `row-${index}`;
                 row.innerHTML = `
-                    <div class="col-select">
-                        <span class="select-label">Select</span>
-                        <input type="checkbox" class="row-checkbox" onchange="toggleSelect(${index})">
-                        <button class="move-btn" onclick="moveRow(${index}, -1)" title="上に移動"><span class="material-symbols-outlined">keyboard_arrow_up</span></button>
-                        <button class="move-btn" onclick="moveRow(${index}, 1)" title="下に移動"><span class="material-symbols-outlined">keyboard_arrow_down</span></button>
-                        <button class="del-btn" onclick="deleteRow(${index})" title="削除"><span class="material-symbols-outlined">delete</span></button>
-                    </div>
                     <div class="row-header">
                         <span class="row-name" data-charkey="${item.charKey}" style="color:${char.color}">${char.displayName} <small style="color:#444; font-size:0.6rem;">[${item.tab}]</small></span>
                         <div class="anchor-area">
                             <label class="anchor-check-label">
-                                <input type="checkbox" class="anchor-check" onchange="toggleAnchor(${index}, this.checked)">目次
-                                <input type="text" class="anchor-input" placeholder="目次名を入力" oninput="logData[${index}].anchor=this.value">
+                                <input type="checkbox" class="anchor-check" ${item.anchor ? 'checked' : ''} onchange="toggleAnchor(${index}, this.checked)">目次
+                                <input type="text" class="anchor-input" value="${item.anchor || ''}" placeholder="目次名を入力" oninput="logData[${index}].anchor=this.value" style="${item.anchor ? 'display:block' : ''}">
                             </label>
                         </div>
                     </div>
                     <textarea class="row-content" oninput="logData[${index}].content = this.value; this.style.height='auto'; this.style.height=this.scrollHeight+'px'">${item.content}</textarea>
+                    <div class="col-select">
+                        <input type="checkbox" id="check-${index}" class="row-checkbox" onchange="toggleSelect(${index})" ${selectedIndices.includes(index) ? 'checked' : ''}>
+                        <label for="check-${index}" class="select-label">Select</label>
+                        <div class="action-group">
+                            <button class="move-btn" onclick="moveRow(${index}, -1)" title="上に移動"><span class="material-symbols-outlined">keyboard_arrow_up</span></button>
+                            <button class="move-btn" onclick="moveRow(${index}, 1)" title="下に移動"><span class="material-symbols-outlined">keyboard_arrow_down</span></button>
+                            <button class="del-btn" onclick="deleteRow(${index})" title="削除"><span class="material-symbols-outlined">delete</span></button>
+                        </div>
+                    </div>
                 `;
                 fragment.appendChild(row);
             });
-	container.appendChild(fragment);
-        container.querySelectorAll('textarea').forEach(ta => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; });
+            container.appendChild(fragment);
+            container.querySelectorAll('textarea').forEach(ta => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; });
             updatePreviewStyles();
         }
         logData.forEach((item, index) => {
@@ -487,7 +493,8 @@
             if (isHit) searchMatches.push(index);
             row.classList.toggle('selected', isSelected);
             row.classList.toggle('search-hit', isHit);
-            row.querySelector('.row-checkbox').checked = isSelected;
+            const cb = row.querySelector('.row-checkbox');
+            if(cb) cb.checked = isSelected;
         });
     }
 
@@ -496,13 +503,10 @@
         const pos = selectedIndices.indexOf(index);
         
         if (pos > -1) {
-            // チェックを外す場合
             selectedIndices.splice(pos, 1);
             lastSelectedIndex = -1;
         } else {
-            // チェックを入れる場合
             if (lastSelectedIndex !== -1 && lastSelectedIndex < index) {
-                // 前回選択位置から今回選択位置まで、同一タブをすべて追加
                 for (let i = lastSelectedIndex; i <= index; i++) {
                     if (logData[i].tab === targetTab) {
                         if (!selectedIndices.includes(i)) {
@@ -669,7 +673,24 @@ function exportLog() {
             }
         });
 
-        let html = `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${h1Title}</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet"><style>:root { --outer-bg: #0f0f0f; --inner-bg: #050505; --block-bg: #111111; --text: #dbdee1; --accent: #C5373C; --sub-line: #444; --border: #222; --tab-text: #666; --chat-text: #8a8a8a; --container-width: 680px; } body { background: var(--outer-bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; margin: 0; padding: 0; line-height: 1.7; display: flex; flex-direction: column; align-items: center; } header { position: sticky; top: 0; width: 100%; background: rgba(5, 5, 5, 0.9); backdrop-filter: blur(12px); z-index: 1000; padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: center; } .header-inner { width: 90%; max-width: var(--container-width); display: flex; justify-content: space-between; align-items: center; } .header-title { font-family: 'Montserrat'; font-weight: 900; font-size: 0.85rem; color: #fff; letter-spacing: 0.2em; text-transform: uppercase; } #nav-drawer { position: relative; } .nav-uncheck { display: none; } .nav-open { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: var(--accent); border-radius: 4px; position: relative; } .nav-open span, .nav-open span:before, .nav-open span:after { content: ''; display: block; height: 2px; width: 16px; background: #fff; position: absolute; transition: 0.3s; } .nav-open span:before { top: -6px; } .nav-open span:after { bottom: -6px; } .nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); opacity: 0; visibility: hidden; transition: 0.3s; z-index: 1500; } .nav-uncheck:checked ~ .nav-overlay { opacity: 1; visibility: visible; } .nav-content { position: fixed; top: 0; right: -300px; width: 280px; height: 100vh; background: #0a0a0a; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 2000; border-left: 1px solid #222; overflow-y: auto; } .nav-uncheck:checked ~ .nav-content { right: 0; } .nav-section { padding: 30px 20px 10px; border-bottom: 1px solid #222; } .nav-label { font-family: 'Montserrat'; font-weight: 900; font-size: 0.6rem; color: var(--accent); margin-bottom: 15px; display: block; } .filter-btn { display: inline-block; padding: 6px 12px; margin: 4px; font-size: 0.7rem; font-weight: bold; background: #1a1a1a; border: 1px solid #333; border-radius: 20px; color: #888; cursor: pointer; transition: 0.2s; } .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); } .index-link { display: block; color: #ccc; text-decoration: none; padding: 15px 20px; font-size: 0.8rem; border-bottom: 1px solid #1a1a1a; } .container { width: 100%; max-width: var(--container-width); background: var(--inner-bg); min-height: 100vh; padding: 0 0 100px; box-shadow: 0 0 50px rgba(0,0,0,0.5); } .hidden { display: none !important; } .log-row { padding: 12px 25px; border-bottom: 1px dashed #1a1a1a; } .row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; } .style-info .row-header { padding-bottom: 6px; border-bottom: 1px solid #333; margin-bottom: 10px; } .row-name { font-weight: 900; font-size: 0.85rem; color: #fff; display: flex; align-items: center; gap: 8px; } .row-name::before { display: none; } .name-line { width: 3px; height: 1em; background: var(--sub-line); } .row-tab { font-family: 'Montserrat'; font-weight: 700; font-size: 0.55rem; color: var(--tab-text); text-transform: uppercase; } .row-content { font-size: 0.95rem; color: #ccc; white-space: pre-wrap; line-height: 1.7; } .hero-title-area { padding: 40px 25px 25px; text-align: left; border-bottom: 1px solid #111; } .hero-brand { font-family: 'Montserrat'; font-size: 0.6rem; font-weight: 900; color: var(--accent); letter-spacing: 0.5em; display: block; margin-bottom: 8px; } .hero-title { font-family: 'Montserrat', 'Noto Sans JP'; font-size: 1.5rem; font-weight: 900; color: #fff; line-height: 1.3; border-left: 3px solid var(--accent); padding-left: 15px; } .style-chat { margin-left: 10%; border-left: 1px solid #222; padding: 10px 15px; opacity: 0.8; } .style-chat .row-content { color: var(--chat-text); font-size: 0.85rem; } .row-system { padding: 2.2em 25px !important; opacity: 0.8; } .row-system .row-header { display: none; } .row-system .row-content { font-style: italic; color: #aaa; text-align: left; margin: 0; } ${customTabStyles} footer { text-align: center; padding: 80px; font-family: 'Montserrat'; font-size: 0.6rem; opacity: 0.2; } [id^="log-"] { scroll-margin-top: 80px; }</style></head><body><header><div class="header-inner"><div class="header-title">${headerTitle}</div><nav id="nav-drawer"><input id="nav-input" type="checkbox" class="nav-uncheck"><label for="nav-input" class="nav-overlay"></label><label for="nav-input" class="nav-open"><span></span></label><div class="nav-content"><div class="nav-section"><span class="nav-label">FILTER</span><div id="filter-container"><button class="filter-btn active" onclick="toggleTab('style-default', this)">MAIN</button><button class="filter-btn active" onclick="toggleTab('style-info', this)">INFO</button><button class="filter-btn active" onclick="toggleTab('style-secret', this)">SECRET</button><button class="filter-btn active" onclick="toggleTab('style-chat', this)">CHAT</button></div></div><div class="nav-section" style="border:none;"><span class="nav-label">INDEX</span><div id="index-list">`;
+        let html = `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${h1Title}</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet"><style>:root { --outer-bg: #0f0f0f; --inner-bg: #050505; --block-bg: #111111; --text: #dbdee1; --accent: #C5373C; --sub-line: #444; --border: #222; --tab-text: #666; --chat-text: #8a8a8a; --container-width: 680px; } body { background: var(--outer-bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; margin: 0; padding: 0; line-height: 1.7; display: flex; flex-direction: column; align-items: center; } header { position: sticky; top: 0; width: 100%; background: rgba(5, 5, 5, 0.9); backdrop-filter: blur(12px); z-index: 1000; padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: center; } .header-inner { width: 90%; max-width: var(--container-width); display: flex; justify-content: space-between; align-items: center; } .header-title { font-family: 'Montserrat'; font-weight: 900; font-size: 0.85rem; color: #fff; letter-spacing: 0.2em; text-transform: uppercase; } #nav-drawer { position: relative; } .nav-uncheck { display: none; } .nav-open { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: var(--accent); border-radius: 4px; position: relative; } .nav-open span, .nav-open span:before, .nav-open span:after { content: ''; display: block; height: 2px; width: 16px; background: #fff; position: absolute; transition: 0.3s; } .nav-open span:before { top: -6px; } .nav-open span:after { bottom: -6px; } .nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); opacity: 0; visibility: hidden; transition: 0.3s; z-index: 1500; } .nav-uncheck:checked ~ .nav-overlay { opacity: 1; visibility: visible; } .nav-content { position: fixed; top: 0; right: -300px; width: 280px; height: 100vh; background: #0a0a0a; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 2000; border-left: 1px solid #222; overflow-y: auto; } .nav-uncheck:checked ~ .nav-content { right: 0; } .nav-section { padding: 30px 20px 10px; border-bottom: 1px solid #222; } .nav-label { font-family: 'Montserrat'; font-weight: 900; font-size: 0.6rem; color: var(--accent); margin-bottom: 15px; display: block; } .filter-btn { display: inline-block; padding: 6px 12px; margin: 4px; font-size: 0.7rem; font-weight: bold; background: #1a1a1a; border: 1px solid #333; border-radius: 20px; color: #888; cursor: pointer; transition: 0.2s; } .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); } .index-link { display: block; color: #ccc; text-decoration: none; padding: 15px 20px; font-size: 0.8rem; border-bottom: 1px solid #1a1a1a; } .container { width: 100%; max-width: var(--container-width); background: var(--inner-bg); min-height: 100vh; padding: 0 0 100px; box-shadow: 0 0 50px rgba(0,0,0,0.5); } .hidden { display: none !important; }
+        .log-row { padding: 12px 25px; border-bottom: 1px dashed #1a1a1a; }
+        .row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .style-info 
+        .row-header { padding-bottom: 6px; border-bottom: 1px solid #333; margin-bottom: 10px; } 
+        .row-name { font-weight: 900; font-size: 0.85rem; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .row-name::before { display: none; } .name-line { width: 3px; height: 1em; background: var(--sub-line); } 
+        .row-tab { font-family: 'Montserrat'; font-weight: 700; font-size: 0.55rem; color: var(--tab-text); text-transform: uppercase; } 
+        .row-content { font-size: 0.95rem; color: #ccc; white-space: pre-wrap; line-height: 1.7; } 
+        .hero-title-area { padding: 40px 25px 25px; text-align: left; border-bottom: 1px solid #111; }
+        .hero-brand { font-family: 'Montserrat'; font-size: 0.6rem; font-weight: 900; color: var(--accent); letter-spacing: 0.5em; display: block; margin-bottom: 8px; } 
+        .hero-title { font-family: 'Montserrat', 'Noto Sans JP'; font-size: 1.5rem; font-weight: 900; color: #fff; line-height: 1.3; border-left: 3px solid var(--accent); padding-left: 15px; }
+        .style-chat { margin-left: 10%; border-left: 1px solid #222; padding: 10px 15px; opacity: 0.8; } 
+        .style-chat .row-content { color: var(--chat-text); font-size: 0.85rem; } 
+        .row-system { padding: 2.2em 25px !important; opacity: 0.8; } 
+        .row-system .row-header { display: none; } 
+        .row-system 
+        .row-content { font-style: italic; color: #aaa; text-align: left; margin: 0; } ${customTabStyles} footer { text-align: center; padding: 80px; font-family: 'Montserrat'; font-size: 0.6rem; opacity: 0.2; } [id^="log-"] { scroll-margin-top: 80px; }</style></head><body><header><div class="header-inner"><div class="header-title">${headerTitle}</div><nav id="nav-drawer"><input id="nav-input" type="checkbox" class="nav-uncheck"><label for="nav-input" class="nav-overlay"></label><label for="nav-input" class="nav-open"><span></span></label><div class="nav-content"><div class="nav-section"><span class="nav-label">FILTER</span><div id="filter-container"><button class="filter-btn active" onclick="toggleTab('style-default', this)">MAIN</button><button class="filter-btn active" onclick="toggleTab('style-info', this)">INFO</button><button class="filter-btn active" onclick="toggleTab('style-secret', this)">SECRET</button><button class="filter-btn active" onclick="toggleTab('style-chat', this)">CHAT</button></div></div><div class="nav-section" style="border:none;"><span class="nav-label">INDEX</span><div id="index-list">`;
         logData.forEach((item, i) => { if (item.anchor) html += `<a href="#log-${i}" class="index-link" onclick="closeMenu()">${item.anchor}</a>`; });
         html += `</div></div></div></nav></div></header><div class="container"><div class="hero-title-area"><span class="hero-brand">SESSION LOG</span><div class="hero-title">${h1Title}</div></div>`;
         logData.forEach((item, i) => {
@@ -705,4 +726,3 @@ function exportLog() {
 <div style="position: fixed; bottom: 10px; right: 15px; font-family: sans-serif; font-size: 10px; color: rgba(255,255,255,0.1); letter-spacing: 0.1em; font-weight: bold; pointer-events: none; z-index: 9999;">✦ IKATOOLBOX</div>
 </body>
 </html>
-
