@@ -7,13 +7,30 @@
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦑</text></svg>">
     
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Montserrat:wght@900&family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Montserrat:wght@900&family=Noto+Sans+JP:wght@700&display=block" rel="stylesheet">
     <style>
         :root {
             --accent: #C5373C;
             --bg: #0a0a0a;
             --card-bg: #151515;
         }
+
+        .material-symbols-outlined {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            overflow: hidden;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+            -moz-osx-font-smoothing: grayscale;
+            font-feature-settings: 'liga';
+            vertical-align: middle;
+        }
+
         body {
             margin: 0;
             background-color: var(--bg);
@@ -27,7 +44,6 @@
             overflow: hidden;
         }
 
-        /* 背景の装飾：下端に固定して配置 */
         body::before {
             content: "";
             position: absolute;
@@ -36,7 +52,7 @@
             background-image: url('tenta.png');
             background-repeat: no-repeat;
             background-size: 80%; 
-            background-position: center bottom -100px; /* 下端からさらに100px下に沈める設定 */
+            background-position: center bottom -100px;
             opacity: 0.03;
             z-index: -1;
             display: flex;
@@ -55,14 +71,14 @@
 
         .menu-container {
             display: flex;
-            gap: 20px; /* カードが増えたので隙間を少し詰めました */
+            gap: 20px;
             z-index: 10;
             flex-wrap: wrap;
             justify-content: center;
         }
 
         .tool-card {
-            width: 260px; /* 3枚並びを考慮して少し幅を調整 */
+            width: 260px;
             height: 360px;
             background: var(--card-bg);
             border: 1px solid rgba(255,255,255,0.1);
@@ -113,12 +129,11 @@
             letter-spacing: 0.1em;
         }
 
-/* スマホ表示用の設定（画面幅768px以下の場合） */
 @media screen and (max-width: 768px) {
     body {
-        overflow-y: auto; /* 縦に並ぶのでスクロールを許可 */
-        justify-content: flex-start; /* 修正：中央寄せから上寄せに変更 */
-        padding: 60px 20px 80px 20px; /* 修正：上下にしっかり余白を確保 */
+        overflow-y: auto;
+        justify-content: flex-start;
+        padding: 60px 20px 80px 20px;
         min-height: 100vh;
         box-sizing: border-box;
     }
@@ -129,45 +144,45 @@
     }
 
     .menu-container {
-        flex-direction: column; /* 縦に並べる */
+        flex-direction: column;
         width: 100%;
-        max-width: 400px; /* 広がりすぎないように制限 */
+        max-width: 400px;
     }
 
     .tool-card {
-        width: 100%;     /* 横幅いっぱい */
-        height: 100px;   /* 高さを抑えて横長に */
-        flex-direction: row; /* 中身を横並びにする */
-        justify-content: flex-start; /* 左寄せ */
+        width: 100%;
+        height: 100px;
+        flex-direction: row;
+        justify-content: flex-start;
         padding: 0 20px;
         box-sizing: border-box;
     }
 
     .icon {
-        font-size: 2.2rem; /* アイコンを少し小さく */
-        margin-bottom: 0;  /* 下余白を消す */
-        margin-right: 20px; /* 横余白を足す */
+        font-size: 2.2rem;
+        margin-bottom: 0;
+        margin-right: 20px;
     }
 
     .title {
         font-size: 1rem;
         margin-bottom: 2px;
-        text-align: left; /* 文字を左揃え */
+        text-align: left;
     }
 
     .desc {
-        display: block; /* 非表示を解除 */
+        display: block;
         text-align: left;
         padding: 0;
         font-size: 0.65rem;
         line-height: 1.3;
-        br { display: none; } /* スマホの横長レイアウトでは改行を無視して一行に近づける */
+        br { display: none; }
     }
 
     .footer {
-        position: relative; /* 修正：絶対配置から相対配置へ */
+        position: relative;
         bottom: auto;
-        margin-top: 40px; /* カードとの間に余白を追加 */
+        margin-top: 40px;
         padding-bottom: 20px;
     }
 }
@@ -205,6 +220,16 @@
             <div>
                 <div class="title">Log Tool</div>
                 <div class="desc">セッションログの整理や<br>統計の作成</div>
+            </div>
+        </a>
+
+        <a href="generator.html" class="tool-card">
+            <div class="icon">
+                <span class="material-symbols-outlined" style="font-size: inherit;">history_edu</span>
+            </div>
+            <div>
+                <div class="title">Log Generator</div>
+                <div class="desc">チャットログを<br>読みやすい形式に変換</div>
             </div>
         </a>
     </div>
