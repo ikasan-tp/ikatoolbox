@@ -229,9 +229,15 @@
                 </div>
             </div>
         </div>
-        <div class="sidebar-footer">
-            <button class="save-btn" id="downloadBtn" disabled onclick="exportLog()">HTMLを書き出し</button>
-        </div>
+<div class="sidebar-footer">
+    <button class="save-btn" id="downloadBtn" disabled onclick="exportLog()">HTMLを書き出し</button>
+    <div style="width: 100%; text-align: center;">
+        <button onclick="if(confirm('入力をすべてクリアしますか？')) location.reload()" 
+                style="background:none; border:none; color:#555; font-size:0.7rem; font-weight:bold; cursor:pointer; margin-top:15px; text-decoration:underline; display: inline-block;">
+            入力をクリア
+        </button>
+    </div>
+</div>
     </aside>
 
     <main class="main-content" id="mainScrollArea">
@@ -411,7 +417,7 @@
         });
     }
 
-    function renderTabSettings() {
+function renderTabSettings() {
         const container = document.getElementById('tabStyleSettings');
         container.innerHTML = '';
         Object.keys(tabStyleMap).forEach(tab => {
@@ -421,8 +427,10 @@
                 <div class="tab-config-top">
                     <span class="tab-config-name">${tab}</span>
                     <div class="tab-config-controls">
-                        <input type="color" class="in-color-picker" value="${tabStyleMap[tab].color}" oninput="tabStyleMap['${tab}'].color=this.value; updatePreviewStyles()">
-                        <select class="style-select" onchange="tabStyleMap['${tab}'].style=this.value; updatePreviewStyles()">
+                        <input type="color" class="in-color-picker" value="${tabStyleMap[tab].color}" 
+                            onchange="tabStyleMap['${tab}'].color=this.value; renderEditor(true)">
+                        <select class="style-select" 
+                            onchange="tabStyleMap['${tab}'].style=this.value; renderEditor(true)">
                             ${STYLES.map(s => `<option value="${s.id}" ${tabStyleMap[tab].style === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}
                         </select>
                     </div>
@@ -430,7 +438,7 @@
             `;
             container.appendChild(div);
         });
-        updatePreviewStyles();
+        renderEditor(true);
     }
 
     function updatePreviewStyles() {
@@ -455,8 +463,9 @@ function renderEditor(fullInit = false) {
             logData.forEach((item, index) => {
                 const char = charSettings[item.charKey] || { displayName: "Unknown", color: "#888" };
                 const row = document.createElement('div');
-                row.className = `log-row`;
-                row.id = `row-${index}`;
+                row.classList.add('log-row');
+                row.setAttribute('id', 'row-' + index);
+
                 row.innerHTML = `
                     <div class="row-header">
                         <span class="row-name" data-charkey="${item.charKey}" style="color:${char.color}">${char.displayName} <small style="color:#444; font-size:0.6rem;">[${item.tab}]</small></span>
@@ -478,12 +487,21 @@ function renderEditor(fullInit = false) {
                         </div>
                     </div>
                 `;
+
+                const currentTabConfig = tabStyleMap[item.tab];
+                if (currentTabConfig && currentTabConfig.style === 'style-secret') {
+                    const translucentColor = currentTabConfig.color + '44';
+                    row.style.setProperty('background-color', translucentColor, 'important');
+                    row.style.setProperty('color', '#ccc', 'important');
+                }
+
                 fragment.appendChild(row);
             });
             container.appendChild(fragment);
             container.querySelectorAll('textarea').forEach(ta => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; });
             updatePreviewStyles();
         }
+
         logData.forEach((item, index) => {
             const row = document.getElementById(`row-${index}`);
             if(!row) return;
@@ -725,4 +743,3 @@ function exportLog() {
 <div style="position: fixed; bottom: 10px; right: 15px; font-family: sans-serif; font-size: 10px; color: rgba(255,255,255,0.1); letter-spacing: 0.1em; font-weight: bold; pointer-events: none; z-index: 9999;">✦ IKATOOLBOX</div>
 </body>
 </html>
-
