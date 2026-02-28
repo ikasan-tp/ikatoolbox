@@ -700,10 +700,20 @@ function exportLog() {
         html += `</div><header><h1>${h1Title}</h1><p>${headerTitle}</p></header><div class="log-container">`;
 
         logData.forEach((item, i) => {
+            const char = charConfig[item.name] || { displayName: item.name, color: "#ffffff" };
             const config = tabStyleMap[item.tab] || { style: 'style-chat', color: '#ffffff' };
             const safeName = btoa(encodeURIComponent(item.tab)).replace(/=/g, "");
             const styleClass = config.style === 'style-chat' ? 'style-chat' : `style-std tab-custom-${safeName}`;
-            html += `<div class="log-row ${styleClass}" data-tab="${item.tab}"><div class="row-header"><div class="row-name" style="color:${config.color}">${item.name}</div><div class="row-tab">${item.tab}</div></div><div class="row-content">${item.content.replace(/\\n/g, '<br>')}</div></div>`;
+            
+            let nameStyle = "", lineStyle = "";
+            if (config.style === 'style-chat') {
+                nameStyle = `style="color:${char.color}"`;
+                lineStyle = `style="display:none;"`;
+            } else {
+                lineStyle = `style="background:${char.color}"`;
+            }
+
+            html += `<div class="log-row ${styleClass}" data-tab="${item.tab}"><div class="row-header"><div class="row-name" ${nameStyle}><span class="name-line" ${lineStyle}></span>${char.displayName}</div><div class="row-tab">${item.tab}</div></div><div class="row-content">${item.content.replace(/\\n/g, '<br>')}</div></div>`;
         });
 
         html += `</div><footer>✦ IKATOOLBOX</footer><script>
