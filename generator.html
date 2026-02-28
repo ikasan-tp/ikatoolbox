@@ -734,17 +734,38 @@ function exportLog() {
             html += `<div class="log-row ${styleClass}" id="log-${i}" data-tab="${config.style}"><div class="row-header"><div class="row-name" ${nameStyle}><span class="name-line" ${lineStyle}></span>${char.displayName}</div><div class="row-tab">${item.tab}</div></div><div class="row-content">${item.content.replace(/\n/g, '<br>')}</div></div>`;
         });
 
-        html += `</div>
+html += `</div>
         <footer>✦ IKATOOLBOX</footer>
         
         <script>
         document.addEventListener('DOMContentLoaded', () => {
             const navContent = document.querySelector('.nav-content');
             if (navContent) {
+                const style = document.createElement('style');
+                style.textContent = \`
+                    .js-close-menu {
+                        display: block;
+                        text-align: center;
+                        padding: 15px;
+                        margin-bottom: 20px;
+                        font-family: 'Montserrat', sans-serif;
+                        font-size: 11px;
+                        letter-spacing: 0.2em;
+                        color: #888;
+                        border-bottom: 1px solid #333;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                    }
+                    .js-close-menu:hover { color: #fff; background: #222; }
+                    @media screen and (max-width: 1024px) {
+                        .nav-content { padding-top: env(safe-area-inset-top, 20px) !important; }
+                    }
+                \`;
+                document.head.appendChild(style);
+
                 const closeArea = document.createElement('div');
                 closeArea.className = 'js-close-menu';
-                closeArea.innerHTML = '× CLOSE';
-                closeArea.style = 'margin: 0 0 15px 0; padding: 12px; color: #888; font-size: 12px; letter-spacing: 2px; text-align: center; cursor: pointer; border-bottom: 1px solid #333; transition: 0.3s;';
+                closeArea.innerHTML = '✕ CLOSE MENU';
                 navContent.prepend(closeArea);
             }
         });
