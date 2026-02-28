@@ -734,65 +734,32 @@ function exportLog() {
             html += `<div class="log-row ${styleClass}" id="log-${i}" data-tab="${config.style}"><div class="row-header"><div class="row-name" ${nameStyle}><span class="name-line" ${lineStyle}></span>${char.displayName}</div><div class="row-tab">${item.tab}</div></div><div class="row-content">${item.content.replace(/\n/g, '<br>')}</div></div>`;
         });
 
-html += `</div>
-        <footer>✦ IKATOOLBOX</footer>
-        
-        <script>
+html += `</div><footer>✦ IKATOOLBOX</footer><style>
+        .js-close-menu { display: block; text-align: center; padding: 15px; margin-bottom: 20px; font-size: 11px; letter-spacing: 0.2em; color: #888; border-bottom: 1px solid #333; cursor: pointer; }
+        @media screen and (max-width: 1024px) { .nav-content { padding-top: env(safe-area-inset-top, 20px) !important; } }
+        </style><script>
         document.addEventListener('DOMContentLoaded', () => {
-            const navContent = document.querySelector('.nav-content');
-            if (navContent) {
-                const style = document.createElement('style');
-                style.textContent = \`
-                    .js-close-menu {
-                        display: block;
-                        text-align: center;
-                        padding: 15px;
-                        margin-bottom: 20px;
-                        font-family: 'Montserrat', sans-serif;
-                        font-size: 11px;
-                        letter-spacing: 0.2em;
-                        color: #888;
-                        border-bottom: 1px solid #333;
-                        cursor: pointer;
-                        transition: all 0.3s;
-                    }
-                    .js-close-menu:hover { color: #fff; background: #222; }
-                    @media screen and (max-width: 1024px) {
-                        .nav-content { padding-top: env(safe-area-inset-top, 20px) !important; }
-                    }
-                \`;
-                document.head.appendChild(style);
-
-                const closeArea = document.createElement('div');
-                closeArea.className = 'js-close-menu';
-                closeArea.innerHTML = '✕ CLOSE MENU';
-                navContent.prepend(closeArea);
+            const nav = document.querySelector('.nav-content');
+            if (nav) {
+                const btn = document.createElement('div');
+                btn.className = 'js-close-menu';
+                btn.innerHTML = '✕ CLOSE MENU';
+                nav.prepend(btn);
             }
         });
-
-        function closeMenu() { 
-            document.getElementById('nav-input').checked = false; 
-        }
-
+        function closeMenu() { document.getElementById('nav-input').checked = false; }
         function toggleTab(tabClass, btn) {
             btn.classList.toggle('active');
             const rows = document.querySelectorAll('[data-tab="' + tabClass + '"]');
             rows.forEach(row => {
-                if (btn.classList.contains('active')) {
-                    row.classList.remove('hidden');
-                } else {
-                    row.classList.add('hidden');
-                }
+                if (btn.classList.contains('active')) { row.classList.remove('hidden'); }
+                else { row.classList.add('hidden'); }
             });
         }
-
         document.addEventListener('click', (e) => {
-            const isMenuOpen = document.getElementById('nav-input').checked;
-            if (!isMenuOpen) return;
-
+            if (!document.getElementById('nav-input').checked) return;
             const nav = document.querySelector('.nav-content');
             const label = document.querySelector('.nav-unfold');
-
             if (e.target.classList.contains('js-close-menu') || (!nav.contains(e.target) && !label.contains(e.target))) {
                 closeMenu();
             }
