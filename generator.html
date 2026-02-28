@@ -690,10 +690,7 @@ function exportLog() {
             }
         });
 
-        let html = `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><title>${fileName}</title><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet"><style>${document.querySelector('style').innerHTML}${customTabStyles}
-        .js-close-menu { display: block; text-align: center; padding: 15px; margin-bottom: 20px; font-size: 11px; letter-spacing: 0.2em; color: #888; border-bottom: 1px solid #333; cursor: pointer; }
-        @media screen and (max-width: 1024px) { .nav-content { padding-top: calc(env(safe-area-inset-top, 20px) + 10px) !important; } }
-        .hidden { display: none !important; }</style></head><body><input type="checkbox" id="nav-input" class="nav-unfold"><label class="nav-unfold" for="nav-input"><span></span></label><div class="nav-content"><div class="index-title">INDEX</div>`;
+        let html = `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><title>${fileName}</title><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet"><style>${document.querySelector('style').innerHTML}${customTabStyles} .js-close-menu { display: block; text-align: center; padding: 15px; margin-bottom: 20px; font-size: 11px; letter-spacing: 0.2em; color: #888; border-bottom: 1px solid #333; cursor: pointer; } @media screen and (max-width: 1024px) { .nav-content { padding-top: calc(env(safe-area-inset-top, 20px) + 10px) !important; } } .hidden { display: none !important; }</style></head><body><input type="checkbox" id="nav-input" class="nav-unfold"><label class="nav-unfold" for="nav-input"><span></span></label><div class="nav-content"><div class="index-title">INDEX</div>`;
 
         const activeTabs = Array.from(new Set(logData.map(item => item.tab)));
         activeTabs.forEach(tab => {
@@ -715,44 +712,47 @@ function exportLog() {
             } else {
                 lineStyle = `style="background:${char.color}"`;
             }
-
             html += `<div class="log-row ${styleClass}"><div class="row-header"><div class="row-name" ${nameStyle}><span class="name-line" ${lineStyle}></span>${char.displayName}</div><div class="row-tab">${item.tab}</div></div><div class="row-content">${item.content.replace(/\n/g, '<br>')}</div></div>`;
         });
 
         html += `</div><footer>✦ IKATOOLBOX</footer><script>
-        const nav = document.querySelector('.nav-content');
-        if (nav) {
-            const btn = document.createElement('div');
-            btn.className = 'js-close-menu';
-            btn.innerHTML = '✕ CLOSE MENU';
-            btn.onclick = () => { document.getElementById('nav-input').checked = false; };
-            nav.prepend(btn);
-        }
-
+        document.addEventListener('DOMContentLoaded', function() {
+            var nav = document.querySelector('.nav-content');
+            if (nav) {
+                var btn = document.createElement('div');
+                btn.className = 'js-close-menu';
+                btn.innerHTML = '✕ CLOSE MENU';
+                btn.onclick = function() { document.getElementById('nav-input').checked = false; };
+                nav.prepend(btn);
+            }
+        });
         function toggleTab(tabName, btn) {
             btn.classList.toggle('active');
-            const isVisible = btn.classList.contains('active');
-            document.querySelectorAll('.log-row').forEach(row => {
-                const tabEl = row.querySelector('.row-tab');
+            var isVisible = btn.classList.contains('active');
+            var rows = document.querySelectorAll('.log-row');
+            for (var i = 0; i < rows.length; i++) {
+                var tabEl = rows[i].querySelector('.row-tab');
                 if (tabEl && tabEl.innerText === tabName) {
-                    if (isVisible) row.classList.remove('hidden');
-                    else row.classList.add('hidden');
+                    if (isVisible) rows[i].classList.remove('hidden');
+                    else rows[i].classList.add('hidden');
                 }
-            });
+            }
         }
-
-        document.addEventListener('click', (e) => {
-            const input = document.getElementById('nav-input');
-            const nav = document.querySelector('.nav-content');
-            const label = document.querySelector('.nav-unfold');
+        document.addEventListener('click', function(e) {
+            var input = document.getElementById('nav-input');
+            var nav = document.querySelector('.nav-content');
+            var label = document.querySelector('.nav-unfold');
             if (input && input.checked && nav && !nav.contains(e.target) && label && !label.contains(e.target) && !e.target.classList.contains('index-item')) {
                 input.checked = false;
             }
         });
-        <\/script></body></html>`;
+        ` + `<` + `/script></body></html>`;
 
         const blob = new Blob([html], { type: 'text/html' });
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fileName + ".html"; a.click();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = fileName + ".html";
+        a.click();
     }
 </script>
 
