@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IKATOOLBOX | CoC CHARACTER ROLLER</title>
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%%22 y=%2250%%22 style=%22dominant-baseline:central;text-anchor:middle;font-size:80px;%22>🦑</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&family=Noto+Sans+JP:wght@400;500;700;900&family=Montserrat:wght@700;900&display=block" rel="stylesheet">
+
+<style>
+  :root {
+    --bg-dark: #1a1a1a;
+    --card-bg: #222222;
+    --ui-border: #444444;
+    --accent: #C5373C;
+    --text-main: #dbdee1;
+    --text-sub: #b5bac1;
+    --stat-max: #5c7cfa;
+    --stat-min: #ff6b6b;
+  }
+
+  .material-symbols-outlined {
+    display: inline-block;
+    width: 1em; height: 1em;
+    overflow: hidden; white-space: nowrap;
+    direction: ltr; vertical-align: middle;
+  }
+
+  body { 
+    font-family: 'Noto Sans JP', sans-serif; 
+    background-color: var(--bg-dark); 
+    color: var(--text-main); 
+    margin: 0; padding: 40px 15px 40px;
+    position: relative;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+
+  .container { 
+    max-width: 850px; margin: 0 auto; 
+  }
+
+  .back-link {
+    display: flex; align-items: center; gap: 8px;
+    text-decoration: none; color: var(--text-sub);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem; font-weight: 700;
+    letter-spacing: 0.1em; transition: 0.3s;
+    margin-bottom: 15px;
+    width: fit-content;
+  }
+  .back-link:hover { color: var(--accent); transform: translateX(-5px); }
+
+  .card { 
+    background: var(--card-bg); 
+    padding: 40px; border-radius: 12px; 
+    border: 1px solid var(--ui-border);
+  }
+
+  .ui-header { text-align: left; margin-bottom: 25px; border-bottom: 3px solid var(--accent); padding-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end; }
+  .ui-brand { font-family: 'Montserrat', sans-serif; font-size: 0.7rem; font-weight: 900; color: var(--accent); letter-spacing: 0.4em; display: block; margin-bottom: 2px; }
+  .ui-title { font-family: 'Montserrat', 'Noto Sans JP', sans-serif; font-size: 1.6rem; font-weight: 900; color: #fff; letter-spacing: 0.05em; display: flex; align-items: baseline; gap: 10px; line-height: 1.2; }
+  
+  .header-left { display: flex; flex-direction: column; }
+  .header-right { display: flex; align-items: center; gap: 15px; padding-bottom: 4px; }
+
+  .edition-tabs { display: flex; gap: 2px; background: #111; padding: 3px; border-radius: 4px; }
+  .tab-btn { 
+    background: transparent; color: var(--text-sub); border: none; padding: 4px 12px; 
+    border-radius: 3px; font-weight: 900; cursor: pointer; transition: 0.2s; font-family: 'Montserrat', sans-serif; font-size: 0.7rem;
+  }
+  .tab-btn.active { background: var(--accent); color: #fff; }
+
+  .btn-all { 
+    background: var(--accent); color: #fff; border: none; padding: 10px 28px; 
+    border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.2s;
+    font-size: 14px;
+  }
+  .btn-all:hover { filter: brightness(1.2); }
+
+  .top-stats { display: flex; gap: 10px; margin-bottom: 30px; }
+  .top-box { flex: 1; background: #111; padding: 15px; text-align: center; border-bottom: 2px solid var(--accent); position: relative; min-height: 60px; display: flex; flex-direction: column; justify-content: center; }
+  .top-label { font-size: 0.7rem; font-weight: 900; color: var(--accent); display: block; margin-bottom: 4px; font-family: 'Montserrat', sans-serif; }
+  .top-val { font-size: 2rem; font-weight: 900; color: #fff; line-height: 1; }
+
+  .main-layout { display: flex; gap: 30px; align-items: stretch; }
+  .stat-column { flex: 1.3; display: flex; flex-direction: column; gap: 6px; } 
+  .calc-column { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+
+  .stat-row { 
+    display: flex; align-items: center; background: rgba(255,255,255,0.03); 
+    padding: 0 15px; gap: 12px; border-radius: 4px; height: 46px;
+  }
+  .stat-id { font-family: 'Montserrat', sans-serif; font-size: 0.95rem; font-weight: 900; color: #fff; width: 45px; }
+  .stat-dice { font-size: 0.65rem; color: var(--text-sub); font-family: monospace; width: 55px; opacity: 0.4; }
+  .stat-num { font-size: 1.8rem; font-weight: 900; color: #fff; width: 55px; text-align: center; }
+  .is-max { color: var(--stat-max) !important; }
+  .is-min { color: var(--stat-min) !important; }
+  
+  .stat-jp-hint { font-size: 0.7rem; color: var(--text-sub); flex: 1; text-align: right; opacity: 0.6; }
+  .stat-jp-hint b { color: #fff; font-family: 'Montserrat', sans-serif; font-size: 0.85rem; }
+
+  .dice-btn { 
+    background: transparent; border: 1px solid var(--ui-border); color: var(--text-sub);
+    padding: 5px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: 0.2s; width: 30px; height: 30px;
+  }
+  .dice-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(197, 55, 60, 0.1); }
+  .dice-btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+  .luk-dice-btn { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); }
+
+  .calc-card { 
+    background: #111; padding: 12px 18px; border-radius: 4px; border-left: 4px solid var(--ui-border); 
+    display: flex; flex-direction: column; flex: 1; justify-content: center;
+  }
+  .calc-card.accent { border-left-color: var(--accent); }
+  
+  .total-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+  .calc-label { font-size: 0.75rem; font-weight: bold; color: var(--text-sub); display: block; }
+  .calc-val { font-size: 2.2rem; font-weight: 900; color: #fff; line-height: 1; }
+  
+  .calc-card.total-box { flex: 1.2; padding: 15px 20px; } 
+  .calc-card.total-box .calc-val { font-size: 2.8rem; color: #fff; }
+
+  .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 2; }
+  .calc-val-center { text-align: center; width: 100%; display: block; }
+  
+  .calc-card.compact-grid { flex: 1; padding: 8px 18px; min-height: 40px; }
+  .calc-card.compact-grid .calc-val { font-size: 1.2rem; }
+
+  /* 特徴表カード専用の調整 */
+  #trait-dice-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* 上下の要素を端に寄せる */
+    min-height: 90px;
+  }
+  .trait-main-display {
+    flex: 1;
+    display: flex;
+    align-items: center; /* 垂直方向中央 */
+    justify-content: center;
+    min-height: 34px;
+  }
+
+  .trait-dice-area { display: flex; gap: 6px; align-items: center; margin-top: 5px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); justify-content: space-between; }
+  .trait-btn-sub { 
+    background: #222; border: 1px solid var(--ui-border); color: #fff; 
+    font-size: 0.65rem; font-weight: 900; padding: 4px 10px; border-radius: 4px; cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+  }
+  .trait-btn-sub:hover { border-color: var(--accent); color: var(--accent); }
+
+  .card-content-wrap { flex: 1; display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
+  .card-footer { height: 26px; display: flex; align-items: center; justify-content: center; margin-top: 8px; }
+  .hint-text { font-size: 0.7rem; color: var(--text-sub); opacity: 0.4; font-family: 'Montserrat', sans-serif; letter-spacing: 0.1em; }
+
+  select { 
+    background: #000; color: #fff; border: 1px solid var(--ui-border); 
+    padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; outline: none; width: 100%; height: 26px;
+  }
+
+  .edu-check-card { cursor: pointer; transition: 0.2s; border-left-color: #666; flex: 1; }
+  .edu-check-card:hover { background: #1a1a1a; border-left-color: var(--accent); }
+  .edu-check-btn-label { font-size: 0.65rem; color: var(--accent); font-weight: 900; letter-spacing: 0.1em; opacity: 0.8; }
+
+  .footer-ctrl { margin-top: 30px; border-top: 1px solid var(--ui-border); padding-top: 30px; }
+  .btn-ui { 
+    width: 100%; background: var(--card-bg); border: 1px solid var(--ui-border); color: #fff;
+    padding: 16px; border-radius: 4px; font-size: 0.95rem; font-weight: bold; cursor: pointer; transition: 0.2s;
+  }
+  .btn-ui:hover { border-color: var(--accent); color: var(--accent); }
+
+  .fixed-footer { position: fixed; bottom: 10px; right: 15px; font-family: sans-serif; font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: 0.1em; font-weight: bold; pointer-events: none; z-index: 9999; }
+
+  @media screen and (max-width: 750px) {
+    .main-layout { flex-direction: column; }
+    .top-stats { display: grid; grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <a href="index.html" class="back-link">
+    <span class="material-symbols-outlined" style="font-size: 1.2rem;">arrow_back_ios</span>
+    BACK TO TOOLBOX
+  </a>
+
+  <div class="card">
+    <div class="ui-header">
+      <div class="header-left">
+        <span class="ui-brand">IKATOOLBOX</span>
+        <div class="ui-title">CHARACTER ROLLER</div>
+      </div>
+      <div class="header-right">
+        <div class="edition-tabs">
+          <button id="tab-7th" class="tab-btn active" onclick="switchEdition(7)">7th</button>
+          <button id="tab-6th" class="tab-btn" onclick="switchEdition(6)">6th</button>
+        </div>
+        <button class="btn-all" onclick="rollAll()">一括ロール</button>
+      </div>
+    </div>
+
+    <div class="top-stats">
+      <div class="top-box"><span class="top-label">HP</span><span class="top-val" id="hp-val">0</span></div>
+      <div class="top-box"><span class="top-label">MP</span><span class="top-val" id="mp-val">0</span></div>
+      <div class="top-box"><span class="top-label">SAN</span><span class="top-val" id="san-val">0</span></div>
+      <div class="top-box">
+        <span class="top-label">幸運</span>
+        <span class="top-val" id="luk-val">0</span>
+        <button class="dice-btn luk-dice-btn" id="luk-reroll" onclick="reroll('LUK')">
+          <svg viewBox="0 0 24 24"><path d="M19,3H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V5C21,3.9,20.1,3,19,3z M7,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,9,7,9z M7,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,19,7,19z M12,14c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S13.1,14,12,14z M17,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,9,17,19z M17,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,19,17,19z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="main-layout">
+      <div class="stat-column" id="stat-list"></div>
+      <div class="calc-column">
+        <div class="calc-card accent total-box">
+          <div class="total-row">
+            <div class="total-label-group">
+              <span class="calc-label">TOTAL</span>
+              <span class="calc-label" id="total-sub-label" style="font-size: 0.6rem; opacity: 0.5;">能力値合計</span>
+            </div>
+            <span class="calc-val" id="total-val">0</span>
+          </div>
+        </div>
+        
+        <div class="calc-grid" style="flex: 2.5;">
+          <div class="calc-card">
+            <div class="card-content-wrap">
+              <span class="calc-label">職業技能P</span>
+              <span class="calc-val calc-val-center" id="job-p-main">0</span>
+              <div class="card-footer">
+                <select id="job-select" onchange="updateDisplay()"></select>
+              </div>
+            </div>
+          </div>
+          <div class="calc-card">
+            <div class="card-content-wrap">
+              <span class="calc-label">興味技能P</span>
+              <span class="calc-val calc-val-center" id="int-p">0</span>
+              <div class="card-footer">
+                <span class="hint-text" id="int-p-hint">INT × 2</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-grid" id="secondary-stats-grid">
+          <div class="calc-card compact-grid" id="db-card">
+            <div class="total-row">
+              <span class="calc-label">DB</span>
+              <span class="calc-val" id="db-val">0</span>
+            </div>
+          </div>
+          <div class="calc-card compact-grid" id="build-card">
+            <div class="total-row">
+              <span class="calc-label">ビルド</span>
+              <span class="calc-val" id="build-val">0</span>
+            </div>
+          </div>
+          <div class="calc-card compact-grid" id="trait-dice-card" style="display: none;">
+            <div class="total-row">
+              <span class="calc-label">特徴表</span>
+              <button class="dice-btn" onclick="rollTraitList()">
+                <svg viewBox="0 0 24 24"><path d="M19,3H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V5C21,3.9,20.1,3,19,3z M7,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,9,7,9z M7,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,19,7,19z M12,14c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S13.1,14,12,14z M17,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,9,17,19z M17,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,19,17,19z"/></svg>
+              </button>
+            </div>
+            <div class="trait-main-display">
+              <span class="calc-val calc-val-center" id="trait-val" style="font-size: 1.1rem; color: var(--accent);">--</span>
+            </div>
+            <div class="trait-dice-area" id="extra-trait-dice" style="display:none;">
+              <span class="calc-label" style="font-size: 0.6rem;">追加P: <b id="extra-val" style="color:#fff;">--</b></span>
+              <button class="trait-btn-sub" onclick="rollExtraPoint()">ROLL</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-card edu-check-card" id="edu-check-card" onclick="checkEdu()">
+          <div class="total-row">
+            <span class="calc-label">EDU上達</span>
+            <span class="calc-val" id="edu-display-val" style="font-size:1.4rem; color:var(--text-sub);">未実施</span>
+          </div>
+          <div class="card-footer" style="height: auto; margin-top: 5px; justify-content: flex-start;">
+            <span class="edu-check-btn-label">CLICK TO ROLL</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-ctrl">
+      <button class="btn-ui" onclick="outputToIachara()">いあきゃらでキャラ作成</button>
+    </div>
+  </div>
+</div>
+
+<div class="fixed-footer">✦ IKATOOLBOX</div>
+
+<script>
+  let currentEdition = 7;
+  let sumVals = { STR:0, CON:0, POW:0, DEX:0, APP:0, SIZ:0, INT:0, EDU:0, LUK_SUM:0 };
+  let dmsg = {};
+
+  const config7th = [
+    { id: "STR", d: 3, f: 6, a: 0, min: 3, max: 18 },
+    { id: "CON", d: 3, f: 6, a: 0, min: 3, max: 18 },
+    { id: "POW", d: 3, f: 6, a: 0, min: 3, max: 18 },
+    { id: "DEX", d: 3, f: 6, a: 0, min: 3, max: 18 },
+    { id: "APP", d: 3, f: 6, a: 0, min: 3, max: 18 },
+    { id: "SIZ", d: 2, f: 6, a: 6, min: 8, max: 18 },
+    { id: "INT", d: 2, f: 6, a: 6, min: 8, max: 18 },
+    { id: "EDU", d: 2, f: 6, a: 6, min: 8, max: 18 }
+  ];
+
+  const config6th = [
+    { id: "STR", d: 3, f: 6, a: 0, min: 3, max: 18 },
+    { id: "CON", d: 3, f: 6, a: 0, min: 3, max: 18 },
+    { id: "POW", d: 3, f: 6, a: 0, min: 3, max: 18 },
+    { id: "DEX", d: 3, f: 6, a: 0, min: 3, max: 18 },
+    { id: "APP", d: 3, f: 6, a: 0, min: 3, max: 18 },
+    { id: "SIZ", d: 2, f: 6, a: 6, min: 8, max: 18 },
+    { id: "INT", d: 2, f: 6, a: 6, min: 8, max: 18 },
+    { id: "EDU", d: 3, f: 6, a: 3, min: 6, max: 21 }
+  ];
+
+  const traitList = [];
+  for(let i=1; i<=7; i++) {
+    for(let j=1; j<=10; j++) {
+      traitList.push(`${i}-${j.toString().padStart(2, '0')}`);
+    }
+  }
+
+  const diceIcon = `<svg viewBox="0 0 24 24"><path d="M19,3H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V5C21,3.9,20.1,3,19,3z M7,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,9,7,9z M7,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,19,7,19z M12,14c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S13.1,14,12,14z M17,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,9,17,19z M17,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,19,17,19z"/></svg>`;
+
+  function switchEdition(ed) {
+    currentEdition = ed;
+    document.getElementById('tab-7th').classList.toggle('active', ed === 7);
+    document.getElementById('tab-6th').classList.toggle('active', ed === 6);
+    
+    if (ed === 7) {
+      document.getElementById('build-card').style.display = 'flex';
+      document.getElementById('trait-dice-card').style.display = 'none';
+    } else {
+      document.getElementById('build-card').style.display = 'none';
+      document.getElementById('trait-dice-card').style.display = 'flex';
+    }
+
+    document.getElementById('edu-check-card').style.display = (ed === 7) ? 'flex' : 'none';
+    document.getElementById('int-p-hint').innerText = (ed === 7) ? 'INT × 2' : 'INT × 10';
+    document.getElementById('luk-reroll').style.display = (ed === 7) ? 'flex' : 'none';
+    document.getElementById('total-sub-label').innerText = (ed === 7) ? '能力値合計' : '能力値合計(×5前)';
+
+    const jobSelect = document.getElementById('job-select');
+    if (ed === 7) {
+      jobSelect.innerHTML = `
+        <option value="EDU">EDU×4</option>
+        <option value="STR">STR+EDU(×2)</option>
+        <option value="CON">CON+EDU(×2)</option>
+        <option value="POW">POW+EDU(×2)</option>
+        <option value="DEX">DEX+EDU(×2)</option>
+        <option value="APP">APP+EDU(×2)</option>
+        <option value="SIZ">SIZ+EDU(×2)</option>
+        <option value="INT">INT+EDU(×2)</option>`;
+    } else {
+      jobSelect.innerHTML = `
+        <option value="EDU_20">EDU × 20</option>
+        <option value="EDU_STR">EDU×10 + STR×10</option>
+        <option value="EDU_CON">EDU×10 + CON×10</option>
+        <option value="EDU_POW">EDU×10 + POW×10</option>
+        <option value="EDU_DEX">EDU×10 + DEX×10</option>
+        <option value="EDU_APP">EDU×10 + APP×10</option>
+        <option value="EDU_SIZ">EDU×10 + SIZ×10</option>
+        <option value="EDU_INT">EDU×10 + INT×10</option>`;
+    }
+    updateDisplay();
+  }
+
+  function rollTraitList() {
+    const shuffled = [...traitList].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, 2);
+    document.getElementById('trait-val').innerText = selected.join(' / ');
+    const needsExtra = selected.some(s => s.startsWith('4-'));
+    document.getElementById('extra-trait-dice').style.display = needsExtra ? 'flex' : 'none';
+    document.getElementById('extra-val').innerText = "--";
+  }
+
+  function rollExtraPoint() {
+    const res = (Math.floor(Math.random() * 6) + 1) * 10;
+    document.getElementById('extra-val').innerText = res;
+  }
+
+  function rollAll() {
+    const config = (currentEdition === 7) ? config7th : config6th;
+    config.forEach(s => {
+      const r = Array.from({length: s.d}, () => Math.floor(Math.random() * s.f) + 1);
+      dmsg[s.id] = r.join('+') + (s.a ? `+${s.a}` : '');
+      sumVals[s.id] = r.reduce((a, b) => a + b, 0) + s.a;
+    });
+    sumVals.LUK_SUM = Array.from({length: 3}, () => Math.floor(Math.random() * 6) + 1).reduce((a, b) => a + b, 0);
+    document.getElementById('edu-display-val').innerText = "未実施";
+    document.getElementById('edu-display-val').style.color = "var(--text-sub)";
+    document.getElementById('trait-val').innerText = "--";
+    document.getElementById('extra-trait-dice').style.display = 'none';
+    updateDisplay();
+  }
+
+  function reroll(id) {
+    if(sumVals.STR === 0) return;
+    const config = (currentEdition === 7) ? config7th : config6th;
+    const s = (id === 'LUK') ? { d: 3, f: 6, a: 0 } : config.find(x => x.id === id);
+    const r = Array.from({length: s.d}, () => Math.floor(Math.random() * s.f) + 1);
+    if (id === 'LUK') {
+      sumVals.LUK_SUM = r.reduce((a, b) => a + b, 0);
+    } else {
+      dmsg[id] = r.join('+') + (s.a ? `+${s.a}` : '');
+      sumVals[id] = r.reduce((a, b) => a + b, 0) + (s.a || 0);
+    }
+    updateDisplay();
+  }
+
+  function checkEdu() {
+    if(sumVals.EDU === 0 || currentEdition === 6) return;
+    const currentEDUValue = Math.floor(sumVals.EDU * 5);
+    const r = Math.floor(Math.random() * 100) + 1;
+    const display = document.getElementById('edu-display-val');
+    if (r > currentEDUValue || r >= 96) {
+      const g = Math.floor(Math.random() * 10) + 1;
+      sumVals.EDU += (g / 5); 
+      display.innerText = `成功 (+${g})`;
+      display.style.color = "var(--stat-max)";
+    } else { 
+      display.innerText = `失敗 (${r})`;
+      display.style.color = "var(--stat-min)";
+    }
+    updateDisplay();
+  }
+
+  function outputToIachara() {
+    if(sumVals.STR === 0) { alert("まずはロールしてください。"); return; }
+    const luk = (currentEdition === 7) ? sumVals.LUK_SUM * 5 : sumVals.POW * 5;
+    const params = new URLSearchParams({
+      var: currentEdition.toString(),
+      STR: (currentEdition === 7) ? Math.floor(sumVals.STR * 5) : sumVals.STR,
+      CON: (currentEdition === 7) ? Math.floor(sumVals.CON * 5) : sumVals.CON,
+      POW: (currentEdition === 7) ? Math.floor(sumVals.POW * 5) : sumVals.POW,
+      DEX: (currentEdition === 7) ? Math.floor(sumVals.DEX * 5) : sumVals.DEX,
+      APP: (currentEdition === 7) ? Math.floor(sumVals.APP * 5) : sumVals.APP,
+      SIZ: (currentEdition === 7) ? Math.floor(sumVals.SIZ * 5) : sumVals.SIZ,
+      INT: (currentEdition === 7) ? Math.floor(sumVals.INT * 5) : sumVals.INT,
+      EDU: (currentEdition === 7) ? Math.floor(sumVals.EDU * 5) : sumVals.EDU,
+      LUK: luk
+    });
+    window.open(`https://iachara.com/new/costom/webdice?${params.toString()}`, '_blank');
+  }
+
+  function updateDisplay() {
+    const config = (currentEdition === 7) ? config7th : config6th;
+    let html = "";
+    let total = 0;
+    config.forEach(s => {
+      const val = (currentEdition === 7) ? Math.floor(sumVals[s.id] * 5) : sumVals[s.id];
+      total += val;
+      let colorClass = (val !== 0 && Math.round(sumVals[s.id]) === s.max) ? "is-max" : (val !== 0 && Math.round(sumVals[s.id]) === s.min) ? "is-min" : "";
+      let hintHtml = "";
+      if (currentEdition === 7) {
+        let eduVal = Math.floor(sumVals.EDU * 5);
+        let hintVal = (s.id === "EDU") ? (val * 4) : (eduVal * 2 + val * 2);
+        hintHtml = `${(s.id === "EDU") ? '基本' : '候補'}: <b>${hintVal}</b>`;
+      } else {
+        let eduVal = sumVals.EDU;
+        let statVal = sumVals[s.id];
+        let hintVal = (s.id === "EDU") ? (statVal * 20) : (eduVal * 10 + statVal * 10);
+        hintHtml = `${(s.id === "EDU") ? '基本' : '候補'}: <b>${hintVal}</b>`;
+      }
+      html += `
+        <div class="stat-row">
+          <span class="stat-id">${s.id}</span>
+          <span class="stat-dice">${dmsg[s.id] || ""}</span>
+          <span class="stat-num ${colorClass}">${val}</span>
+          <span class="stat-jp-hint">${hintHtml}</span>
+          <button class="dice-btn" onclick="reroll('${s.id}')">${diceIcon}</button>
+        </div>`;
+    });
+    document.getElementById('stat-list').innerHTML = html;
+    document.getElementById('total-val').innerText = total;
+    const curSTR = (currentEdition === 7 ? Math.floor(sumVals.STR * 5) : sumVals.STR);
+    const curCON = (currentEdition === 7 ? Math.floor(sumVals.CON * 5) : sumVals.CON);
+    const curPOW = (currentEdition === 7 ? Math.floor(sumVals.POW * 5) : sumVals.POW);
+    const curSIZ = (currentEdition === 7 ? Math.floor(sumVals.SIZ * 5) : sumVals.SIZ);
+    const curINT = (currentEdition === 7 ? Math.floor(sumVals.INT * 5) : sumVals.INT);
+    const curEDU = (currentEdition === 7 ? Math.floor(sumVals.EDU * 5) : sumVals.EDU);
+    if (currentEdition === 7) {
+      document.getElementById('hp-val').innerText = Math.floor((curCON + curSIZ) / 10);
+      document.getElementById('mp-val').innerText = Math.floor(curPOW / 5);
+      document.getElementById('san-val').innerText = curPOW;
+      document.getElementById('luk-val').innerText = sumVals.LUK_SUM * 5;
+    } else {
+      document.getElementById('hp-val').innerText = Math.ceil((curCON + curSIZ) / 2);
+      document.getElementById('mp-val').innerText = curPOW;
+      document.getElementById('san-val').innerText = curPOW * 5;
+      document.getElementById('luk-val').innerText = curPOW * 5;
+    }
+    const sel = document.getElementById('job-select').value;
+    if (currentEdition === 7) {
+      const curDEX = Math.floor(sumVals.DEX * 5);
+      const curAPP = Math.floor(sumVals.APP * 5);
+      let targetStat = (sel === 'STR') ? curSTR : (sel === 'CON') ? curCON : (sel === 'POW') ? curPOW : (sel === 'DEX') ? curDEX : (sel === 'APP') ? curAPP : (sel === 'SIZ') ? curSIZ : (sel === 'INT') ? curINT : 0;
+      let jobVal = (sel === 'EDU') ? (curEDU * 4) : (curEDU * 2 + targetStat * 2);
+      document.getElementById('job-p-main').innerText = (sumVals.STR === 0) ? 0 : jobVal;
+      document.getElementById('int-p').innerText = curINT * 2;
+    } else {
+      let jobVal = 0;
+      if (sel === 'EDU_20') { jobVal = curEDU * 20; } 
+      else {
+        const statKey = sel.split('_')[1];
+        const secondStat = sumVals[statKey];
+        jobVal = (sumVals.EDU * 10) + (secondStat * 10);
+      }
+      document.getElementById('job-p-main').innerText = (sumVals.STR === 0) ? 0 : jobVal;
+      document.getElementById('int-p').innerText = curINT * 10;
+    }
+    let db = "0", bld = 0;
+    if (currentEdition === 7) {
+      const ds7 = curSTR + curSIZ;
+      if (ds7 <= 64) { db = "-2"; bld = "-2"; } 
+      else if (ds7 <= 84) { db = "-1"; bld = "-1"; } 
+      else if (ds7 <= 124) { db = "0"; bld = "0"; } 
+      else if (ds7 <= 164) { db = "+1D4"; bld = "1"; } 
+      else { db = "+1D6"; bld = "2"; }
+      document.getElementById('build-val').innerText = bld;
+    } else {
+      const ds6 = sumVals.STR + sumVals.SIZ;
+      if (ds6 <= 12) { db = "-1D6"; }
+      else if (ds6 <= 16) { db = "-1D4"; }
+      else if (ds6 <= 24) { db = "0"; }
+      else if (ds6 <= 32) { db = "+1D4"; }
+      else if (ds6 <= 40) { db = "+1D6"; }
+      else { db = "+2D6"; }
+    }
+    document.getElementById('db-val').innerText = db;
+  }
+  switchEdition(7);
+</script>
+</body>
+</html>
