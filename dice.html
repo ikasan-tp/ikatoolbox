@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IKATOOLBOX | CoC CHARACTER ROLLER</title>
+<title>IKATOOLBOX | CHARACTER ROLLER</title>
 
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%%22 y=%2250%%22 style=%22dominant-baseline:central;text-anchor:middle;font-size:80px;%22>🦑</text></svg>">
 
@@ -77,8 +77,14 @@
 
   .btn-all { 
     background: var(--accent); color: #fff; border: none; padding: 10px 28px; 
-    border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.2s;
+    border-radius: 20px; font-weight: 900; cursor: pointer; transition: 0.2s;
     font-size: 14px;
+    font-family: 'Montserrat', sans-serif;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.05em;
   }
   .btn-all:hover { filter: brightness(1.2); }
 
@@ -94,6 +100,7 @@
   .stat-row { 
     display: flex; align-items: center; background: rgba(255,255,255,0.03); 
     padding: 0 15px; gap: 12px; border-radius: 4px; height: 46px;
+    position: relative;
   }
   .stat-id { font-family: 'Montserrat', sans-serif; font-size: 0.95rem; font-weight: 900; color: #fff; width: 45px; }
   .stat-dice { font-size: 0.65rem; color: var(--text-sub); font-family: monospace; width: 55px; opacity: 0.4; }
@@ -133,17 +140,16 @@
   .calc-card.compact-grid { flex: 1; padding: 8px 18px; min-height: 40px; }
   .calc-card.compact-grid .calc-val { font-size: 1.2rem; }
 
-  /* 特徴表カード専用の調整 */
   #trait-dice-card {
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* 上下の要素を端に寄せる */
+    justify-content: space-between;
     min-height: 90px;
   }
   .trait-main-display {
     flex: 1;
     display: flex;
-    align-items: center; /* 垂直方向中央 */
+    align-items: center;
     justify-content: center;
     min-height: 34px;
   }
@@ -179,8 +185,55 @@
   .fixed-footer { position: fixed; bottom: 10px; right: 15px; font-family: sans-serif; font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: 0.1em; font-weight: bold; pointer-events: none; z-index: 9999; }
 
   @media screen and (max-width: 750px) {
-    .main-layout { flex-direction: column; }
-    .top-stats { display: grid; grid-template-columns: 1fr 1fr; }
+    body { padding: 20px 10px; }
+    .card { padding: 20px; }
+    
+    .ui-header { 
+      flex-direction: column; 
+      align-items: flex-start; 
+      gap: 15px; 
+      border-bottom-width: 2px;
+    }
+    .header-left { width: 100%; }
+    .header-right { 
+      width: 100%; 
+      justify-content: space-between; 
+      align-items: center;
+      padding-bottom: 0;
+    }
+    
+    .btn-all { 
+      padding: 8px 16px; 
+      font-size: 12px;
+      border-radius: 15px;
+      min-width: 60px;
+    }
+
+    .top-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+    .top-box { padding: 10px; }
+    .top-val { font-size: 1.6rem; }
+
+    .main-layout { flex-direction: column; gap: 20px; }
+    
+    .stat-row { 
+      height: auto; padding: 10px 15px; flex-wrap: wrap; 
+      justify-content: flex-start; align-items: center;
+    }
+    .stat-id { width: 40px; font-size: 0.85rem; }
+    .stat-dice { width: 50px; }
+    .stat-num { width: 45px; font-size: 1.5rem; text-align: left; }
+    .stat-jp-hint { 
+      width: 100%; text-align: left; flex: none; order: 10;
+      margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .dice-btn { position: absolute; right: 10px; top: 10px; }
+
+    .calc-column { gap: 10px; }
+    .calc-grid { grid-template-columns: 1fr; }
+    .calc-card { min-height: 80px; }
+    .calc-card.compact-grid { min-height: 50px; }
+    .calc-val { font-size: 1.8rem; }
+    .calc-card.total-box .calc-val { font-size: 2.2rem; }
   }
 </style>
 </head>
@@ -203,7 +256,7 @@
           <button id="tab-7th" class="tab-btn active" onclick="switchEdition(7)">7th</button>
           <button id="tab-6th" class="tab-btn" onclick="switchEdition(6)">6th</button>
         </div>
-        <button class="btn-all" onclick="rollAll()">一括ロール</button>
+        <button class="btn-all" onclick="rollAll()">ALL</button>
       </div>
     </div>
 
