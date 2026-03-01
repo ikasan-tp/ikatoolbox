@@ -668,6 +668,15 @@ function exportLog() {
         document.getElementById('customSystemInput').value || 'LOG ARCHIVE' : 
         systemSelectVal;
 
+    // --- 通常タブの色をアクセントカラーとして取得 ---
+    let dynamicAccent = "#C5373C"; 
+    if (tabStyleMap['通常']) {
+        dynamicAccent = tabStyleMap['通常'].color;
+    } else {
+        const firstTab = Object.keys(tabStyleMap)[0];
+        if (firstTab) dynamicAccent = tabStyleMap[firstTab].color;
+    }
+
     const hexToRgba = (hex, alpha) => {
         const r = parseInt(hex.slice(1, 3), 16);
         const g = parseInt(hex.slice(3, 5), 16);
@@ -693,7 +702,7 @@ function exportLog() {
     });
 
     let html = `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><title>${h1Title}</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet"><style>
-    :root { --outer-bg: #0f0f0f; --inner-bg: #050505; --block-bg: #111111; --text: #dbdee1; --accent: #C5373C; --sub-line: #444; --border: #222; --tab-text: #666; --chat-text: #8a8a8a; --container-width: 680px; } 
+    :root { --outer-bg: #0f0f0f; --inner-bg: #050505; --block-bg: #111111; --text: #dbdee1; --accent: ${dynamicAccent}; --sub-line: #444; --border: #222; --tab-text: #666; --chat-text: #8a8a8a; --container-width: 680px; } 
     body { background: var(--outer-bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; margin: 0; padding: 0; line-height: 1.7; display: flex; flex-direction: column; align-items: center; } 
     
     header { position: fixed; top: 0; left: 0; width: 100%; background: rgba(5, 5, 5, 0.98); backdrop-filter: blur(12px); z-index: 1000; border-bottom: 1px solid var(--border); display: flex; justify-content: center; padding: 0; } 
@@ -796,7 +805,10 @@ function exportLog() {
         const tabNameDisplay = isSystem ? '' : item.tab;
         const nameDisplay = isSystem ? '' : char.displayName;
 
-        html += `<div class="log-row ${styleClass}" id="log-${i}"><div class="row-header"><div class="row-name" ${nameStyle}><span class="name-line" ${lineStyle}></span>${nameDisplay}</div><div class="row-tab">${tabNameDisplay}</div></div><hr class="info-separator"><div class="row-content">${item.content.replace(/\n/g, '<br>')}</div></div>`;
+        // 特殊文字のエスケープを回避しつつ改行を置換
+        const safeContent = item.content.split('\\n').join('<br>');
+
+        html += `<div class="log-row ${styleClass}" id="log-${i}"><div class="row-header"><div class="row-name" ${nameStyle}><span class="name-line" ${lineStyle}></span>${nameDisplay}</div><div class="row-tab">${tabNameDisplay}</div></div><hr class="info-separator"><div class="row-content">${safeContent}</div></div>`;
     });
 
     html += `</div><footer>✦ IKATOOLBOX</footer>
@@ -821,7 +833,8 @@ function exportLog() {
     a.href = URL.createObjectURL(blob); 
     a.download = fileName + ".html"; 
     a.click();
-}</script>
+}
+</script>
 
 <div style="position: fixed; bottom: 10px; right: 15px; font-family: sans-serif; font-size: 10px; color: rgba(255,255,255,0.1); letter-spacing: 0.1em; font-weight: bold; pointer-events: none; z-index: 9999;">✦ IKATOOLBOX</div>
 </body>
