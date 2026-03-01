@@ -143,6 +143,30 @@
             .log-row { min-height: 130px; } 
              .del-btn { padding: 8px; margin-top: 8px; }
         }
+.btn-clean-minimal {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    background: var(--accent);
+    border: none;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: filter 0.2s;
+}
+
+.btn-clean-minimal:hover {
+    filter: brightness(1.2);
+}
+
+.btn-clean-minimal .material-symbols-outlined {
+    font-size: 1.1rem;
+}
     </style>
 </head>
 <body>
@@ -152,50 +176,68 @@
     </button>
 
     <aside class="sidebar">
-        <div class="sidebar-scroll">
-            <a href="index.html" class="back-link">
-                <span class="material-symbols-outlined" style="font-size: 1rem;">arrow_back_ios</span>
-                BACK TO TOOLBOX
-            </a>
+  <div class="sidebar-scroll">
+    <a href="index.html" class="back-link">
+        <span class="material-symbols-outlined" style="font-size: 1rem;">arrow_back_ios</span>
+        BACK TO TOOLBOX
+    </a>
 
-            <div class="ui-header">
-                <span class="ui-brand">IKATOOLBOX</span>
-                <div class="ui-title">LOG EDITOR</div>
+    <div class="ui-header">
+        <span class="ui-brand">IKATOOLBOX</span>
+        <div class="ui-title">LOG EDITOR</div>
+    </div>
+
+    <div class="control-group">
+        <h2>1. ファイル読込</h2>
+        <input type="file" id="logFile" accept=".html" style="display:none" onchange="processLog(this.files[0])">
+        <div class="file-input-area" onclick="document.getElementById('logFile').click()">
+            <p style="font-size:0.75rem; color:var(--text-sub); margin:0;">HTMLをドロップするか<br><span class="file-label">ファイルを選択</span></p>
+        </div>
+    </div>
+
+   <div id="postUploadControls" style="display: none;">
+        <div class="control-group">
+            <h2>2. タイトル設定</h2>
+            <p style="font-size:0.6rem; color:var(--text-sub); margin-bottom:4px;">セッションタイトル</p>
+            <input type="text" id="logTitleInput" placeholder="セッションタイトル">
+
+            <p style="font-size:0.6rem; color:var(--text-sub); margin-top:12px; margin-bottom:4px;">書き出しファイル名</p>
+            <div class="input-with-extension">
+                <input type="text" id="fileNameInput" placeholder="export_log">
+                <span class="extension-label">.html</span>
             </div>
 
-            <div class="control-group">
-                <h2>1. ファイル読込</h2>
-                <input type="file" id="logFile" accept=".html" style="display:none" onchange="processLog(this.files[0])">
-                <div class="file-input-area" onclick="document.getElementById('logFile').click()">
-                    <p style="font-size:0.75rem; color:var(--text-sub); margin:0;">HTMLをドロップするか<br><span class="file-label">ファイルを選択</span></p>
+            <p style="font-size:0.6rem; color:var(--text-sub); margin-top:12px; margin-bottom:4px;">システム名 (ヘッダー表示)</p>
+            <select id="systemSelect" class="style-select" style="width:100%; margin-bottom:6px; height:36px;" onchange="toggleCustomSystem(this.value)">
+                <option value="CALL OF CTHULHU 6th">Call of Cthulhu 6th</option>
+                <option value="CALL OF CTHULHU 7th">Call of Cthulhu 7th</option>
+                <option value="EMOKLORE">Emoklore</option>
+                <option value="CUSTOM" selected>その他（自由入力）</option>
+            </select>
+            <input type="text" id="customSystemInput" placeholder="システム名を入力" value="LOG ARCHIVE">
+        </div>
+
+        <div class="control-group">
+            <h2>3. 検索・置換</h2>
+<div style="margin-bottom: 20px; text-align: right;">
+    <button onclick="cleanUpLogData()" class="btn-clean-minimal">
+        <span class="material-symbols-outlined">mop</span>
+        <span>ログを掃除する</span>
+    </button>
+</div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="検索ワード..." oninput="handleSearch()">
+                <div class="search-btns">
+                    <button onclick="navSearch(-1)">前へ</button>
+                    <button onclick="navSearch(1)">次へ</button>
+                </div>
+                <div style="margin-top:10px; border-top:1px solid #333; padding-top:10px;">
+                    <input type="text" id="replaceInput" placeholder="置換後のワード...">
+                    <button onclick="handleReplace()" style="width:100%; margin-top:4px; padding:6px; background:var(--accent); border:none; color:#fff; font-size:0.65rem; border-radius:4px; font-weight:bold; cursor:pointer;">一括置換を実行</button>
                 </div>
             </div>
-
-                <div class="control-group">
-                    <h2>2. タイトル設定</h2>
-                    <p style="font-size:0.6rem; color:var(--text-sub); margin-bottom:4px;">セッションタイトル</p>
-                    <input type="text" id="logTitleInput" placeholder="セッションタイトル">
-
-                    <p style="font-size:0.6rem; color:var(--text-sub); margin-top:12px; margin-bottom:4px;">書き出しファイル名</p>
-                    <div class="input-with-extension">
-                        <input type="text" id="fileNameInput" placeholder="export_log">
-                        <span class="extension-label">.html</span>
-                    </div>
-
-                    <p style="font-size:0.6rem; color:var(--text-sub); margin-top:12px; margin-bottom:4px;">システム名 (ヘッダー表示)</p>
-                    <select id="systemSelect" class="style-select" style="width:100%; margin-bottom:6px; height:36px;" onchange="toggleCustomSystem(this.value)">
-                        <option value="CALL OF CTHULHU 6th">Call of Cthulhu 6th</option>
-                        <option value="CALL OF CTHULHU 7th">Call of Cthulhu 7th</option>
-                        <option value="EMOKLORE">Emoklore</option>
-                        <option value="CUSTOM" selected>その他（自由入力）</option>
-                    </select>
-                    <input type="text" id="customSystemInput" placeholder="システム名を入力" value="LOG ARCHIVE">
-                </div>
-
-                <div class="control-group">
-                    <h2>3. 検索・置換</h2>
-
-                               <div id="editorSettings" style="display:none;">
+            
+            <div id="editorSettings" style="display:none; margin-top:15px;">
                 <div id="groupPanel" class="group-panel">
                     <div id="selectionInfo" style="font-size: 0.65rem; font-weight: 900; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px;">選択した行をまとめて操作</div>
                     <div class="btn-wrap">
@@ -206,30 +248,19 @@
                         <button onclick="clearSelection()"><span class="material-symbols-outlined">close</span> 取消</button>
                     </div>
                 </div>
-
-                    <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="検索ワード..." oninput="handleSearch()">
-                        <div class="search-btns">
-                            <button onclick="navSearch(-1)">前へ</button>
-                            <button onclick="navSearch(1)">次へ</button>
-                        </div>
-                        <div style="margin-top:10px; border-top:1px solid #333; padding-top:10px;">
-                            <input type="text" id="replaceInput" placeholder="置換後のワード...">
-                            <button onclick="handleReplace()" style="width:100%; margin-top:4px; padding:6px; background:var(--accent); border:none; color:#fff; font-size:0.65rem; border-radius:4px; font-weight:bold; cursor:pointer;">一括置換を実行</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="control-group">
-                    <h2>4. キャラクター設定</h2>
-                    <div id="charGrid"></div>
-                </div>
-                <div class="control-group">
-                    <h2>5. タブ装飾設定</h2>
-                    <div id="tabStyleSettings"></div>
-                </div>
             </div>
         </div>
+
+        <div class="control-group">
+            <h2>4. キャラクター設定</h2>
+            <div id="charGrid"></div>
+        </div>
+        <div class="control-group">
+            <h2>5. タブ装飾設定</h2>
+            <div id="tabStyleSettings"></div>
+        </div>
+    </div> 
+    </div>
 <div class="sidebar-footer">
     <button class="save-btn" id="downloadBtn" disabled onclick="exportLog()">HTMLを書き出し</button>
     <div style="width: 100%; text-align: center;">
@@ -385,7 +416,7 @@
         });
 
         document.getElementById('emptyState').style.display = 'none';
-        document.getElementById('editorSettings').style.display = 'block';
+        document.getElementById('postUploadControls').style.display = 'block';
         document.getElementById('downloadBtn').disabled = false;
         renderCharConfigs(); renderTabSettings(); renderEditor(true);
     }
@@ -660,6 +691,28 @@ function handleReplace() {
         });
     }
 
+function cleanUpLogData() {
+    const beforeCount = logData.length;
+
+    logData = logData.filter(item => {
+        const contentStr = String(item.content);
+        const hasDeletedText = contentStr.includes('削除済');
+        const isEmpty = !contentStr.trim();
+        
+        return !(hasDeletedText || isEmpty);
+    });
+
+    const afterCount = logData.length;
+    const diff = beforeCount - afterCount;
+
+    if (diff === 0) {
+        alert('掃除する行（削除済・空行）は見つかりませんでした。');
+    } else {
+        renderEditor(true);
+        alert(`掃除完了！\n不要な ${diff} 行をリストから完全に消去しました🦑`);
+    }
+}
+
 function exportLog() {
     const h1Title = document.getElementById('logTitleInput').value || 'LOG';
     const fileName = document.getElementById('fileNameInput').value || 'log';
@@ -837,4 +890,3 @@ function exportLog() {
 <div style="position: fixed; bottom: 10px; right: 15px; font-family: sans-serif; font-size: 10px; color: rgba(255,255,255,0.1); letter-spacing: 0.1em; font-weight: bold; pointer-events: none; z-index: 9999;">✦ IKATOOLBOX</div>
 </body>
 </html>
-
