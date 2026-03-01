@@ -804,8 +804,6 @@ function exportLog() {
         
         const tabNameDisplay = isSystem ? '' : item.tab;
         const nameDisplay = isSystem ? '' : char.displayName;
-
-        // 特殊文字のエスケープを回避しつつ改行を置換
         const safeContent = item.content.split('\\n').join('<br>');
 
         html += `<div class="log-row ${styleClass}" id="log-${i}"><div class="row-header"><div class="row-name" ${nameStyle}><span class="name-line" ${lineStyle}></span>${nameDisplay}</div><div class="row-tab">${tabNameDisplay}</div></div><hr class="info-separator"><div class="row-content">${safeContent}</div></div>`;
@@ -839,3 +837,4 @@ function exportLog() {
 <div style="position: fixed; bottom: 10px; right: 15px; font-family: sans-serif; font-size: 10px; color: rgba(255,255,255,0.1); letter-spacing: 0.1em; font-weight: bold; pointer-events: none; z-index: 9999;">✦ IKATOOLBOX</div>
 </body>
 </html>
+
