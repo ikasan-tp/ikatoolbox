@@ -80,7 +80,7 @@
         .search-btns button { flex: 1; padding: 6px; background: #333; border: none; color: #fff; font-size: 0.65rem; border-radius: 4px; cursor: pointer; }
         .search-btns button:hover { background: #444; }
 
-        .main-content { flex: 1; background: #0a0a0a; overflow-y: auto; padding: 40px 0; scroll-behavior: smooth; }
+        .main-content { flex: 1; background: #0a0a0a; overflow-y: auto; padding: 0; scroll-behavior: smooth; }
         .log-row { position: relative; width: 100%; max-width: 900px; margin: 0 auto; padding: 20px 15px; border-bottom: 1px solid #222; transition: 0.1s; border-left: 4px solid transparent; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px; }
         .log-row.search-hit { outline: 2px solid rgba(255, 235, 59, 0.3); background: rgba(255, 235, 59, 0.05); }
         .log-row.preview-info, .log-row.preview-secret, .log-row.preview-chat { background: #151515; }
@@ -272,7 +272,7 @@
 </div>
     </aside>
 
-    <main class="main-content" id="mainScrollArea">
+    <main class="main-content" id="mainScrollArea" onscroll="handleScroll()">
         <div id="emptyState">
             <div class="guide-container">
                 <div class="guide-welcome">
@@ -326,7 +326,9 @@
                 </div>
             </div>
         </div>
-        <div id="logEditor"></div>
+        <div id="virtualScrollContainer" style="position: relative; width: 100%;">
+            <div id="logEditor"></div>
+        </div>
     </main>
 
 <script>
@@ -337,6 +339,11 @@
     let searchMatches = [];
     let currentSearchIdx = -1;
     let lastSelectedIndex = -1;
+
+    // 仮想スクロール用の変数
+    const ROW_HEIGHT = 180; // およその1行の高さ
+    const VISIBLE_COUNT = 20; // 同時に表示する数
+    let startIndex = 0;
 
     const STYLES = [
         { id: 'style-default', name: 'メイン' },
@@ -418,7 +425,11 @@
         document.getElementById('emptyState').style.display = 'none';
         document.getElementById('postUploadControls').style.display = 'block';
         document.getElementById('downloadBtn').disabled = false;
-        renderCharConfigs(); renderTabSettings(); renderEditor(true);
+        renderCharConfigs(); renderTabSettings(); 
+        
+        // 全体の高さを設定
+        document.getElementById('virtualScrollContainer').style.height = (logData.length * ROW_HEIGHT) + 'px';
+        renderEditor(true);
     }
 
     function renderCharConfigs() {
@@ -474,9 +485,12 @@ function renderTabSettings() {
     }
 
     function updatePreviewStyles() {
-        logData.forEach((item, index) => {
-            const row = document.getElementById(`row-${index}`);
-            if(!row) return;
+        // 現在描画されている行だけ更新
+        const renderedRows = document.querySelectorAll('.log-row');
+        renderedRows.forEach(row => {
+            const idx = parseInt(row.id.split('-')[1]);
+            const item = logData[idx];
+            if(!item) return;
             row.classList.remove('preview-info', 'preview-secret', 'preview-chat');
             const styleObj = tabStyleMap[item.tab];
             if(styleObj.style === 'style-info') row.classList.add('preview-info');
@@ -485,66 +499,83 @@ function renderTabSettings() {
         });
     }
 
-function renderEditor(fullInit = false) {
+    function handleScroll() {
+        const scrollArea = document.getElementById('mainScrollArea');
+        const newStartIndex = Math.max(0, Math.floor(scrollArea.scrollTop / ROW_HEIGHT) - 5);
+        if (newStartIndex !== startIndex) {
+            startIndex = newStartIndex;
+            renderEditor(true);
+        }
+    }
+
+    function renderEditor(fullInit = false) {
         const container = document.getElementById('logEditor');
+        if (!logData.length) return;
+
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         searchMatches = [];
-        if (fullInit) {
-            container.innerHTML = '';
-            const fragment = document.createDocumentFragment();
+        if (searchTerm) {
             logData.forEach((item, index) => {
-                const char = charSettings[item.charKey] || { displayName: "Unknown", color: "#888" };
-                const row = document.createElement('div');
-                row.classList.add('log-row');
-                row.setAttribute('id', 'row-' + index);
-
-                row.innerHTML = `
-                    <div class="row-header">
-                        <span class="row-name" data-charkey="${item.charKey}" style="color:${char.color}">${char.displayName} <small style="color:#444; font-size:0.6rem;">[${item.tab}]</small></span>
-                        <div class="anchor-area">
-                            <label class="anchor-check-label">
-                                <input type="checkbox" class="anchor-check" ${item.anchor ? 'checked' : ''} onchange="toggleAnchor(${index}, this.checked)">目次
-                                <input type="text" class="anchor-input" value="${item.anchor || ''}" placeholder="目次名を入力" oninput="logData[${index}].anchor=this.value" style="${item.anchor ? 'display:block' : ''}">
-                            </label>
-                        </div>
-                    </div>
-                    <textarea class="row-content" oninput="logData[${index}].content = this.value; this.style.height='auto'; this.style.height=this.scrollHeight+'px'">${item.content}</textarea>
-                    <div class="col-select">
-                        <input type="checkbox" id="check-${index}" class="row-checkbox" onchange="toggleSelect(${index})" ${selectedIndices.includes(index) ? 'checked' : ''}>
-                        <label for="check-${index}" class="select-label">Select</label>
-                        <div class="action-group">
-                            <button class="move-btn" onclick="moveRow(${index}, -1)" title="上に移動"><span class="material-symbols-outlined">keyboard_arrow_up</span></button>
-                            <button class="move-btn" onclick="moveRow(${index}, 1)" title="下に移動"><span class="material-symbols-outlined">keyboard_arrow_down</span></button>
-                            <button class="del-btn" onclick="deleteRow(${index})" title="削除"><span class="material-symbols-outlined">delete</span></button>
-                        </div>
-                    </div>
-                `;
-
-                const currentTabConfig = tabStyleMap[item.tab];
-                if (currentTabConfig && currentTabConfig.style === 'style-secret') {
-                    const translucentColor = currentTabConfig.color + '44';
-                    row.style.setProperty('background-color', translucentColor, 'important');
-                    row.style.setProperty('color', '#ccc', 'important');
-                }
-
-                fragment.appendChild(row);
+                if (item.content.toLowerCase().includes(searchTerm)) searchMatches.push(index);
             });
-            container.appendChild(fragment);
-            container.querySelectorAll('textarea').forEach(ta => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; });
-            updatePreviewStyles();
         }
 
-        logData.forEach((item, index) => {
-            const row = document.getElementById(`row-${index}`);
-            if(!row) return;
-            const isSelected = selectedIndices.includes(index);
+        // 表示範囲の決定
+        const endIndex = Math.min(logData.length, startIndex + VISIBLE_COUNT);
+        const topPadding = startIndex * ROW_HEIGHT;
+
+        container.style.transform = `translateY(${topPadding}px)`;
+        container.innerHTML = '';
+        const fragment = document.createDocumentFragment();
+
+        for (let i = startIndex; i < endIndex; i++) {
+            const item = logData[i];
+            const char = charSettings[item.charKey] || { displayName: "Unknown", color: "#888" };
+            const row = document.createElement('div');
+            row.classList.add('log-row');
+            row.setAttribute('id', 'row-' + i);
+            row.style.height = ROW_HEIGHT + 'px'; // 仮想スクロール維持のため固定
+
+            const isSelected = selectedIndices.includes(i);
             const isHit = searchTerm && item.content.toLowerCase().includes(searchTerm);
-            if (isHit) searchMatches.push(index);
-            row.classList.toggle('selected', isSelected);
-            row.classList.toggle('search-hit', isHit);
-            const cb = row.querySelector('.row-checkbox');
-            if(cb) cb.checked = isSelected;
-        });
+
+            row.innerHTML = `
+                <div class="row-header">
+                    <span class="row-name" data-charkey="${item.charKey}" style="color:${char.color}">${char.displayName} <small style="color:#444; font-size:0.6rem;">[${item.tab}]</small></span>
+                    <div class="anchor-area">
+                        <label class="anchor-check-label">
+                            <input type="checkbox" class="anchor-check" ${item.anchor ? 'checked' : ''} onchange="toggleAnchor(${i}, this.checked)">目次
+                            <input type="text" class="anchor-input" value="${item.anchor || ''}" placeholder="目次名を入力" oninput="logData[${i}].anchor=this.value" style="${item.anchor ? 'display:block' : ''}">
+                        </label>
+                    </div>
+                </div>
+                <textarea class="row-content" oninput="logData[${i}].content = this.value">${item.content}</textarea>
+                <div class="col-select">
+                    <input type="checkbox" id="check-${i}" class="row-checkbox" onchange="toggleSelect(${i})" ${isSelected ? 'checked' : ''}>
+                    <label for="check-${i}" class="select-label">Select</label>
+                    <div class="action-group">
+                        <button class="move-btn" onclick="moveRow(${i}, -1)" title="上に移動"><span class="material-symbols-outlined">keyboard_arrow_up</span></button>
+                        <button class="move-btn" onclick="moveRow(${i}, 1)" title="下に移動"><span class="material-symbols-outlined">keyboard_arrow_down</span></button>
+                        <button class="del-btn" onclick="deleteRow(${i})" title="削除"><span class="material-symbols-outlined">delete</span></button>
+                    </div>
+                </div>
+            `;
+
+            if (isHit) row.classList.add('search-hit');
+            if (isSelected) row.classList.add('selected');
+
+            const currentTabConfig = tabStyleMap[item.tab];
+            if (currentTabConfig && currentTabConfig.style === 'style-secret') {
+                const translucentColor = currentTabConfig.color + '44';
+                row.style.setProperty('background-color', translucentColor, 'important');
+                row.style.setProperty('color', '#ccc', 'important');
+            }
+
+            fragment.appendChild(row);
+        }
+
+        container.appendChild(fragment);
+        updatePreviewStyles();
     }
 
     function toggleSelect(index) {
@@ -578,6 +609,7 @@ function renderEditor(fullInit = false) {
     function deleteRow(index) {
         if (!confirm("この行を削除しますか？")) return;
         logData.splice(index, 1);
+        document.getElementById('virtualScrollContainer').style.height = (logData.length * ROW_HEIGHT) + 'px';
         renderEditor(true);
     }
 
@@ -593,43 +625,24 @@ function renderEditor(fullInit = false) {
         selectedIndices = [];
         lastSelectedIndex = -1;
         document.getElementById('groupPanel').style.display = 'none';
+        document.getElementById('virtualScrollContainer').style.height = (logData.length * ROW_HEIGHT) + 'px';
         renderEditor(true);
     }
 
     function moveRow(index, direction) {
         const newIndex = index + direction;
         if (newIndex < 0 || newIndex >= logData.length) return;
-        const container = document.getElementById('logEditor');
-        const rowA = document.getElementById(`row-${index}`);
-        const rowB = document.getElementById(`row-${newIndex}`);
-        if (direction === 1) container.insertBefore(rowB, rowA);
-        else container.insertBefore(rowA, rowB);
-        rowA.id = `row-temp`;
-        rowB.id = `row-${index}`;
-        rowA.id = `row-${newIndex}`;
-        updateRowIndex(rowA, newIndex);
-        updateRowIndex(rowB, index);
+        
         const temp = logData[index];
         logData[index] = logData[newIndex];
         logData[newIndex] = temp;
+        
         if (selectedIndices.includes(index)) {
             selectedIndices = selectedIndices.map(i => i === index ? newIndex : (i === newIndex ? index : i));
         } else if (selectedIndices.includes(newIndex)) {
             selectedIndices = selectedIndices.map(i => i === newIndex ? index : i);
         }
-    }
-
-    function updateRowIndex(row, newIdx) {
-        row.querySelector('.row-checkbox').setAttribute('onchange', `toggleSelect(${newIdx})`);
-        const btns = row.querySelectorAll('.move-btn');
-        btns[0].setAttribute('onclick', `moveRow(${newIdx}, -1)`);
-        btns[1].setAttribute('onclick', `moveRow(${newIdx}, 1)`);
-        row.querySelector('.del-btn').setAttribute('onclick', `deleteRow(${newIdx})`);
-        const anchorCheck = row.querySelector('.anchor-check');
-        if(anchorCheck) anchorCheck.setAttribute('onchange', `toggleAnchor(${newIdx}, this.checked)`);
-        const anchorInput = row.querySelector('.anchor-input');
-        if(anchorInput) anchorInput.setAttribute('oninput', `logData[${newIdx}].anchor=this.value`);
-        row.querySelector('.row-content').setAttribute('oninput', `logData[${newIdx}].content = this.value; this.style.height='auto'; this.style.height=this.scrollHeight+'px'`);
+        renderEditor(true);
     }
 
     function moveGroup(direction) {
@@ -638,7 +651,14 @@ function renderEditor(fullInit = false) {
         if (direction === -1 && selectedIndices[0] === 0) return;
         if (direction === 1 && selectedIndices[selectedIndices.length - 1] === logData.length - 1) return;
         const loopRange = direction === -1 ? selectedIndices : [...selectedIndices].reverse();
-        loopRange.forEach(idx => moveRow(idx, direction));
+        loopRange.forEach(idx => {
+            const newIndex = idx + direction;
+            const temp = logData[idx];
+            logData[idx] = logData[newIndex];
+            logData[newIndex] = temp;
+        });
+        selectedIndices = selectedIndices.map(i => i + direction);
+        renderEditor(true);
     }
 
     function groupAndMove() {
@@ -659,12 +679,14 @@ function renderEditor(fullInit = false) {
     function clearSelection() { selectedIndices = []; lastSelectedIndex = -1; document.getElementById('groupPanel').style.display = 'none'; renderEditor(); }
 
     function toggleAnchor(index, checked) { if (!checked) logData[index].anchor = ''; }
-    function handleSearch() { currentSearchIdx = -1; renderEditor(); }
+    function handleSearch() { currentSearchIdx = -1; renderEditor(true); }
     function navSearch(dir) {
         if (searchMatches.length === 0) return;
         currentSearchIdx = (currentSearchIdx + dir + searchMatches.length) % searchMatches.length;
-        const targetId = `row-${searchMatches[currentSearchIdx]}`;
-        document.getElementById(targetId).scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const targetIndex = searchMatches[currentSearchIdx];
+        const scrollArea = document.getElementById('mainScrollArea');
+        scrollArea.scrollTop = targetIndex * ROW_HEIGHT;
+        renderEditor(true);
     }
 
 function handleReplace() {
@@ -673,22 +695,12 @@ function handleReplace() {
         if (!search) return;
         if (!confirm(`「${search}」をすべて「${replace}」に置換しますか？`)) return;
         
-        let changedCount = 0;
-
-        logData.forEach((item, index) => {
+        logData.forEach((item) => {
             if (item.content.includes(search)) {
                 item.content = item.content.split(search).join(replace);
-                
-                const row = document.getElementById(`row-${index}`);
-                if (row) {
-                    const ta = row.querySelector('.row-content');
-                    ta.value = item.content;
-                    ta.style.height = 'auto';
-                    ta.style.height = ta.scrollHeight + 'px';
-                    changedCount++;
-                }
             }
         });
+        renderEditor(true);
     }
 
 function cleanUpLogData() {
@@ -708,6 +720,7 @@ function cleanUpLogData() {
     if (diff === 0) {
         alert('掃除する行（削除済・空行）は見つかりませんでした。');
     } else {
+        document.getElementById('virtualScrollContainer').style.height = (logData.length * ROW_HEIGHT) + 'px';
         renderEditor(true);
         alert(`掃除完了！\n不要な ${diff} 行をリストから完全に消去しました🦑`);
     }
