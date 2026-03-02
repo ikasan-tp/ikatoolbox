@@ -237,7 +237,7 @@
                 </div>
             </div>
             
-            <div id="editorSettings" style="display:none; margin-top:15px;">
+            <div id="editorSettings" style="display:block; margin-top:15px;">
                 <div id="groupPanel" class="group-panel">
                     <div id="selectionInfo" style="font-size: 0.65rem; font-weight: 900; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px;">選択した行をまとめて操作</div>
                     <div class="btn-wrap">
@@ -340,9 +340,8 @@
     let currentSearchIdx = -1;
     let lastSelectedIndex = -1;
 
-    // 仮想スクロール用の変数
-    const ROW_HEIGHT = 180; // およその1行の高さ
-    const VISIBLE_COUNT = 20; // 同時に表示する数
+    const ROW_HEIGHT = 180; 
+    const VISIBLE_COUNT = 25; 
     let startIndex = 0;
 
     const STYLES = [
@@ -403,20 +402,11 @@
             const charKey = getCharKey(name, color);
             logData.push({ charKey, content, tab, anchor: '' });
             if (!tabStyleMap[tab]) {
-                let defaultColor = '#333333'; 
                 let style = 'style-chat';     
-                
-                if (tab.match(/info|情報|system/i)) { 
-                    style = 'style-info'; 
-                    defaultColor = '#444444'; 
-                } else if (tab.match(/秘匿|秘密|HO/i)) { 
-                    style = 'style-secret'; 
-                    defaultColor = '#8e44ad'; 
-                } else if (tab.match(/main|メイン/i)) {
-                    style = 'style-default';
-                    defaultColor = '#C5373C';
-                }
-                
+                let defaultColor = '#333333'; 
+                if (tab.match(/info|情報|system/i)) { style = 'style-info'; defaultColor = '#444444'; } 
+                else if (tab.match(/秘匿|秘密|HO/i)) { style = 'style-secret'; defaultColor = '#8e44ad'; } 
+                else if (tab.match(/main|メイン/i)) { style = 'style-default'; defaultColor = '#C5373C'; }
                 tabStyleMap[tab] = { style, color: defaultColor };
             }
             if (!charSettings[charKey]) charSettings[charKey] = { displayName: name, color: color };
@@ -427,7 +417,6 @@
         document.getElementById('downloadBtn').disabled = false;
         renderCharConfigs(); renderTabSettings(); 
         
-        // 全体の高さを設定
         document.getElementById('virtualScrollContainer').style.height = (logData.length * ROW_HEIGHT) + 'px';
         renderEditor(true);
     }
@@ -448,19 +437,13 @@
     }
 
     function updateAllRowColors(key) {
-        const color = charSettings[key].color;
-        document.querySelectorAll(`.row-name[data-charkey="${key}"]`).forEach(el => el.style.color = color);
+        renderEditor();
     }
     function updateAllRowNames(key) {
-        const name = charSettings[key].displayName;
-        document.querySelectorAll(`.row-name[data-charkey="${key}"]`).forEach(el => {
-            const tabEl = el.querySelector('small');
-            const tab = tabEl ? tabEl.innerText : '';
-            el.innerHTML = `${name} <small style="color:#444; font-size:0.6rem;">${tab}</small>`;
-        });
+        renderEditor();
     }
 
-function renderTabSettings() {
+    function renderTabSettings() {
         const container = document.getElementById('tabStyleSettings');
         container.innerHTML = '';
         Object.keys(tabStyleMap).forEach(tab => {
@@ -471,9 +454,9 @@ function renderTabSettings() {
                     <span class="tab-config-name">${tab}</span>
                     <div class="tab-config-controls">
                         <input type="color" class="in-color-picker" value="${tabStyleMap[tab].color}" 
-                            onchange="tabStyleMap['${tab}'].color=this.value; renderEditor(true)">
+                            onchange="tabStyleMap['${tab}'].color=this.value; renderEditor()">
                         <select class="style-select" 
-                            onchange="tabStyleMap['${tab}'].style=this.value; renderEditor(true)">
+                            onchange="tabStyleMap['${tab}'].style=this.value; renderEditor()">
                             ${STYLES.map(s => `<option value="${s.id}" ${tabStyleMap[tab].style === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}
                         </select>
                     </div>
@@ -481,34 +464,18 @@ function renderTabSettings() {
             `;
             container.appendChild(div);
         });
-        renderEditor(true);
-    }
-
-    function updatePreviewStyles() {
-        // 現在描画されている行だけ更新
-        const renderedRows = document.querySelectorAll('.log-row');
-        renderedRows.forEach(row => {
-            const idx = parseInt(row.id.split('-')[1]);
-            const item = logData[idx];
-            if(!item) return;
-            row.classList.remove('preview-info', 'preview-secret', 'preview-chat');
-            const styleObj = tabStyleMap[item.tab];
-            if(styleObj.style === 'style-info') row.classList.add('preview-info');
-            if(styleObj.style === 'style-secret') row.classList.add('preview-secret');
-            if(styleObj.style === 'style-chat') row.classList.add('preview-chat');
-        });
     }
 
     function handleScroll() {
         const scrollArea = document.getElementById('mainScrollArea');
         const newStartIndex = Math.max(0, Math.floor(scrollArea.scrollTop / ROW_HEIGHT) - 5);
-        if (newStartIndex !== startIndex) {
+        if (Math.abs(newStartIndex - startIndex) > 2) {
             startIndex = newStartIndex;
-            renderEditor(true);
+            renderEditor();
         }
     }
 
-    function renderEditor(fullInit = false) {
+    function renderEditor() {
         const container = document.getElementById('logEditor');
         if (!logData.length) return;
 
@@ -520,7 +487,6 @@ function renderTabSettings() {
             });
         }
 
-        // 表示範囲の決定
         const endIndex = Math.min(logData.length, startIndex + VISIBLE_COUNT);
         const topPadding = startIndex * ROW_HEIGHT;
 
@@ -534,10 +500,20 @@ function renderTabSettings() {
             const row = document.createElement('div');
             row.classList.add('log-row');
             row.setAttribute('id', 'row-' + i);
-            row.style.height = ROW_HEIGHT + 'px'; // 仮想スクロール維持のため固定
+            row.style.height = ROW_HEIGHT + 'px';
 
             const isSelected = selectedIndices.includes(i);
             const isHit = searchTerm && item.content.toLowerCase().includes(searchTerm);
+            
+            const config = tabStyleMap[item.tab];
+            if (config) {
+                if (config.style === 'style-info') row.classList.add('preview-info');
+                if (config.style === 'style-secret') {
+                    row.classList.add('preview-secret');
+                    row.style.backgroundColor = config.color + '22';
+                }
+                if (config.style === 'style-chat') row.classList.add('preview-chat');
+            }
 
             row.innerHTML = `
                 <div class="row-header">
@@ -551,98 +527,93 @@ function renderTabSettings() {
                 </div>
                 <textarea class="row-content" oninput="logData[${i}].content = this.value">${item.content}</textarea>
                 <div class="col-select">
-                    <input type="checkbox" id="check-${i}" class="row-checkbox" onchange="toggleSelect(${i})" ${isSelected ? 'checked' : ''}>
+                    <input type="checkbox" id="check-${i}" class="row-checkbox" onchange="toggleSelect(${i}, event)" ${isSelected ? 'checked' : ''}>
                     <label for="check-${i}" class="select-label">Select</label>
                     <div class="action-group">
-                        <button class="move-btn" onclick="moveRow(${i}, -1)" title="上に移動"><span class="material-symbols-outlined">keyboard_arrow_up</span></button>
-                        <button class="move-btn" onclick="moveRow(${i}, 1)" title="下に移動"><span class="material-symbols-outlined">keyboard_arrow_down</span></button>
-                        <button class="del-btn" onclick="deleteRow(${i})" title="削除"><span class="material-symbols-outlined">delete</span></button>
+                        <button class="move-btn" onclick="moveRow(${i}, -1)"><span class="material-symbols-outlined">keyboard_arrow_up</span></button>
+                        <button class="move-btn" onclick="moveRow(${i}, 1)"><span class="material-symbols-outlined">keyboard_arrow_down</span></button>
+                        <button class="del-btn" onclick="deleteRow(${i})"><span class="material-symbols-outlined">delete</span></button>
                     </div>
                 </div>
             `;
 
             if (isHit) row.classList.add('search-hit');
-            if (isSelected) row.classList.add('selected');
-
-            const currentTabConfig = tabStyleMap[item.tab];
-            if (currentTabConfig && currentTabConfig.style === 'style-secret') {
-                const translucentColor = currentTabConfig.color + '44';
-                row.style.setProperty('background-color', translucentColor, 'important');
-                row.style.setProperty('color', '#ccc', 'important');
+            if (isSelected) {
+                row.style.outline = "2px solid var(--accent)";
+                row.style.backgroundColor = "rgba(197, 55, 60, 0.05)";
             }
 
             fragment.appendChild(row);
         }
-
         container.appendChild(fragment);
-        updatePreviewStyles();
     }
-
-    function toggleSelect(index) {
-        const targetTab = logData[index].tab;
+function toggleSelect(index, event) {
         const pos = selectedIndices.indexOf(index);
-        
-        if (pos > -1) {
-            selectedIndices.splice(pos, 1);
-            lastSelectedIndex = -1;
-        } else {
-            if (lastSelectedIndex !== -1 && lastSelectedIndex < index) {
-                for (let i = lastSelectedIndex; i <= index; i++) {
-                    if (logData[i].tab === targetTab) {
-                        if (!selectedIndices.includes(i)) {
-                            selectedIndices.push(i);
-                        }
-                    }
-                }
+
+        if (selectedIndices.length === 0 || pos > -1) {
+            if (pos > -1) {
+                selectedIndices.splice(pos, 1);
             } else {
                 selectedIndices.push(index);
             }
             lastSelectedIndex = index;
+        } 
+        else {
+            const start = Math.min(index, lastSelectedIndex);
+            const end = Math.max(index, lastSelectedIndex);
+            
+            const targetTab = logData[lastSelectedIndex].tab;
+            
+            for (let i = start; i <= end; i++) {
+                if (logData[i].tab === targetTab) {
+                    if (!selectedIndices.includes(i)) {
+                        selectedIndices.push(i);
+                    }
+                }
+            }
+            lastSelectedIndex = index;
         }
-
-        const panel = document.getElementById('groupPanel');
-        panel.style.display = selectedIndices.length > 0 ? 'block' : 'none';
-        document.getElementById('selectionInfo').innerText = `${selectedIndices.length}件を選択中`;
+        
+        updateSelectionUI();
         renderEditor();
+    }
+
+    function updateSelectionUI() {
+        const panel = document.getElementById('groupPanel');
+        if (selectedIndices.length > 0) {
+            panel.style.display = 'block';
+            document.getElementById('selectionInfo').innerText = `${selectedIndices.length}件を選択中`;
+        } else {
+            panel.style.display = 'none';
+        }
     }
 
     function deleteRow(index) {
         if (!confirm("この行を削除しますか？")) return;
         logData.splice(index, 1);
+        selectedIndices = selectedIndices.filter(i => i !== index).map(i => i > index ? i - 1 : i);
         document.getElementById('virtualScrollContainer').style.height = (logData.length * ROW_HEIGHT) + 'px';
-        renderEditor(true);
+        updateSelectionUI();
+        renderEditor();
     }
 
     function deleteSelectedRows() {
         if (selectedIndices.length === 0) return;
         if (!confirm(`${selectedIndices.length}件の行を削除しますか？`)) return;
-        const remainingData = [];
-        const movingSet = new Set(selectedIndices);
-        for (let i = 0; i < logData.length; i++) {
-            if (!movingSet.has(i)) remainingData.push(logData[i]);
-        }
-        logData = remainingData;
+        selectedIndices.sort((a, b) => b - a);
+        selectedIndices.forEach(idx => logData.splice(idx, 1));
         selectedIndices = [];
         lastSelectedIndex = -1;
-        document.getElementById('groupPanel').style.display = 'none';
+        updateSelectionUI();
         document.getElementById('virtualScrollContainer').style.height = (logData.length * ROW_HEIGHT) + 'px';
-        renderEditor(true);
+        renderEditor();
     }
 
     function moveRow(index, direction) {
         const newIndex = index + direction;
         if (newIndex < 0 || newIndex >= logData.length) return;
-        
-        const temp = logData[index];
-        logData[index] = logData[newIndex];
-        logData[newIndex] = temp;
-        
-        if (selectedIndices.includes(index)) {
-            selectedIndices = selectedIndices.map(i => i === index ? newIndex : (i === newIndex ? index : i));
-        } else if (selectedIndices.includes(newIndex)) {
-            selectedIndices = selectedIndices.map(i => i === newIndex ? index : i);
-        }
-        renderEditor(true);
+        [logData[index], logData[newIndex]] = [logData[newIndex], logData[index]];
+        renderEditor();
     }
 
     function moveGroup(direction) {
@@ -650,15 +621,14 @@ function renderTabSettings() {
         selectedIndices.sort((a, b) => a - b);
         if (direction === -1 && selectedIndices[0] === 0) return;
         if (direction === 1 && selectedIndices[selectedIndices.length - 1] === logData.length - 1) return;
-        const loopRange = direction === -1 ? selectedIndices : [...selectedIndices].reverse();
-        loopRange.forEach(idx => {
-            const newIndex = idx + direction;
-            const temp = logData[idx];
-            logData[idx] = logData[newIndex];
-            logData[newIndex] = temp;
+        
+        const loop = direction === -1 ? selectedIndices : [...selectedIndices].reverse();
+        loop.forEach(idx => {
+            const target = idx + direction;
+            [logData[idx], logData[target]] = [logData[target], logData[idx]];
         });
         selectedIndices = selectedIndices.map(i => i + direction);
-        renderEditor(true);
+        renderEditor();
     }
 
     function groupAndMove() {
@@ -666,240 +636,121 @@ function renderTabSettings() {
         selectedIndices.sort((a, b) => a - b);
         const targetIdx = selectedIndices[0];
         const movingItems = selectedIndices.map(i => logData[i]);
-        const newData = []; const movingSet = new Set(selectedIndices);
+        const movingSet = new Set(selectedIndices);
+        const newData = [];
+        let added = false;
         for (let i = 0; i < logData.length; i++) {
-            if (i === targetIdx) newData.push(...movingItems);
+            if (i === targetIdx) { newData.push(...movingItems); added = true; }
             if (!movingSet.has(i)) newData.push(logData[i]);
         }
-        logData = newData; 
+        logData = newData;
         selectedIndices = Array.from({length: movingItems.length}, (_, i) => targetIdx + i);
-        renderEditor(true);
+        renderEditor();
     }
 
-    function clearSelection() { selectedIndices = []; lastSelectedIndex = -1; document.getElementById('groupPanel').style.display = 'none'; renderEditor(); }
+    function clearSelection() { selectedIndices = []; lastSelectedIndex = -1; updateSelectionUI(); renderEditor(); }
 
-    function toggleAnchor(index, checked) { if (!checked) logData[index].anchor = ''; }
-    function handleSearch() { currentSearchIdx = -1; renderEditor(true); }
+    function toggleAnchor(index, checked) { if (!checked) logData[index].anchor = ''; renderEditor(); }
+    function handleSearch() { currentSearchIdx = -1; renderEditor(); }
     function navSearch(dir) {
         if (searchMatches.length === 0) return;
         currentSearchIdx = (currentSearchIdx + dir + searchMatches.length) % searchMatches.length;
         const targetIndex = searchMatches[currentSearchIdx];
-        const scrollArea = document.getElementById('mainScrollArea');
-        scrollArea.scrollTop = targetIndex * ROW_HEIGHT;
-        renderEditor(true);
+        document.getElementById('mainScrollArea').scrollTop = targetIndex * ROW_HEIGHT;
+        renderEditor();
     }
 
-function handleReplace() {
+    function handleReplace() {
         const search = document.getElementById('searchInput').value;
         const replace = document.getElementById('replaceInput').value;
         if (!search) return;
         if (!confirm(`「${search}」をすべて「${replace}」に置換しますか？`)) return;
-        
-        logData.forEach((item) => {
-            if (item.content.includes(search)) {
-                item.content = item.content.split(search).join(replace);
+        logData.forEach(item => item.content = item.content.split(search).join(replace));
+        renderEditor();
+    }
+
+    function cleanUpLogData() {
+        const before = logData.length;
+        logData = logData.filter(item => !item.content.includes('削除済') && item.content.trim());
+        const diff = before - logData.length;
+        if (diff > 0) {
+            selectedIndices = [];
+            document.getElementById('virtualScrollContainer').style.height = (logData.length * ROW_HEIGHT) + 'px';
+            updateSelectionUI();
+            renderEditor();
+            alert(`${diff}件削除しました🦑`);
+        }
+    }
+
+    function exportLog() {
+        const h1Title = document.getElementById('logTitleInput').value || 'LOG';
+        const fileName = document.getElementById('fileNameInput').value || 'log';
+        const systemSelectVal = document.getElementById('systemSelect').value;
+        const headerTitle = systemSelectVal === 'CUSTOM' ? 
+            document.getElementById('customSystemInput').value || 'LOG ARCHIVE' : 
+            systemSelectVal;
+
+        let dynamicAccent = "#C5373C"; 
+        const normalTab = tabStyleMap['通常'] || Object.values(tabStyleMap)[0];
+        if (normalTab) dynamicAccent = normalTab.color;
+
+        const hexToRgba = (hex, alpha) => {
+            const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        };
+
+        const getSafeName = (str) => btoa(encodeURIComponent(str)).replace(/=/g, "");
+
+        let customTabStyles = "";
+        Object.keys(tabStyleMap).forEach(tabName => {
+            const config = tabStyleMap[tabName];
+            const safeName = getSafeName(tabName);
+            if (config.style === 'style-secret') {
+                customTabStyles += `.tab-custom-${safeName} { background: ${hexToRgba(config.color, 0.12)} !important; border-left: 3px solid ${config.color} !important; margin: 10px 15px; padding: 15px 20px; border-radius: 4px; }`;
+            } else if (config.style === 'style-info') {
+                customTabStyles += `.tab-custom-${safeName} { background: #111; margin: 30px 15px; padding: 25px; border-radius: 4px; border: 1px solid #222; } .tab-custom-${safeName} .info-separator { display: block; height: 1px; background: ${config.color}; margin: 12px 0; border: none; opacity: 0.8; }`;
             }
         });
-        renderEditor(true);
+
+        let html = `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><title>${h1Title}</title><style>
+        :root { --outer-bg: #0f0f0f; --inner-bg: #050505; --block-bg: #111111; --text: #dbdee1; --accent: ${dynamicAccent}; --sub-line: #444; --border: #222; --tab-text: #666; --container-width: 680px; } 
+        body { background: var(--outer-bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 0; line-height: 1.7; display: flex; flex-direction: column; align-items: center; } 
+        header { position: fixed; top: 0; left: 0; width: 100%; background: rgba(5, 5, 5, 0.98); backdrop-filter: blur(12px); z-index: 1000; border-bottom: 1px solid var(--border); display: flex; justify-content: center; height: 60px; } 
+        .header-inner { width: 90%; max-width: var(--container-width); display: flex; justify-content: space-between; align-items: center; } 
+        .header-title { font-weight: 900; font-size: 0.85rem; color: #fff; letter-spacing: 0.2em; text-transform: uppercase; } 
+        .nav-uncheck { display: none; } 
+        .nav-open { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: var(--accent); border-radius: 4px; z-index: 1001; position: relative; } 
+        .nav-open span, .nav-open span:before, .nav-open span:after { content: ''; display: block; height: 2px; width: 18px; background: #fff; position: absolute; transition: 0.3s; } 
+        .nav-open span:before { top: -6px; } .nav-open span:after { bottom: -6px; } 
+        .nav-content { position: fixed; top: 0; right: -320px; width: 280px; height: 100%; background: #0a0a0a; transition: 0.4s; z-index: 2000; border-left: 1px solid #222; overflow-y: auto; } 
+        .nav-uncheck:checked ~ .nav-content { right: 0; } 
+        .filter-btn { background: #1a1a1a; border: 1px solid transparent; border-radius: 20px; color: #888; padding: 8px 14px; margin: 4px; cursor: pointer; font-size: 0.7rem; } 
+        .filter-btn.active { background: var(--accent); color: #fff; } 
+        .container { width: 100%; max-width: var(--container-width); background: var(--inner-bg); min-height: 100vh; padding: 80px 0 100px; } 
+        .log-row { padding: 12px 25px; border-bottom: 1px dashed #1a1a1a; } 
+        .row-name { font-weight: 900; font-size: 0.85rem; color: #fff; display: flex; align-items: center; gap: 8px; } 
+        .name-line { width: 3px; height: 1em; background: var(--sub-line); } 
+        .row-content { font-size: 0.95rem; color: #ccc; white-space: pre-wrap; } 
+        .style-chat { margin-left: 10%; border-left: 1px solid #222; padding: 10px 15px; opacity: 0.8; } 
+        .row-system { padding: 2em 25px !important; font-style: italic; color: #aaa; } 
+        ${customTabStyles} 
+        </style></head><body>
+        <input id="nav-input" type="checkbox" class="nav-uncheck"><header><div class="header-inner"><div class="header-title">${headerTitle}</div><label for="nav-input" class="nav-open"><span></span></label></div></header>
+        <div class="nav-content"><div style="padding:20px;"><button class="filter-btn active" onclick="document.querySelector('.container').classList.toggle('hide-style-chat')">CHAT TOGGLE</button></div></div>
+        <div class="container">`;
+
+        logData.forEach((item, i) => {
+            const char = charSettings[item.charKey];
+            const config = tabStyleMap[item.tab];
+            const isSystem = char.displayName.toLowerCase() === 'system';
+            let styleClass = config.style + (isSystem ? ' row-system' : '') + ` tab-custom-${getSafeName(item.tab)}`;
+            html += `<div class="log-row ${styleClass}" id="log-${i}"><div class="row-header"><div class="row-name" style="${config.style==='style-chat'?'color:'+char.color:''}"><span class="name-line" style="${(config.style==='style-chat'||isSystem)?'display:none':'background:'+char.color}"></span>${isSystem?'':char.displayName}</div></div><div class="row-content">${item.content.replace(/\n/g,'<br>')}</div></div>`;
+        });
+
+        html += `</div></body></html>`;
+        const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([html], {type:'text/html'})); a.download = fileName + ".html"; a.click();
     }
-
-function cleanUpLogData() {
-    const beforeCount = logData.length;
-
-    logData = logData.filter(item => {
-        const contentStr = String(item.content);
-        const hasDeletedText = contentStr.includes('削除済');
-        const isEmpty = !contentStr.trim();
-        
-        return !(hasDeletedText || isEmpty);
-    });
-
-    const afterCount = logData.length;
-    const diff = beforeCount - afterCount;
-
-    if (diff === 0) {
-        alert('掃除する行（削除済・空行）は見つかりませんでした。');
-    } else {
-        document.getElementById('virtualScrollContainer').style.height = (logData.length * ROW_HEIGHT) + 'px';
-        renderEditor(true);
-        alert(`掃除完了！\n不要な ${diff} 行をリストから完全に消去しました🦑`);
-    }
-}
-
-function exportLog() {
-    const h1Title = document.getElementById('logTitleInput').value || 'LOG';
-    const fileName = document.getElementById('fileNameInput').value || 'log';
-    const systemSelectVal = document.getElementById('systemSelect').value;
-    const headerTitle = systemSelectVal === 'CUSTOM' ? 
-        document.getElementById('customSystemInput').value || 'LOG ARCHIVE' : 
-        systemSelectVal;
-
-    // --- 通常タブの色をアクセントカラーとして取得 ---
-    let dynamicAccent = "#C5373C"; 
-    if (tabStyleMap['通常']) {
-        dynamicAccent = tabStyleMap['通常'].color;
-    } else {
-        const firstTab = Object.keys(tabStyleMap)[0];
-        if (firstTab) dynamicAccent = tabStyleMap[firstTab].color;
-    }
-
-    const hexToRgba = (hex, alpha) => {
-        const r = parseInt(hex.slice(1, 3), 16);
-        const g = parseInt(hex.slice(3, 5), 16);
-        const b = parseInt(hex.slice(5, 7), 16);
-        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-    };
-
-    const getSafeName = (str) => {
-        return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode('0x' + p1))).replace(/=/g, "");
-    };
-
-    let customTabStyles = "";
-    Object.keys(tabStyleMap).forEach(tabName => {
-        const config = tabStyleMap[tabName];
-        const safeName = getSafeName(tabName);
-        const mainColor = config.color;
-        if (config.style === 'style-secret') {
-            const bgColor = hexToRgba(mainColor, 0.12);
-            customTabStyles += `.tab-custom-${safeName} { background: ${bgColor} !important; border-left: 3px solid ${mainColor} !important; margin: 10px 15px; padding: 15px 20px; border-radius: 4px; }`;
-        } else if (config.style === 'style-info') {
-            customTabStyles += `.tab-custom-${safeName} { background: var(--block-bg); margin: 30px 15px; padding: 25px; border-radius: 4px; border: 1px solid #222; } .tab-custom-${safeName} .info-separator { display: block; height: 1px; background: ${mainColor}; margin: 12px 0; border: none; opacity: 0.8; }`;
-        }
-    });
-
-    let html = `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><title>${h1Title}</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet"><style>
-    :root { --outer-bg: #0f0f0f; --inner-bg: #050505; --block-bg: #111111; --text: #dbdee1; --accent: ${dynamicAccent}; --sub-line: #444; --border: #222; --tab-text: #666; --chat-text: #8a8a8a; --container-width: 680px; } 
-    body { background: var(--outer-bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; margin: 0; padding: 0; line-height: 1.7; display: flex; flex-direction: column; align-items: center; } 
-    
-    header { position: fixed; top: 0; left: 0; width: 100%; background: rgba(5, 5, 5, 0.98); backdrop-filter: blur(12px); z-index: 1000; border-bottom: 1px solid var(--border); display: flex; justify-content: center; padding: 0; } 
-    .header-inner { width: 90%; max-width: var(--container-width); height: calc(60px + env(safe-area-inset-top)); display: flex; justify-content: space-between; align-items: center; padding-top: env(safe-area-inset-top); box-sizing: border-box; } 
-    .header-title { font-family: 'Montserrat'; font-weight: 900; font-size: 0.85rem; color: #fff; letter-spacing: 0.2em; text-transform: uppercase; } 
-
-    .nav-uncheck { display: none; } 
-    .nav-open { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: var(--accent); border-radius: 4px; position: relative; z-index: 1001; } 
-    .nav-open span, .nav-open span:before, .nav-open span:after { content: ''; display: block; height: 2px; width: 18px; background: #fff; position: absolute; transition: 0.3s; } 
-    .nav-open span:before { top: -6px; } .nav-open span:after { bottom: -6px; } 
-
-    .nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); opacity: 0; visibility: hidden; transition: 0.3s; z-index: 1500; } 
-    .nav-uncheck:checked ~ .nav-overlay { opacity: 1; visibility: visible; } 
-
-    .nav-content { position: fixed; top: 0; right: -320px; width: 280px; height: 100%; background: #0a0a0a; transition: 0.4s; z-index: 2000; border-left: 1px solid #222; overflow-y: auto; visibility: hidden; padding-top: env(safe-area-inset-top); } 
-    .nav-uncheck:checked ~ .nav-content { right: 0; visibility: visible; } 
-
-    .nav-section { padding: 30px 20px 10px; border-bottom: 1px solid #222; } 
-    .nav-label { font-family: 'Montserrat'; font-weight: 900; font-size: 0.6rem; color: var(--accent); margin-bottom: 15px; display: block; } 
-    
-    .filter-btn { appearance: none; -webkit-appearance: none; display: inline-block; padding: 8px 14px; margin: 4px; font-size: 0.7rem; font-weight: bold; background: #1a1a1a; border: 1px solid #333; border-radius: 20px; color: #888; cursor: pointer; border: 1px solid transparent; } 
-    .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); } 
-    .index-link { display: block; color: #ccc; text-decoration: none; padding: 15px 20px; font-size: 0.8rem; border-bottom: 1px solid #1a1a1a; } 
-
-    .container.hide-style-default .style-default { display: none !important; }
-    .container.hide-style-info .style-info { display: none !important; }
-    .container.hide-style-secret .style-secret { display: none !important; }
-    .container.hide-style-chat .style-chat { display: none !important; }
-
-    .container { width: 100%; max-width: var(--container-width); background: var(--inner-bg); min-height: 100vh; padding: calc(60px + env(safe-area-inset-top)) 0 100px; } 
-    .log-row { padding: 12px 25px; border-bottom: 1px dashed #1a1a1a; } 
-    .row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; } 
-    .row-name { font-weight: 900; font-size: 0.85rem; color: #fff; display: flex; align-items: center; gap: 8px; } 
-    .name-line { width: 3px; height: 1em; background: var(--sub-line); } 
-    .row-tab { font-family: 'Montserrat'; font-weight: 700; font-size: 0.55rem; color: var(--tab-text); } 
-    .row-content { font-size: 0.95rem; color: #ccc; white-space: pre-wrap; } 
-    
-    .hero-title-area { padding: 40px 25px 25px; border-bottom: 1px solid #111; } 
-    .hero-brand { font-family: 'Montserrat'; font-size: 0.6rem; font-weight: 900; color: var(--accent); letter-spacing: 0.5em; display: block; } 
-    .hero-title { font-family: 'Montserrat', 'Noto Sans JP'; font-size: 1.5rem; font-weight: 900; color: #fff; border-left: 3px solid var(--accent); padding-left: 15px; } 
-
-    .style-chat { margin-left: 10%; border-left: 1px solid #222; padding: 10px 15px; opacity: 0.8; } 
-    .row-system { padding: 2.2em 25px !important; font-style: italic; color: #aaa; } 
-    .info-separator { display: none; } 
-
-    ${customTabStyles} 
-    footer { text-align: center; padding: 80px; font-family: 'Montserrat'; font-size: 0.6rem; opacity: 0.2; } 
-    [id^="log-"] { scroll-margin-top: calc(80px + env(safe-area-inset-top)); } 
-    </style></head><body>
-    
-    <input id="nav-input" type="checkbox" class="nav-uncheck">
-    <label for="nav-input" class="nav-overlay"></label>
-    
-    <header>
-        <div class="header-inner">
-            <div class="header-title">${headerTitle}</div>
-            <label for="nav-input" class="nav-open"><span></span></label>
-        </div>
-    </header>
-
-    <div class="nav-content">
-        <div class="nav-section">
-            <span class="nav-label">FILTER</span>
-            <div id="filter-container">
-                <button class="filter-btn active" onclick="toggleTab('style-default', this)">MAIN</button>
-                <button class="filter-btn active" onclick="toggleTab('style-info', this)">INFO</button>
-                <button class="filter-btn active" onclick="toggleTab('style-secret', this)">SECRET</button>
-                <button class="filter-btn active" onclick="toggleTab('style-chat', this)">CHAT</button>
-            </div>
-        </div>
-        <div class="nav-section" style="border:none;">
-            <span class="nav-label">INDEX</span>
-            <div id="index-list">`;
-
-    logData.forEach((item, i) => { 
-        if (item.anchor) html += `<a href="#log-${i}" class="index-link" onclick="closeMenu()">${item.anchor}</a>`; 
-    });
-
-    html += `</div></div></div>
-
-    <div class="container">
-        <div class="hero-title-area">
-            <span class="hero-brand">SESSION LOG</span>
-            <div class="hero-title">${h1Title}</div>
-        </div>`;
-
-    logData.forEach((item, i) => {
-        const char = charSettings[item.charKey];
-        const config = tabStyleMap[item.tab];
-        const safeName = getSafeName(item.tab);
-        let styleClass = config.style;
-        if (config.style === 'style-secret' || config.style === 'style-info') styleClass += ` tab-custom-${safeName}`;
-        
-        const isSystem = (char.displayName && char.displayName.toLowerCase() === 'system');
-        if (isSystem) styleClass += ' row-system';
-        
-        let nameStyle = config.style === 'style-chat' ? `style="color:${char.color}"` : "";
-        let lineStyle = (config.style === 'style-chat' || isSystem) ? `style="display:none;"` : `style="background:${char.color}"`;
-        
-        const tabNameDisplay = isSystem ? '' : item.tab;
-        const nameDisplay = isSystem ? '' : char.displayName;
-        const safeContent = item.content.split('\\n').join('<br>');
-
-        html += `<div class="log-row ${styleClass}" id="log-${i}"><div class="row-header"><div class="row-name" ${nameStyle}><span class="name-line" ${lineStyle}></span>${nameDisplay}</div><div class="row-tab">${tabNameDisplay}</div></div><hr class="info-separator"><div class="row-content">${safeContent}</div></div>`;
-    });
-
-    html += `</div><footer>✦ IKATOOLBOX</footer>
-    <script>
-    function closeMenu() {
-        document.getElementById('nav-input').checked = false;
-    }
-
-    function toggleTab(styleClass, btn) {
-        btn.classList.toggle('active');
-        const isVisible = btn.classList.contains('active');
-        const container = document.querySelector('.container');
-        if (container) {
-            if (isVisible) container.classList.remove('hide-' + styleClass);
-            else container.classList.add('hide-' + styleClass);
-        }
-    }
-    <\/script></body></html>`;
-
-    const blob = new Blob([html], { type: 'text/html' });
-    const a = document.createElement('a'); 
-    a.href = URL.createObjectURL(blob); 
-    a.download = fileName + ".html"; 
-    a.click();
-}
 </script>
-
-<div style="position: fixed; bottom: 10px; right: 15px; font-family: sans-serif; font-size: 10px; color: rgba(255,255,255,0.1); letter-spacing: 0.1em; font-weight: bold; pointer-events: none; z-index: 9999;">✦ IKATOOLBOX</div>
+<div style="position: fixed; bottom: 10px; right: 15px; font-size: 10px; color: rgba(255,255,255,0.1); font-weight: bold; pointer-events: none; z-index: 9999;">✦ IKATOOLBOX</div>
 </body>
 </html>
