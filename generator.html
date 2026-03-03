@@ -547,6 +547,8 @@ function renderEditor(fullInit = false) {
                 });
             }, { rootMargin: '500px 0px' });
 
+            const scrollPos = window.scrollY;
+
             logData.forEach((item, index) => {
                 const row = document.createElement('div');
                 row.classList.add('log-row');
@@ -572,6 +574,8 @@ function renderEditor(fullInit = false) {
             const cb = row.querySelector('.row-checkbox');
             if(cb) cb.checked = isSelected;
         });
+
+        window.scrollTo(0, scrollPos);
     }
 
 function renderRowContent(row, index) {
