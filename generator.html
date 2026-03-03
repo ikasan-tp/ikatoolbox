@@ -306,7 +306,7 @@
         <span class="material-symbols-outlined guide-icon">cleaning_services</span>
         <div class="guide-text">
             <b>4. ログを掃除する</b>
-            <p>「ログを掃除する」ボタンで、不要な行を整理して軽量化できます。</p>
+            <p>「ログを掃除」ボタンで、不要な行を整理して軽量化できます。</p>
         </div>
     </div>
     <div class="guide-item">
@@ -337,7 +337,15 @@
             <p>「HTMLを書き出し」で、自分だけのログファイルを保存できます。</p>
         </div>
     </div>
+</div> <div style="margin-top: 20px; display: flex;">
+                <a href="sample.html" target="_blank" class="back-link" style="margin: 0; padding: 8px 16px; border: 1px solid #444; border-radius: 4px; background: rgba(255,255,255,0.02); font-size: 0.75rem; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined" style="font-size: 1.1rem;">description</span>
+                    VIEW LOG SAMPLE
+                </a>
+            </div>
+        </div>
 </div> </div> </div>
+
         <div id="logEditor"></div>
     </main>
 
@@ -964,7 +972,7 @@ function exportLog() {
             else container.classList.add('hide-' + styleClass);
         }
     }
-    <\/script></body></html>`;
+<\\\/script></body></html>`;
 
     const blob = new Blob([html], { type: 'text/html' });
     const a = document.createElement('a'); 
