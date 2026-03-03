@@ -1,0 +1,121 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><title>サンプルログ</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet"><style>
+    :root { --outer-bg: #0f0f0f; --inner-bg: #050505; --block-bg: #111111; --text: #dbdee1; --accent: #9237c3; --sub-line: #444; --border: #222; --tab-text: #666; --chat-text: #8a8a8a; --container-width: 680px; } 
+    body { background: var(--outer-bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; margin: 0; padding: 0; line-height: 1.7; display: flex; flex-direction: column; align-items: center; } 
+    
+    header { position: fixed; top: 0; left: 0; width: 100%; background: rgba(5, 5, 5, 0.98); backdrop-filter: blur(12px); z-index: 1000; border-bottom: 1px solid var(--border); display: flex; justify-content: center; padding: 0; } 
+    .header-inner { width: 90%; max-width: var(--container-width); height: calc(60px + env(safe-area-inset-top)); display: flex; justify-content: space-between; align-items: center; padding-top: env(safe-area-inset-top); box-sizing: border-box; } 
+    .header-title { font-family: 'Montserrat'; font-weight: 900; font-size: 0.85rem; color: #fff; letter-spacing: 0.2em; text-transform: uppercase; } 
+.style-info .row-header { margin-bottom: 0px !important; }
+
+    .nav-uncheck { display: none; } 
+    .nav-open { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: var(--accent); border-radius: 4px; position: relative; z-index: 1001; } 
+    .nav-open span, .nav-open span:before, .nav-open span:after { content: ''; display: block; height: 2px; width: 18px; background: #fff; position: absolute; transition: 0.3s; } 
+    .nav-open span:before { top: -6px; } .nav-open span:after { bottom: -6px; } 
+
+    .nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); opacity: 0; visibility: hidden; transition: 0.3s; z-index: 1500; } 
+    .nav-uncheck:checked ~ .nav-overlay { opacity: 1; visibility: visible; } 
+
+    .nav-content { position: fixed; top: 0; right: -320px; width: 280px; height: 100%; background: #0a0a0a; transition: 0.4s; z-index: 2000; border-left: 1px solid #222; overflow-y: auto; visibility: hidden; padding-top: env(safe-area-inset-top); } 
+    .nav-uncheck:checked ~ .nav-content { right: 0; visibility: visible; } 
+
+    .nav-section { padding: 30px 20px 10px; border-bottom: 1px solid #222; } 
+    .nav-label { font-family: 'Montserrat'; font-weight: 900; font-size: 0.6rem; color: var(--accent); margin-bottom: 15px; display: block; } 
+    
+    .filter-btn { appearance: none; -webkit-appearance: none; display: inline-block; padding: 8px 14px; margin: 4px; font-size: 0.7rem; font-weight: bold; background: #1a1a1a; border: 1px solid #333; border-radius: 20px; color: #888; cursor: pointer; border: 1px solid transparent; } 
+    .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); } 
+    .index-link { display: block; color: #ccc; text-decoration: none; padding: 15px 20px; font-size: 0.8rem; border-bottom: 1px solid #1a1a1a; } 
+
+    .container.hide-style-default .style-default { display: none !important; }
+    .container.hide-style-info .style-info { display: none !important; }
+    .container.hide-style-secret .style-secret { display: none !important; }
+    .container.hide-style-chat .style-chat { display: none !important; }
+
+    .container { width: 100%; max-width: var(--container-width); background: var(--inner-bg); min-height: 100vh; padding: calc(60px + env(safe-area-inset-top)) 0 100px; } 
+    .log-row { padding: 12px 25px; border-bottom: 1px dashed #1a1a1a; } 
+    .row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; } 
+    .row-name { font-weight: 900; font-size: 0.85rem; color: #fff; display: flex; align-items: center; gap: 8px; } 
+    .name-line { width: 3px; height: 1em; background: var(--sub-line); } 
+    .row-tab { font-family: 'Montserrat'; font-weight: 700; font-size: 0.55rem; color: var(--tab-text); } 
+    .row-content { font-size: 0.95rem; color: #ccc; white-space: pre-wrap; } 
+    
+    .hero-title-area { padding: 40px 25px 25px; border-bottom: 1px solid #111; } 
+    .hero-brand { font-family: 'Montserrat'; font-size: 0.6rem; font-weight: 900; color: var(--accent); letter-spacing: 0.5em; display: block; } 
+    .hero-title { font-family: 'Montserrat', 'Noto Sans JP'; font-size: 1.5rem; font-weight: 900; color: #fff; border-left: 3px solid var(--accent); padding-left: 15px; } 
+
+    .style-chat { margin-left: 10%; border-left: 1px solid #222; padding: 10px 15px; opacity: 0.8; } 
+    .row-system { padding: 2.2em 25px !important; font-style: italic; color: #aaa; } 
+    .info-separator { display: none; } 
+
+    .tab-custom-aW5mbw { background: var(--block-bg); margin: 30px 15px; padding: 25px; border-radius: 4px; border: 1px solid #222; } .tab-custom-aW5mbw .info-separator { display: block; height: 1px; background: #444 !important; margin: 2px 0 8px; border: none; opacity: 0.8; }.tab-custom-SE8x { background: rgba(67, 74, 173, 0.12) !important; border-left: 3px solid #434aad !important; margin: 10px 15px; padding: 15px 20px; border-radius: 4px; }.tab-custom-SE8y { background: rgba(227, 43, 43, 0.12) !important; border-left: 3px solid #e32b2b !important; margin: 10px 15px; padding: 15px 20px; border-radius: 4px; } 
+    footer { text-align: center; padding: 80px; font-family: 'Montserrat'; font-size: 0.6rem; opacity: 0.2; } 
+    [id^="log-"] { scroll-margin-top: calc(80px + env(safe-area-inset-top)); } 
+    </style></head><body>
+    
+    <input id="nav-input" type="checkbox" class="nav-uncheck">
+    <label for="nav-input" class="nav-overlay"></label>
+    
+    <header>
+        <div class="header-inner">
+            <div class="header-title">CALL OF CTHULHU 6th</div>
+            <label for="nav-input" class="nav-open"><span></span></label>
+        </div>
+    </header>
+
+    <div class="nav-content">
+        <div class="nav-section">
+            <span class="nav-label">FILTER</span>
+            <div id="filter-container">
+                <button class="filter-btn active" onclick="toggleTab('style-default', this)">MAIN</button>
+                <button class="filter-btn active" onclick="toggleTab('style-info', this)">INFO</button>
+                <button class="filter-btn active" onclick="toggleTab('style-secret', this)">SECRET</button>
+                <button class="filter-btn active" onclick="toggleTab('style-chat', this)">CHAT</button>
+            </div>
+        </div>
+        <div class="nav-section" style="border:none;">
+            <span class="nav-label">INDEX</span>
+            <div id="index-list"><a href="#log-7" class="index-link" onclick="closeMenu()">01:シナリオタイトル</a><a href="#log-27" class="index-link" onclick="closeMenu()">02:目次を入れることが出来ます</a></div></div></div>
+
+    <div class="container">
+        <div class="hero-title-area">
+            <span class="hero-brand">SESSION LOG</span>
+            <div class="hero-title">サンプルログ</div>
+        </div><div class="log-row style-chat" id="log-0"><div class="row-header"><div class="row-name" style="color:#CB55D3"><span class="name-line" style="display:none;"></span>▽</div><div class="row-tab">other</div></div><hr class="info-separator"><div class="row-content">これはサンプルです</div></div><div class="log-row style-chat" id="log-1"><div class="row-header"><div class="row-name" style="color:#E91E63"><span class="name-line" style="display:none;"></span>山田 花子</div><div class="row-tab">other</div></div><hr class="info-separator"><div class="row-content">10D100 (10D100) ＞ 456[73,41,1,20,86,45,60,5,56,69] ＞ 456</div></div><div class="log-row style-chat" id="log-2"><div class="row-header"><div class="row-name" style="color:#3F51B5"><span class="name-line" style="display:none;"></span>田中 太郎</div><div class="row-tab">other</div></div><hr class="info-separator"><div class="row-content">10D100 (10D100) ＞ 465[83,59,33,13,86,33,54,15,77,12] ＞ 465</div></div><div class="log-row style-chat" id="log-3"><div class="row-header"><div class="row-name" style="color:#3F51B5"><span class="name-line" style="display:none;"></span>田中 太郎</div><div class="row-tab">other</div></div><hr class="info-separator"><div class="row-content">よろしくお願いします！</div></div><div class="log-row style-chat" id="log-4"><div class="row-header"><div class="row-name" style="color:#E91E63"><span class="name-line" style="display:none;"></span>山田 花子</div><div class="row-tab">other</div></div><hr class="info-separator"><div class="row-content">よろしくおねがいします！</div></div><div class="log-row style-default" id="log-5"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#CB55D3"></span>▽</div><div class="row-tab">main</div></div><hr class="info-separator"><div class="row-content">いいかんじのプロローグが入ります</div></div><div class="log-row style-default" id="log-6"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#CB55D3"></span>▽</div><div class="row-tab">main</div></div><hr class="info-separator"><div class="row-content">…
+
+……
+
+………</div></div><div class="log-row style-default" id="log-7"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#CB55D3"></span>▽</div><div class="row-tab">main</div></div><hr class="info-separator"><div class="row-content">─────────────────
+
+
+　　nanka ii sample
+　　NOTITLE NONAME
+
+
+─────────────────</div></div><div class="log-row style-default" id="log-8"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#CB55D3"></span>▽</div><div class="row-tab">main</div></div><hr class="info-separator"><div class="row-content">導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入導入</div></div><div class="log-row style-default" id="log-9"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#CB55D3"></span>▽</div><div class="row-tab">main</div></div><hr class="info-separator"><div class="row-content">こうやって<ruby>描写<rt>びょうしゃ</rt></ruby>にルビを入れたりすることができます</div></div><div class="log-row style-default" id="log-10"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#CB55D3"></span>▽</div><div class="row-tab">main</div></div><hr class="info-separator"><div class="row-content"><ruby>ルビは、括弧単体<rt>かっこたんたい</rt></ruby>よりは
+<ruby>縦線<rt>たてせん</rt></ruby>も<ruby>入<rt>い</rt></ruby>れた<ruby>方<rt>ほう</rt></ruby>が安定すると思います</div></div><div class="log-row style-info tab-custom-aW5mbw" id="log-11"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#2f925f"></span>情報タブについて</div><div class="row-tab">info</div></div><hr class="info-separator"><div class="row-content">情報タブはこのように表示されます。
+
+左側の色は情報タブのカラーで変更できます！</div></div><div class="log-row style-secret tab-custom-SE8x" id="log-12"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#CB55D3"></span>▽</div><div class="row-tab">HO1</div></div><hr class="info-separator"><div class="row-content">秘匿はこのように表示されるよ</div></div><div class="log-row style-secret tab-custom-SE8x" id="log-13"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#3F51B5"></span>田中 太郎</div><div class="row-tab">HO1</div></div><hr class="info-separator"><div class="row-content">choice[PC1,PC2,PC3,PC4]  (choice[PC1,PC2,PC3,PC4]) ＞ PC2</div></div><div class="log-row style-secret tab-custom-SE8y" id="log-14"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#E91E63"></span>山田 花子</div><div class="row-tab">HO2</div></div><hr class="info-separator"><div class="row-content">背景はタブカラーを変更することで
+好きな色に変えられます</div></div><div class="log-row style-secret tab-custom-SE8y" id="log-15"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#E91E63"></span>山田 花子</div><div class="row-tab">HO2</div></div><hr class="info-separator"><div class="row-content">choice[PC1,PC2,PC3,PC4]  (choice[PC1,PC2,PC3,PC4]) ＞ PC1</div></div><div class="log-row style-info tab-custom-aW5mbw" id="log-16"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#2f925f"></span>探索箇所</div><div class="row-tab">info</div></div><hr class="info-separator"><div class="row-content">メインタブカラーでログ全体の色を変更可能です</div></div><div class="log-row style-default" id="log-17"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#E91E63"></span>山田 花子</div><div class="row-tab">main</div></div><hr class="info-separator"><div class="row-content">CCB<=15*5 【STR】 (1D100<=75) ＞ 40 ＞ 成功</div></div><div class="log-row style-default" id="log-18"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#E91E63"></span>山田 花子</div><div class="row-tab">main</div></div><hr class="info-separator"><div class="row-content">CCB<=11*5 【CON】 (1D100<=55) ＞ 83 ＞ 失敗</div></div><div class="log-row style-default" id="log-19"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#E91E63"></span>山田 花子</div><div class="row-tab">main</div></div><hr class="info-separator"><div class="row-content">CCB<=15*5 【POW】 (1D100<=75) ＞ 92 ＞ 失敗</div></div><div class="log-row style-default" id="log-20"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#E91E63"></span>山田 花子</div><div class="row-tab">main</div></div><hr class="info-separator"><div class="row-content">CCB<=13*5 【DEX】 (1D100<=65) ＞ 95 ＞ 失敗</div></div><div class="log-row style-default row-system" id="log-21"><div class="row-header"><div class="row-name" ><span class="name-line" style="display:none;"></span></div><div class="row-tab"></div></div><hr class="info-separator"><div class="row-content">[ 山田 花子 ] HP : 14 → 10</div></div><div class="log-row style-default row-system" id="log-22"><div class="row-header"><div class="row-name" ><span class="name-line" style="display:none;"></span></div><div class="row-tab"></div></div><hr class="info-separator"><div class="row-content">[ 山田 花子 ] HP : 10 → 5</div></div><div class="log-row style-default row-system" id="log-23"><div class="row-header"><div class="row-name" ><span class="name-line" style="display:none;"></span></div><div class="row-tab"></div></div><hr class="info-separator"><div class="row-content">[ 山田 花子 ] MP : 15 → 10</div></div><div class="log-row style-default" id="log-24"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#E91E63"></span>山田 花子</div><div class="row-tab">main</div></div><hr class="info-separator"><div class="row-content">systemメッセージはココフォリアにならい
+上のように表示されます。</div></div><div class="log-row style-default" id="log-25"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#E91E63"></span>山田 花子</div><div class="row-tab">main</div></div><hr class="info-separator"><div class="row-content">x3 CCB<=50 #1
+(1D100<=50) ＞ 41 ＞ 成功
+
+#2
+(1D100<=50) ＞ 17 ＞ 成功
+
+#3
+(1D100<=50) ＞ 51 ＞ 失敗</div></div><div class="log-row style-default" id="log-26"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#FF5722"></span>寿限無寿限無後光の擦り傷</div><div class="row-tab">main</div></div><hr class="info-separator"><div class="row-content">長い名前はこのように表示されるよ</div></div><div class="log-row style-default" id="log-27"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#CB55D3"></span>▽</div><div class="row-tab">main</div></div><hr class="info-separator"><div class="row-content">このコンバーターは目次を付けることが出来ます。
+左上のアイコンを押せば、目次を付けた場所にページジャンプが可能です。</div></div><div class="log-row style-default" id="log-28"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#E91E63"></span>山田 花子</div><div class="row-tab">main</div></div><hr class="info-separator"><div class="row-content">ログデータは装飾により、少し重くなっていると思います。</div></div><div class="log-row style-default" id="log-29"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#E91E63"></span>山田 花子</div><div class="row-tab">main</div></div><hr class="info-separator"><div class="row-content">発言ミスを<ruby>自動的に削除してくれるボタン<rt>ログを掃除するボタン</rt></ruby>を用意しています。</div></div><div class="log-row style-default" id="log-30"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#E91E63"></span>山田 花子</div><div class="row-tab">main</div></div><hr class="info-separator"><div class="row-content">削除済</div></div><div class="log-row style-default" id="log-31"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#E91E63"></span>山田 花子</div><div class="row-tab">main</div></div><hr class="info-separator"><div class="row-content">上のように打つか、空白の発言を全て削除してくれます！</div></div><div class="log-row style-default" id="log-32"><div class="row-header"><div class="row-name" ><span class="name-line" style="background:#CB55D3"></span>▽</div><div class="row-tab">main</div></div><hr class="info-separator"><div class="row-content">よい卓ライフを！</div></div></div><footer>✦ IKATOOLBOX</footer>
+    <script>
+    function closeMenu() {
+        document.getElementById('nav-input').checked = false;
+    }
+
+    function toggleTab(styleClass, btn) {
+        btn.classList.toggle('active');
+        const isVisible = btn.classList.contains('active');
+        const container = document.querySelector('.container');
+        if (container) {
+            if (isVisible) container.classList.remove('hide-' + styleClass);
+            else container.classList.add('hide-' + styleClass);
+        }
+    }
+    </script></body></html>
