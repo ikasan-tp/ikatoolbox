@@ -306,7 +306,7 @@
         <span class="material-symbols-outlined guide-icon">cleaning_services</span>
         <div class="guide-text">
             <b>4. ログを掃除する</b>
-            <p>「ログを掃除」ボタンで、不要な行を整理して軽量化できます。</p>
+            <p>「ログを掃除する」ボタンで、不要な行を整理して軽量化できます。</p>
         </div>
     </div>
     <div class="guide-item">
@@ -832,7 +832,7 @@ function exportLog() {
             const bgColor = hexToRgba(mainColor, 0.12);
             customTabStyles += `.tab-custom-${safeName} { background: ${bgColor} !important; border-left: 3px solid ${mainColor} !important; margin: 10px 15px; padding: 15px 20px; border-radius: 4px; }`;
         } else if (config.style === 'style-info') {
-            customTabStyles += `.tab-custom-${safeName} { background: var(--block-bg); margin: 30px 15px; padding: 25px; border-radius: 4px; border: 1px solid #222; } .tab-custom-${safeName} .info-separator { display: block; height: 1px; background: #444 !important; margin: 12px 0; border: none; opacity: 0.8; }`;
+            customTabStyles += `.tab-custom-${safeName} { background: var(--block-bg); margin: 30px 15px; padding: 25px; border-radius: 4px; border: 1px solid #222; } .tab-custom-${safeName} .info-separator { display: block; height: 1px; background: #444 !important; margin: 2px 0 8px; border: none; opacity: 0.8; }`;
         }
     });
 
@@ -843,6 +843,7 @@ function exportLog() {
     header { position: fixed; top: 0; left: 0; width: 100%; background: rgba(5, 5, 5, 0.98); backdrop-filter: blur(12px); z-index: 1000; border-bottom: 1px solid var(--border); display: flex; justify-content: center; padding: 0; } 
     .header-inner { width: 90%; max-width: var(--container-width); height: calc(60px + env(safe-area-inset-top)); display: flex; justify-content: space-between; align-items: center; padding-top: env(safe-area-inset-top); box-sizing: border-box; } 
     .header-title { font-family: 'Montserrat'; font-weight: 900; font-size: 0.85rem; color: #fff; letter-spacing: 0.2em; text-transform: uppercase; } 
+.style-info .row-header { margin-bottom: 0px !important; }
 
     .nav-uncheck { display: none; } 
     .nav-open { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: var(--accent); border-radius: 4px; position: relative; z-index: 1001; } 
