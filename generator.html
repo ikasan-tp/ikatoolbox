@@ -292,7 +292,7 @@
         <span class="material-symbols-outlined guide-icon">palette</span>
         <div class="guide-text">
             <b>2. 見た目を整える</b>
-            <p>名前、色、タブの種類などの装飾を変更可能です。</p>
+            <p>名前、色、タブごとの装飾スタイルを一括で変更可能です。</p>
         </div>
     </div>
     <div class="guide-item">
@@ -306,7 +306,7 @@
         <span class="material-symbols-outlined guide-icon">cleaning_services</span>
         <div class="guide-text">
             <b>4. ログを掃除する</b>
-            <p>「ログを掃除する」ボタンで、不要な行を整理して軽量化できます。</p>
+            <p>「ログを掃除」ボタンで、不要な行を整理して軽量化できます。</p>
         </div>
     </div>
     <div class="guide-item">
@@ -337,7 +337,7 @@
             <p>「HTMLを書き出し」で、自分だけのログファイルを保存できます。</p>
         </div>
     </div>
-</div>
+</div> </div> </div>
         <div id="logEditor"></div>
     </main>
 
@@ -583,8 +583,7 @@ function renderRowContent(row, index) {
                     <button class="del-btn" onclick="deleteRow(${index})" title="削除"><span class="material-symbols-outlined">delete</span></button>
                 </div>
             </div>
-        `;
-
+        `; 
         if (isSelected) row.classList.add('selected');
 
         row.style.borderLeft = `4px solid ${accentColor}`;
@@ -601,7 +600,6 @@ function renderRowContent(row, index) {
             ta.style.height = ta.scrollHeight + 'px';
         }
     }
-
     function toggleSelect(index) {
         const targetTab = logData[index].tab;
         const pos = selectedIndices.indexOf(index);
@@ -978,5 +976,3 @@ function exportLog() {
 <div style="position: fixed; bottom: 10px; right: 15px; font-family: sans-serif; font-size: 10px; color: rgba(255,255,255,0.1); letter-spacing: 0.1em; font-weight: bold; pointer-events: none; z-index: 9999;">✦ IKATOOLBOX</div>
 </body>
 </html>
-
-
