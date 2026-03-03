@@ -280,52 +280,64 @@
                     <p>IKATOOL LOG EDITOR</p>
                 </div>
 
-                <div class="guide-grid">
-                    <div class="guide-item">
-                        <span class="material-symbols-outlined guide-icon">upload_file</span>
-                        <div class="guide-text">
-                            <b>1. ログを読み込む</b>
-                            <p>左パネルからココフォリア等のHTMLログを選択します。</p>
-                        </div>
-                    </div>
-                    <div class="guide-item">
-                        <span class="material-symbols-outlined guide-icon">palette</span>
-                        <div class="guide-text">
-                            <b>2. 見た目を整える</b>
-                            <p>名前、色、タブごとの装飾スタイルを一括で変更可能です。</p>
-                        </div>
-                    </div>
-                    <div class="guide-item">
-                        <span class="material-symbols-outlined guide-icon">check_box</span>
-                        <div class="guide-text">
-                            <b>3. まとめて操作</b>
-                            <p>左側のチェックで複数行を選択し、一括移動や削除が行えます。</p>
-                        </div>
-                    </div>
-                    <div class="guide-item">
-                        <span class="material-symbols-outlined guide-icon">shortcut</span>
-                        <div class="guide-text">
-                            <b>4. 目次をつける</b>
-                            <p>「目次」にチェックを入れて命名すると、書き出し後のログにリンクを作成します。</p>
-                        </div>
-                    </div>
-                    <div class="guide-item">
-                        <span class="material-symbols-outlined guide-icon">find_replace</span>
-                        <div class="guide-text">
-                            <b>5. 検索と置換</b>
-                            <p>特定のワードを検索し、ログ全体から一括で書き換えられます。</p>
-                        </div>
-                    </div>
-                    <div class="guide-item">
-                        <span class="material-symbols-outlined guide-icon">download</span>
-                        <div class="guide-text">
-                            <b>6. 保存する</b>
-                            <p>「HTMLを書き出し」で、ログを保存できます。</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<div class="guide-grid">
+    <div class="guide-item">
+        <span class="material-symbols-outlined guide-icon">upload_file</span>
+        <div class="guide-text">
+            <b>1. ログを読み込む</b>
+            <p>左パネルからココフォリア等のHTMLログを選択します。</p>
         </div>
+    </div>
+    <div class="guide-item">
+        <span class="material-symbols-outlined guide-icon">palette</span>
+        <div class="guide-text">
+            <b>2. 見た目を整える</b>
+            <p>名前、色、タブごとの装飾スタイルを一括で変更可能です。</p>
+        </div>
+    </div>
+    <div class="guide-item">
+        <span class="material-symbols-outlined guide-icon">check_box</span>
+        <div class="guide-text">
+            <b>3. まとめて操作</b>
+            <p>左側のチェックで複数行を選択し、一括移動や削除が行えます。</p>
+        </div>
+    </div>
+    <div class="guide-item">
+        <span class="material-symbols-outlined guide-icon">cleaning_services</span>
+        <div class="guide-text">
+            <b>4. ログを掃除する</b>
+            <p>「削除済みを完全に消去」ボタンで、不要な行を整理して軽量化できます。</p>
+        </div>
+    </div>
+    <div class="guide-item">
+        <span class="material-symbols-outlined guide-icon">shortcut</span>
+        <div class="guide-text">
+            <b>5. 目次をつける</b>
+            <p>「目次」にチェックを入れて命名すると、ログ内にリンクを作成します。</p>
+        </div>
+    </div>
+    <div class="guide-item">
+        <span class="material-symbols-outlined guide-icon">auto_fix_high</span>
+        <div class="guide-text">
+            <b>6. ルビを振る</b>
+            <p>「漢字《るび》」または「｜範囲《るび》」の形式でふりがなを表示できます。</p>
+        </div>
+    </div>
+    <div class="guide-item">
+        <span class="material-symbols-outlined guide-icon">find_replace</span>
+        <div class="guide-text">
+            <b>7. 検索と置換</b>
+            <p>特定のワードを検索し、ログ全体から一括で書き換えられます。</p>
+        </div>
+    </div>
+    <div class="guide-item">
+        <span class="material-symbols-outlined guide-icon">download</span>
+        <div class="guide-text">
+            <b>8. 保存する</b>
+            <p>「HTMLを書き出し」で、自分だけのログファイルを保存できます。</p>
+        </div>
+    </div>
+</div>
         <div id="logEditor"></div>
     </main>
 
@@ -550,11 +562,15 @@ function renderRowContent(row, index) {
                 <span class="row-name" data-charkey="${item.charKey}" style="color:${isInfo ? '#888' : char.color}; border-left: 3px solid ${nameBarColor}; padding-left: 8px;">
                     ${char.displayName} <small style="color:#444; font-size:0.6rem;">[${item.tab}]</small>
                 </span>
-                <div class="anchor-area">
+                <div class="anchor-area" style="display: flex; gap: 10px; align-items: center;">
                     <label class="anchor-check-label">
                         <input type="checkbox" class="anchor-check" ${item.anchor ? 'checked' : ''} onchange="toggleAnchor(${index}, this.checked)">目次
                         <input type="text" class="anchor-input" value="${item.anchor || ''}" placeholder="目次名を入力" oninput="logData[${index}].anchor=this.value" style="${item.anchor ? 'display:block' : ''}">
                     </label>
+                    <div class="ruby-buttons" style="display: flex; gap: 3px;">
+                        <button type="button" onclick="applyRubyToRow(${index}, '｜')" style="background: #333; color: #888; border: 1px solid #444; padding: 2px 5px; border-radius: 3px; font-size: 0.6rem; cursor: pointer;">｜</button>
+                        <button type="button" onclick="applyRubyToRow(${index}, '《》')" style="background: #333; color: #888; border: 1px solid #444; padding: 2px 5px; border-radius: 3px; font-size: 0.6rem; cursor: pointer;">《 》</button>
+                    </div>
                 </div>
             </div>
             <textarea class="row-content" oninput="logData[${index}].content = this.value; this.style.height='auto'; this.style.height=this.scrollHeight+'px'">${item.content}</textarea>
@@ -755,6 +771,33 @@ function cleanUpLogData() {
     }
 }
 
+function applyRubyToRow(index, type) {
+    const textarea = document.querySelectorAll('.row-content')[index];
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const selectedText = text.substring(start, end);
+
+    let newText;
+    let newCursorPos;
+
+    if (type === '｜') {
+        newText = text.substring(0, start) + '｜' + selectedText + text.substring(end);
+        newCursorPos = start + (selectedText ? selectedText.length + 1 : 1);
+    } else if (type === '《》') {
+        newText = text.substring(0, start) + '《' + selectedText + '》' + text.substring(end);
+        newCursorPos = selectedText ? end + 2 : start + 1;
+    }
+
+    textarea.value = newText;
+    logData[index].content = newText;
+    
+    textarea.focus();
+    textarea.setSelectionRange(newCursorPos, newCursorPos);
+}
+
 function exportLog() {
     const h1Title = document.getElementById('logTitleInput').value || 'LOG';
     const fileName = document.getElementById('fileNameInput').value || 'log';
@@ -898,7 +941,11 @@ function exportLog() {
         if (item.tab.toLowerCase() === 'info') lineStyle = `style="background:${config.color}"`;
         const tabNameDisplay = isSystem ? '' : item.tab;
         const nameDisplay = isSystem ? '' : char.displayName;
-        const safeContent = item.content.split('\\n').join('<br>');
+        const safeContent = item.content
+            .split('\\n').join('<br>')
+            .replace(/[｜|]([^｜|《》]+)《([^《》]+)》/g, '<ruby>$1<rt>$2</rt></ruby>')
+            .replace(/([^ \n\t｜|《》]+)《([^《》]+)》/g, '<ruby>$1<rt>$2</rt></ruby>');
+
 
         html += `<div class="log-row ${styleClass}" id="log-${i}"><div class="row-header"><div class="row-name" ${nameStyle}><span class="name-line" ${lineStyle}></span>${nameDisplay}</div><div class="row-tab">${tabNameDisplay}</div></div><hr class="info-separator"><div class="row-content">${safeContent}</div></div>`;
     });
