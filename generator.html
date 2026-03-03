@@ -391,6 +391,26 @@
         return btoa(encodeURIComponent(name + color)).replace(/=/g, "");
     }
 
+    document.addEventListener('DOMContentLoaded', () => {
+    const dropArea = document.querySelector('.file-input-area');
+    if (!dropArea) return;
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        }, false);
+    });
+
+    dropArea.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files && files[0]) {
+            processLog(files[0]);
+        }
+    }, false);
+});
+
     async function processLog(file) {
         if (!file) return;
         logData = []; charSettings = {}; tabStyleMap = {}; selectedIndices = []; lastSelectedIndex = -1;
