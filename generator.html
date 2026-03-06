@@ -72,7 +72,9 @@
         .tab-config-item { background: #111; border-radius: 4px; padding: 10px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 8px; border: 1px solid #333; }
         .tab-config-top { display: flex; align-items: center; justify-content: space-between; }
         .tab-config-name { font-size: 0.75rem; font-weight: 900; color: #888; }
-        .tab-config-controls { display: flex; align-items: center; gap: 8px; }
+        .tab-config-controls { display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 8px; flex: 1; justify-content: flex-end; white-space: nowrap; }
+        .btn-toggle-input { background: none; border: none; color: #888; cursor: pointer; padding: 0; display: flex; align-items: center; } 
+        .btn-toggle-input:hover { color: #fff; } .hidden-input { display: none !important; }        
         .style-select { background: #222; color: #eee; border: 1px solid #444; border-radius: 4px; padding: 4px 8px; font-size: 0.7rem; }
 
         .search-box { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 6px; border: 1px solid #333; }
@@ -500,7 +502,16 @@ function renderTabSettings() {
                     <span class="tab-config-name">${tab}</span>
                     <div class="tab-config-controls">
                         <input type="color" class="in-color-picker" value="${tabStyleMap[tab].color}" 
-                            onchange="tabStyleMap['${tab}'].color=this.value; renderEditor(true)">
+                            oninput="tabStyleMap['${tab}'].color=this.value.toUpperCase(); this.nextElementSibling.nextElementSibling.value=this.value.toUpperCase(); renderEditor(true)">
+                        
+                        <button class="btn-toggle-input" onclick="this.nextElementSibling.classList.toggle('hidden-input')" title="カラーコード入力を表示">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">settings</span>
+                        </button>
+
+                        <input type="text" class="in-color hidden-input" value="${tabStyleMap[tab].color}" 
+                            style="width: 75px; background: #222; border: 1px solid #444; color: #888; font-size: 0.7rem; padding: 4px; margin: 0; text-align: center; border-radius: 2px;"
+                            oninput="if(/^#[0-9A-F]{6}$/i.test(this.value)){tabStyleMap['${tab}'].color=this.value.toUpperCase(); this.previousElementSibling.previousElementSibling.value=this.value.toUpperCase(); renderEditor(true)}">
+                        
                         <select class="style-select" 
                             onchange="tabStyleMap['${tab}'].style=this.value; renderEditor(true)">
                             ${STYLES.map(s => `<option value="${s.id}" ${tabStyleMap[tab].style === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}
