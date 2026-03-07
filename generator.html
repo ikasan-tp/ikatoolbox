@@ -537,58 +537,59 @@ function renderTabSettings() {
     }
 
 function renderEditor(fullInit = false) {
-        const container = document.getElementById('logEditor');
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        searchMatches = [];
+    const scrollPos = window.scrollY;
 
-        if (fullInit) {
-            container.innerHTML = '';
-            const fragment = document.createDocumentFragment();
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const row = entry.target;
-                        const index = parseInt(row.dataset.index);
-                        if (row.getAttribute('data-rendered') === 'false') {
-                            renderRowContent(row, index);
-                            row.setAttribute('data-rendered', 'true');
-                            observer.unobserve(row);
-                        }
+    const container = document.getElementById('logEditor');
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    searchMatches = [];
+
+    if (fullInit) {
+        container.innerHTML = '';
+        const fragment = document.createDocumentFragment();
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const row = entry.target;
+                    const index = parseInt(row.dataset.index);
+                    if (row.getAttribute('data-rendered') === 'false') {
+                        renderRowContent(row, index);
+                        row.setAttribute('data-rendered', 'true');
+                        observer.unobserve(row);
                     }
-                });
-            }, { rootMargin: '500px 0px' });
-
-            const scrollPos = window.scrollY;
-
-            logData.forEach((item, index) => {
-                const row = document.createElement('div');
-                row.classList.add('log-row');
-                row.setAttribute('id', 'row-' + index);
-                row.setAttribute('data-index', index);
-                row.setAttribute('data-rendered', 'false');
-                row.style.minHeight = '100px'; 
-                fragment.appendChild(row);
-                observer.observe(row);
+                }
             });
-            container.appendChild(fragment);
-            updatePreviewStyles();
-        }
+        }, { rootMargin: '500px 0px' });
 
         logData.forEach((item, index) => {
-            const row = document.getElementById(`row-${index}`);
-            if(!row) return;
-            const isSelected = selectedIndices.includes(index);
-            const isHit = searchTerm && item.content.toLowerCase().includes(searchTerm);
-            if (isHit) searchMatches.push(index);
-            row.classList.toggle('selected', isSelected);
-            row.classList.toggle('search-hit', isHit);
-            const cb = row.querySelector('.row-checkbox');
-            if(cb) cb.checked = isSelected;
+            const row = document.createElement('div');
+            row.classList.add('log-row');
+            row.setAttribute('id', 'row-' + index);
+            row.setAttribute('data-index', index);
+            row.setAttribute('data-rendered', 'false');
+            row.style.minHeight = '100px'; 
+            fragment.appendChild(row);
+            observer.observe(row);
         });
-
-        window.scrollTo(0, scrollPos);
+        container.appendChild(fragment);
+        updatePreviewStyles();
     }
 
+    logData.forEach((item, index) => {
+        const row = document.getElementById(`row-${index}`);
+        if(!row) return;
+        const isSelected = selectedIndices.includes(index);
+        const isHit = searchTerm && item.content.toLowerCase().includes(searchTerm);
+        if (isHit) searchMatches.push(index);
+        row.classList.toggle('selected', isSelected);
+        row.classList.toggle('search-hit', isHit);
+        const cb = row.querySelector('.row-checkbox');
+        if(cb) cb.checked = isSelected;
+    });
+
+    if (fullInit) {
+        window.scrollTo(0, scrollPos);
+    }
+}
 function renderRowContent(row, index) {
         const item = logData[index];
         const char = charSettings[item.charKey] || { displayName: "Unknown", color: "#888" };
