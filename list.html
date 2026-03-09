@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IKATOOLBOX | SCENARIO LIST GENERATOR</title>
+    <title>IKATOOLBOX | Scenario List Generator</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦑</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&family=Montserrat:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -14,7 +14,6 @@
             --canvas-text: #ffffff;
             --accent-color: #C5373C;
             --sys-text-color: #000000; /* 初期値（DARKモード用） */
-            --ui-accent: #C5373C; 
             --ui-bg: #222222;
             --ui-input: #111111;
             --ui-border: #444444;
@@ -167,13 +166,14 @@
                 <div class="dynamic-input-row">
                     <input type="text" class="in-pc-label" placeholder="PC">
                     <input type="text" class="in-pc-name" placeholder="PC名">
+                    <button class="btn-mini" onclick="this.parentElement.remove()">×</button>
                 </div>
             </div>
             <button class="btn-add-field" onclick="addPcField()">＋ PCを追加</button>
 
             <label>KP / PL</label>
             <input type="text" id="in-kp" placeholder="KP名">
-            <div id="pl-fields" style="margin-top:5px;"><div class="dynamic-input-row"><input type="text" class="in-pl" placeholder="PL名"></div></div>
+            <div id="pl-fields" style="margin-top:5px;"><div class="dynamic-input-row"><input type="text" class="in-pl" placeholder="PL名"><button class="btn-mini" onclick="this.parentElement.remove()">×</button></div></div>
             <button class="btn-add-field" onclick="addPlField()">＋ PLを追加</button>
             
             <label>メモ</label>
@@ -199,7 +199,7 @@
     </div>
 </div>
 
-<div style="position: fixed; bottom: 10px; right: 15px; font-family: sans-serif; font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; font-weight: bold; pointer-events: none; z-index: 9999;">✦ IKATOOLBOX</div>
+<div id="fixed-logo" style="position: fixed; bottom: 10px; right: 15px; font-family: sans-serif; font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; font-weight: bold; pointer-events: none; z-index: 9999;">✦ IKATOOLBOX</div>
 
 <script>
     const root = document.documentElement;
@@ -232,8 +232,7 @@
         document.getElementById('btn-dark').classList.toggle('active', isDark);
         document.getElementById('btn-light').classList.toggle('active', !isDark);
         
-        const fixedLogo = document.querySelector('div[style*="fixed"]');
-        if(fixedLogo) fixedLogo.style.color = isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)';
+        // ロゴはUIの背景（常に暗色）に合わせて常に白系のまま変更しない
     }
 
     function updateAccent(color) {
@@ -324,4 +323,3 @@
 </script>
 </body>
 </html>
-
