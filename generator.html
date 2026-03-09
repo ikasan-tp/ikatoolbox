@@ -115,6 +115,21 @@
         mark { background: #ffeb3b; color: #000; border-radius: 2px; }
 
         .save-btn { width: 100%; padding: 16px; background: var(--accent); color: white; border: none; border-radius: 25px; font-weight: 900; cursor: pointer; letter-spacing: 0.1em; transition: 0.2s; }
+
+        .anchor-panel { display: none; border-top: 1px solid #333; padding-top: 16px; margin-bottom: 16px; }
+        .anchor-panel.has-items { display: block; }
+        .anchor-panel-title { font-size: 0.7rem; font-weight: 900; color: #aaa; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+        .anchor-panel-count { background: var(--accent); color: #fff; font-size: 0.6rem; padding: 1px 6px; border-radius: 10px; }
+        .anchor-list { display: flex; flex-direction: column; gap: 4px; max-height: 180px; overflow-y: auto; }
+        .anchor-panel-title { cursor: pointer; user-select: none; }
+        .anchor-panel-title:hover { color: #fff; }
+        .anchor-toggle-icon { transition: transform 0.2s; font-size: 1rem !important; }
+        .anchor-panel.collapsed .anchor-toggle-icon { transform: rotate(-90deg); }
+        .anchor-panel.collapsed .anchor-list { display: none; }
+        .anchor-list-item { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 4px; cursor: pointer; transition: 0.15s; background: var(--ui-input); border: 1px solid transparent; }
+        .anchor-list-item:hover { border-color: var(--accent); background: var(--selection-bg); }
+        .anchor-list-num { font-family: 'Montserrat', sans-serif; font-size: 0.6rem; font-weight: 900; color: var(--accent); min-width: 18px; }
+        .anchor-list-name { font-size: 0.75rem; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
         .save-btn:hover:not(:disabled) { filter: brightness(1.2); }
         .save-btn:disabled { background: #444; opacity: 0.5; }
         
@@ -264,6 +279,16 @@
     </div> 
     </div>
 <div class="sidebar-footer">
+    <div class="anchor-panel" id="anchorPanel">
+        <div class="anchor-panel-title" onclick="document.getElementById('anchorPanel').classList.toggle('collapsed')">
+            <span style="display:flex;align-items:center;gap:6px;">
+                <span class="material-symbols-outlined anchor-toggle-icon">expand_more</span>
+                目次一覧
+            </span>
+            <span class="anchor-panel-count" id="anchorCount">0</span>
+        </div>
+        <div class="anchor-list" id="anchorList"></div>
+    </div>
     <button class="save-btn" id="downloadBtn" disabled onclick="exportLog()">HTMLを書き出し</button>
     <div style="width: 100%; text-align: center;">
         <button onclick="if(confirm('入力をすべてクリアしますか？')) location.reload()" 
@@ -460,7 +485,7 @@
         document.getElementById('emptyState').style.display = 'none';
         document.getElementById('postUploadControls').style.display = 'block';
         document.getElementById('downloadBtn').disabled = false;
-        renderCharConfigs(); renderTabSettings(); renderEditor(true);
+        renderCharConfigs(); renderTabSettings(); renderEditor(true); renderAnchorPanel();
     }
 
     function renderCharConfigs() {
@@ -633,7 +658,7 @@ function renderRowContent(row, index) {
         // イベントリスナーはdata-indexを参照するクロージャで登録（行移動後も正しく動作する）
         const getIdx = () => parseInt(row.dataset.index);
         row.querySelector('.anchor-check').addEventListener('change', function() { toggleAnchor(getIdx(), this.checked); });
-        row.querySelector('.anchor-input').addEventListener('input', function() { logData[getIdx()].anchor = this.value; });
+        row.querySelector('.anchor-input').addEventListener('input', function() { logData[getIdx()].anchor = this.value; renderAnchorPanel(); });
         row.querySelectorAll('.ruby-btn').forEach(btn => {
             btn.addEventListener('click', function() { applyRubyToRow(getIdx(), this.dataset.rubyType); });
         });
@@ -773,7 +798,37 @@ function renderRowContent(row, index) {
 
     function clearSelection() { selectedIndices = []; lastSelectedIndex = -1; document.getElementById('groupPanel').style.display = 'none'; renderEditor(); }
 
-    function toggleAnchor(index, checked) { if (!checked) logData[index].anchor = ''; }
+    function toggleAnchor(index, checked) {
+        if (!checked) logData[index].anchor = '';
+        renderAnchorPanel();
+    }
+
+    function renderAnchorPanel() {
+        const panel = document.getElementById('anchorPanel');
+        const list  = document.getElementById('anchorList');
+        const count = document.getElementById('anchorCount');
+        if (!panel || !list) return;
+
+        // 目次が設定されている行だけ抽出
+        const anchors = logData
+            .map((item, idx) => ({ idx, anchor: item.anchor }))
+            .filter(a => a.anchor && a.anchor.trim());
+
+        count.textContent = anchors.length;
+        panel.classList.toggle('has-items', anchors.length > 0);
+
+        list.innerHTML = '';
+        anchors.forEach((a, n) => {
+            const el = document.createElement('div');
+            el.className = 'anchor-list-item';
+            el.innerHTML = `<span class="anchor-list-num">${n + 1}</span><span class="anchor-list-name">${a.anchor}</span>`;
+            el.addEventListener('click', () => {
+                const row = document.getElementById('row-' + a.idx);
+                if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+            list.appendChild(el);
+        });
+    }
     function handleSearch() { currentSearchIdx = -1; renderEditor(); }
     function navSearch(dir) {
         if (searchMatches.length === 0) return;
