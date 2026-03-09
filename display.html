@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IKATOOLBOX | DISPLAY GENERATORr</title>
+    <title>IKATOOLBOX | Display Generator</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦑</text></svg>">
     
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&family=Montserrat:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
@@ -119,11 +119,16 @@
             border: none; z-index: 3000; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
+        .mobile-menu-btn span { 
+            transition: transform 0.3s ease; 
+            display: inline-block;
+        }
+        .mobile-menu-btn.is-active span { 
+            transform: rotate(180deg); 
+        }
+
         @media screen and (max-width: 1024px) {
             .mobile-menu-btn { display: flex; }
-	@media screen and (max-width: 1024px) {
-            .mobile-menu-btn { display: flex; }
-            
             .sidebar { 
                 position: fixed; 
                 left: 0; 
@@ -136,7 +141,6 @@
                 z-index: 2000;
                 padding-bottom: env(safe-area-inset-bottom, 80px);
             }
-
             .sidebar.active { 
                 transform: translateX(0); 
                 box-shadow: 10px 0 30px rgba(0,0,0,0.5); 
@@ -150,14 +154,6 @@
                 overflow: hidden; 
             }
         }
-.mobile-menu-btn span { 
-    transition: transform 0.3s ease; 
-    display: inline-block;
-}
-
-.mobile-menu-btn.is-active span { 
-    transform: rotate(180deg); 
-}
     </style>
 </head>
 <body>
@@ -478,8 +474,27 @@ function refreshScenarioDisplay() {
         const c = document.getElementById('skill-manager-list'); c.innerHTML = "";
         allSkills.forEach((s, i) => {
             const div = document.createElement('div'); div.className = 'skill-manage-item';
-            div.onclick = (e) => { if(e.target.tagName !== 'INPUT') { const cb = div.querySelector('input'); cb.checked = !cb.checked; allSkills[i].visible = cb.checked; refreshSkills(); } };
-            div.innerHTML = `<input type="checkbox" id="sm-${i}" ${s.visible ? 'checked' : ''} onchange="allSkills[${i}].visible=this.checked;refreshSkills()"><label for="sm-${i}">${s.label}(${s.value})</label>`;
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.id = 'sm-' + i;
+            cb.checked = s.visible;
+            cb.addEventListener('change', function() {
+                allSkills[i].visible = this.checked;
+                refreshSkills();
+            });
+            const lbl = document.createElement('label');
+            lbl.setAttribute('for', 'sm-' + i);
+            lbl.textContent = s.label + '(' + s.value + ')';
+            // ラベルクリックでもトグル（チェックボックスと連動）
+            div.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'LABEL') {
+                    cb.checked = !cb.checked;
+                    allSkills[i].visible = cb.checked;
+                    refreshSkills();
+                }
+            });
+            div.appendChild(cb);
+            div.appendChild(lbl);
             c.appendChild(div);
         });
     }
@@ -555,7 +570,7 @@ window.setSecretMode = function(isOn) {
     if (bOn) bOn.classList.toggle('active', isOn);
     if (bOff) bOff.classList.toggle('active', !isOn);
 
-const statIds = ["str","con","pow","dex","app","siz","int","edu","san","luk","hp","mp"];
+    const statIds = ["str","con","pow","dex","app","siz","int","edu","san","luk","hp","mp"];
     statIds.forEach(id => {
         const input = document.getElementById('in-' + id);
         const displayId = (id==='san'||id==='luk'||id==='hp'||id==='mp') ? 'd-'+id : 'val-'+id;
@@ -591,9 +606,8 @@ window.addEventListener('DOMContentLoaded', () => {
             setBar(id, 0);
         }
     });
+    refreshScenarioDisplay();
 });
-refreshScenarioDisplay()
 </script>
 </body>
 </html>
-
