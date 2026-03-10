@@ -112,15 +112,12 @@
 
         .tool-card:hover::before { opacity: 1; }
 
-        /* 6列グリッドで2段目の4・5枚目を中央に揃える */
+        /* 6枚を3列×2段に均等配置 */
         .menu-container {
-            grid-template-columns: repeat(6, 105px);
+            grid-template-columns: repeat(3, 210px);
         }
         .menu-container .tool-card {
-            grid-column: span 2;
-        }
-        .menu-container .tool-card:nth-child(4) {
-            grid-column: 2 / span 2;
+            grid-column: span 1;
         }
 
         .icon { font-size: 2.8rem; margin-bottom: 14px; color: var(--accent); }
@@ -233,9 +230,6 @@
             .menu-container .tool-card {
                 grid-column: auto;
             }
-            .menu-container .tool-card:nth-child(4) {
-                grid-column: auto;
-            }
         }
     </style>
 </head>
@@ -244,6 +238,16 @@
     <h1>IKATOOLBOX</h1>
 
     <div class="menu-container">
+        <a href="dice.html" class="tool-card">
+            <div class="icon">
+                <span class="material-symbols-outlined" style="font-size: inherit;">casino</span>
+            </div>
+            <div>
+                <div class="title">CHARACTER ROLLER</div>
+                <div class="desc">CoC 6版/7版対応<br>能力値の生成・計算</div>
+            </div>
+        </a>
+
         <a href="display.html" class="tool-card">
             <div class="icon">
                 <span class="material-symbols-outlined" style="font-size: inherit;">image</span>
@@ -284,13 +288,13 @@
             </div>
         </a>
 
-        <a href="dice.html" class="tool-card">
+        <a href="growth.html" class="tool-card">
             <div class="icon">
-                <span class="material-symbols-outlined" style="font-size: inherit;">casino</span>
+                <span class="material-symbols-outlined" style="font-size: inherit;">trending_up</span>
             </div>
             <div>
-                <div class="title">CHARACTER ROLLER</div>
-                <div class="desc">CoC 6版/7版対応<br>能力値の生成・計算</div>
+                <div class="title">GROWTH CHECK</div>
+                <div class="desc">セッションログから<br>成長チェックを自動処理</div>
             </div>
         </a>
 
