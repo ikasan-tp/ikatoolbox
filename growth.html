@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IKATOOLBOX | GROWTH CHECK</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%%22 y=%2250%%22 style=%22dominant-baseline:central;text-anchor:middle;font-size:80px;%22>🦑</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&family=Noto+Sans+JP:wght@400;500;700&family=Montserrat:wght@700;900&display=block" rel="stylesheet">
+<style>
+  :root {
+    --bg-dark: #1a1a1a;
+    --card-bg: #222222;
+    --ui-border: #444444;
+    --accent: #C5373C;
+    --text-main: #dbdee1;
+    --text-sub: #b5bac1;
+    --col-special:  #ffd740;
+    --col-critical: #ff9800;
+    --col-success:  #00e676;
+    --col-fail:     #b5bac1;
+    --col-fumble:   #ff5252;
+    --col-initial:  #00bcd4;
+  }
+  .material-symbols-outlined {
+    display:inline-block; width:1em; height:1em;
+    overflow:hidden; white-space:nowrap; direction:ltr; vertical-align:middle;
+  }
+  body {
+    font-family:'Noto Sans JP',sans-serif; line-height:1.6;
+    max-width:1280px; margin:0 auto; padding:80px 20px 60px;
+    background-color:var(--bg-dark); color:var(--text-main);
+    min-height:100vh; box-sizing:border-box; position:relative;
+  }
+  .page-layout {
+    display:grid;
+    grid-template-columns: 380px 1fr;
+    gap:20px;
+    align-items:start;
+  }
+  .left-panel { position:sticky; top:20px; }
+  .right-panel { min-width:0; }
+  .back-link {
+    position:absolute; top:30px; left:20px;
+    display:flex; align-items:center; gap:8px;
+    text-decoration:none; color:var(--text-sub);
+    font-family:'Montserrat',sans-serif; font-size:0.8rem; font-weight:700;
+    letter-spacing:0.1em; transition:0.3s; z-index:1000;
+  }
+  .back-link:hover { color:var(--accent); transform:translateX(-5px); }
+  .card { background:var(--card-bg); padding:28px; border-radius:12px; border:1px solid var(--ui-border); margin-bottom:16px; }
+  .ui-header { margin-bottom:20px; border-bottom:3px solid var(--accent); padding-bottom:12px; display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:10px; }
+  .ui-brand { font-family:'Montserrat',sans-serif; font-size:0.7rem; font-weight:900; color:var(--accent); letter-spacing:0.4em; display:block; margin-bottom:2px; }
+  .ui-title { font-family:'Montserrat','Noto Sans JP',sans-serif; font-size:1.3rem; font-weight:900; color:#fff; letter-spacing:0.05em; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
+  .ui-title-sub { color:var(--text-sub); font-size:0.8rem; font-weight:400; letter-spacing:0.1em; }
+  .edition-tabs { display:flex; gap:2px; background:#111; padding:3px; border-radius:4px; }
+  .tab-btn { background:transparent; color:var(--text-sub); border:none; padding:4px 12px; border-radius:3px; font-weight:900; cursor:pointer; transition:0.2s; font-family:'Montserrat',sans-serif; font-size:0.7rem; }
+  .tab-btn.active { background:var(--accent); color:#fff; }
+  .privacy-note { font-size:0.75em; color:var(--text-sub); margin-bottom:20px; }
+  .guide-container { background:#313338; border-radius:8px; margin-bottom:20px; overflow:hidden; }
+  .guide-header { padding:10px 20px; background:#383a40; cursor:pointer; font-size:0.9em; font-weight:bold; display:flex; justify-content:space-between; align-items:center; }
+  .guide-content { padding:20px; font-size:0.85em; display:none; }
+  .file-input-area { border:2px dashed #4f545c; padding:18px 16px; border-radius:8px; background:#313338; cursor:pointer; margin-bottom:16px; text-align:center; }
+  input[type="file"] { display:none; }
+  .file-label { color:var(--accent); text-decoration:underline; font-weight:bold; }
+  .file-info-box { font-size:0.85em; color:var(--accent); margin:16px auto 0; background:rgba(197,55,60,0.1); padding:12px; border-radius:6px; border-left:4px solid var(--accent); max-width:500px; text-align:left; display:none; }
+  .btn-group { display:flex; justify-content:center; gap:10px; margin-top:10px; flex-wrap:wrap; }
+  .btn { padding:10px 28px; font-size:14px; cursor:pointer; background-color:var(--accent); color:#fff; border:none; border-radius:25px; font-weight:bold; transition:0.2s; font-family:'Montserrat',sans-serif; letter-spacing:0.05em; }
+  .btn:hover { filter:brightness(1.2); }
+  .btn:disabled { opacity:0.4; cursor:default; filter:none; }
+  .btn-ghost { padding:9px 20px; font-size:13px; cursor:pointer; background:transparent; color:var(--text-sub); border:1px solid var(--ui-border); border-radius:25px; font-weight:bold; transition:0.2s; font-family:'Montserrat',sans-serif; }
+  .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+  #settingsSection { margin-top:0; }
+  .settings-grid { display:grid; grid-template-columns:1fr; gap:12px; }
+  .settings-box { background:#111; border-radius:8px; padding:16px 20px; }
+  .settings-box-title { font-family:'Montserrat',sans-serif; font-size:0.7rem; font-weight:900; color:var(--accent); letter-spacing:0.3em; margin-bottom:12px; }
+  .tag-list { display:flex; flex-wrap:wrap; gap:8px; }
+  .tag-item { background:#1e1f22; padding:6px 14px; border-radius:20px; font-size:0.8em; cursor:pointer; transition:0.2s; color:var(--text-sub); border:1px solid transparent; user-select:none; }
+  .tag-item.on { color:#fff; border-color:#6e7278; background:#383a40; }
+  .tag-item.on.sp  { border-color:var(--col-special);  color:var(--col-special); }
+  .tag-item.on.cr  { border-color:var(--col-critical); color:var(--col-critical); }
+  .tag-item.on.sc  { border-color:var(--col-success);  color:var(--col-success); }
+  .tag-item.on.fa  { border-color:var(--ui-border);    color:var(--text-main); }
+  .tag-item.on.fu  { border-color:var(--col-fumble);   color:var(--col-fumble); }
+  .tag-item.on.ini { border-color:var(--col-initial);  color:var(--col-initial); }
+  .select-links { display:flex; gap:8px; margin-bottom:8px; }
+  .select-link { font-size:0.75rem; color:var(--text-sub); cursor:pointer; text-decoration:underline; }
+  .select-link:hover { color:var(--accent); }
+  #resultSection { display:block; margin-top:0; }
+  .section-label { font-family:'Montserrat',sans-serif; font-size:0.72rem; font-weight:900; color:var(--accent); letter-spacing:0.3em; margin-bottom:14px; }
+  .char-block { background:#111; border-radius:8px; margin-bottom:0; border:1px solid var(--ui-border); overflow:hidden; }
+  #charBlocks { display:flex; flex-direction:column; gap:10px; }
+  .char-header { padding:12px 20px; background:#1a1a1a; display:flex; align-items:center; gap:12px; cursor:pointer; user-select:none; }
+  .char-name { font-weight:700; font-size:1rem; color:#fff; flex:1; }
+  .char-count { font-family:'Montserrat',sans-serif; font-size:0.7rem; color:var(--text-sub); }
+  .char-toggle { color:var(--text-sub); font-size:0.8rem; }
+  .char-body { padding:10px 14px 14px; }
+  .skill-row {
+    display:grid;
+    grid-template-columns: 20px 1fr 72px 58px 28px 84px;
+    gap:8px; align-items:center;
+    padding:7px 6px; border-radius:4px; font-size:0.84rem;
+    border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.15s;
+  }
+  .skill-row:last-child { border-bottom:none; }
+  .skill-row:hover { background:rgba(255,255,255,0.03); }
+  .skill-row.excluded { opacity:0.3; }
+  .skill-row-header { font-family:'Montserrat',sans-serif; font-size:0.63rem; color:var(--text-sub); letter-spacing:0.05em; border-bottom:1px solid var(--ui-border) !important; padding-bottom:8px !important; }
+  .chk-box { width:16px; height:16px; border-radius:3px; border:2px solid var(--ui-border); cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:0.15s; }
+  .chk-box.on { background:var(--accent); border-color:var(--accent); }
+  .chk-box.on::after { content:'✓'; color:#fff; font-size:0.65rem; font-weight:bold; }
+  .skill-name-cell { font-weight:700; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:default; }
+  .badge { display:inline-block; padding:2px 7px; border-radius:3px; font-size:0.68rem; font-weight:900; font-family:'Montserrat',sans-serif; white-space:nowrap; }
+  .badge-sp  { background:rgba(255,215,64,0.15);  color:var(--col-special); }
+  .badge-cr  { background:rgba(255,152,0,0.15);   color:var(--col-critical); }
+  .badge-sc  { background:rgba(0,230,118,0.15);   color:var(--col-success); }
+  .badge-fa  { background:rgba(181,186,193,0.1);  color:var(--text-sub); }
+  .badge-fu  { background:rgba(255,82,82,0.15);   color:var(--col-fumble); }
+  .badge-ini { background:rgba(0,188,212,0.15);   color:var(--col-initial); }
+  .dice-expr { font-family:monospace; font-size:0.75rem; color:var(--text-sub); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .skill-roll-info { font-size:0.68rem; color:var(--text-sub); font-family:monospace; margin-top:1px; opacity:0.7; }
+  .val-input { width:100%; background:#1a1a1a; border:1px solid var(--ui-border); color:#fff; border-radius:4px; padding:3px 6px; font-size:0.82rem; font-weight:700; text-align:center; outline:none; font-family:'Montserrat',sans-serif; box-sizing:border-box; }
+  .val-input:focus { border-color:var(--accent); }
+  .val-input:disabled { opacity:0.5; }
+  .roll-btn { background:transparent; border:1px solid var(--ui-border); color:var(--text-sub); width:26px; height:26px; border-radius:4px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s; padding:0; flex-shrink:0; }
+  .roll-btn:hover:not(:disabled) { border-color:var(--accent); color:var(--accent); }
+  .roll-btn:disabled { opacity:0.25; cursor:default; }
+  .roll-btn svg { width:13px; height:13px; fill:currentColor; }
+  .roll-result { font-family:'Montserrat',sans-serif; font-size:0.76rem; font-weight:900; text-align:right; white-space:nowrap; }
+  .rr-grew { color:var(--col-success); }
+  .rr-same { color:var(--text-sub); }
+  #outputSection { display:none; margin-top:0; }
+  .output-area { background:#111; border:1px solid var(--ui-border); border-radius:8px; padding:20px; font-family:monospace; font-size:0.82rem; line-height:1.9; color:var(--text-main); white-space:pre-wrap; word-break:break-all; max-height:380px; overflow-y:auto; }
+  #status { margin-top:12px; font-size:0.85em; color:var(--text-sub); text-align:center; min-height:1.4em; }
+  hr.div { border:none; border-top:1px solid var(--ui-border); margin:20px 0; }
+  @media (max-width:900px) {
+    .page-layout { grid-template-columns:1fr; }
+    .left-panel { position:static; }
+  }
+  @media (max-width:640px) {
+    .card { padding:20px 14px; }
+    .back-link { top:10px; left:10px; }
+    .skill-row { grid-template-columns:18px 1fr 58px 50px 26px 70px; }
+    .ui-header { flex-direction:column; align-items:flex-start; gap:10px; }
+  }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-link">
+  <span class="material-symbols-outlined" style="font-size:1.2rem;">arrow_back_ios</span>
+  BACK TO TOOLBOX
+</a>
+
+<div class="page-layout">
+
+  <!-- 左パネル：設定 -->
+  <div class="left-panel">
+    <div class="card">
+      <div class="ui-header">
+        <div>
+          <span class="ui-brand">IKATOOLBOX</span>
+          <div class="ui-title">GROWTH CHECK <span class="ui-title-sub">for CCFOLIA</span></div>
+        </div>
+        <div class="edition-tabs">
+          <button class="tab-btn active" data-ed="7">7th</button>
+          <button class="tab-btn" data-ed="6">6th</button>
+        </div>
+      </div>
+
+      <p class="privacy-note">※ログはサーバーに送信されず、ブラウザ内でのみ処理されます。</p>
+
+      <div class="guide-container">
+        <div class="guide-header" id="guideHeader"><span>✦ つかいかた</span><span id="guideArrow">▼</span></div>
+        <div class="guide-content" id="guideContent">
+          <ul style="margin:0;padding-left:18px;line-height:2.1;font-size:0.82em;">
+            <li>6版/7版をタブで選択してください。</li>
+            <li>[all]ログ（HTML）を読み込み「抽出する」を押します。</li>
+            <li>キャラクターと判定種別を絞り込んで「表示を更新」。</li>
+            <li>成功値は自動入力済み。必要なら手動で変更可能です。</li>
+            <li>個別またはまとめてロールし「テキスト書き出し」で出力できます。</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="file-input-area" id="dropZone">
+        <label for="logFile" style="cursor:pointer;display:block;">
+          <p id="dropText" style="margin:0;">ログファイルをドロップするか<br><span class="file-label">ファイルを選択</span></p>
+          <input type="file" id="logFile" accept=".html,.txt">
+          <div id="fileInfoBox" class="file-info-box"></div>
+        </label>
+      </div>
+
+      <div class="btn-group">
+        <button id="extractBtn" class="btn" disabled>抽出する</button>
+        <button id="resetBtn" class="btn-ghost" style="display:none;">リセット</button>
+      </div>
+      <div id="status"></div>
+    </div>
+
+    <div id="settingsSection">
+      <div class="card">
+        <div class="section-label">✦ 抽出設定</div>
+        <div class="settings-grid">
+          <div class="settings-box">
+            <div class="settings-box-title">対象キャラクター</div>
+            <div class="select-links">
+              <span class="select-link" id="charSelectAll">全選択</span>
+              <span class="select-link" id="charDeselectAll">全解除</span>
+            </div>
+            <div class="tag-list" id="charTagList"></div>
+          </div>
+          <div class="settings-box">
+            <div class="settings-box-title">抽出する判定種別</div>
+            <div class="tag-list" id="filterTagList"></div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:16px;">
+          <button id="applyBtn" class="btn">表示を更新</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 右パネル：結果 -->
+  <div class="right-panel">
+    <div id="resultSection">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+          <div class="section-label" style="margin-bottom:0;">✦ 成長チェック</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button id="rollAllBtn" class="btn">全技能をロール</button>
+            <button id="exportBtn" class="btn-ghost">テキスト書き出し</button>
+          </div>
+        </div>
+        <div id="charBlocks"></div>
+      </div>
+
+      <div id="outputSection">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div class="section-label" style="margin-bottom:0;">✦ テキスト出力</div>
+            <button id="copyBtn" class="btn-ghost">コピー</button>
+          </div>
+          <div class="output-area" id="outputArea"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="emptyState" class="card" style="text-align:center;padding:60px 20px;color:var(--text-sub);">
+      <div style="font-family:'Montserrat',sans-serif;font-size:0.8rem;font-weight:900;letter-spacing:0.2em;opacity:0.3;">ログを読み込んで<br>抽出するとここに表示されます</div>
+    </div>
+  </div>
+
+</div>
+
+<div style="position:fixed;bottom:10px;right:15px;font-family:sans-serif;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:0.1em;font-weight:bold;pointer-events:none;z-index:9999;">✦ IKATOOLBOX</div>
+
+<script>
+
+// ---- 初期値テーブル ----
+const INITIAL_VALUES_6 = {
+  '目星':25,'聞き耳':25,'図書館':25,'回避':1,
+  'こぶし（パンチ）':50,'キック':25,'組み付き':25,'頭突き':10,'投擲':25,'マーシャルアーツ':1,
+  '拳銃':20,'サブマシンガン':15,'ショットガン':30,'マシンガン':15,'ライフル':25,
+  '応急手当':30,'鍵開け':1,'隠す':15,'隠れる':10,'忍び歩き':10,'写真術':10,
+  '精神分析':1,'追跡':10,'登攀':40,'運転':20,'機械修理':20,'重機械操作':1,
+  '乗馬':5,'水泳':25,'製作':5,'操縦':1,'跳躍':25,'電気修理':10,'ナビゲート':10,'変装':1,
+  '言いくるめ':5,'信用':15,'説得':15,'値切り':5,'母国語':0,
+  '医学':5,'オカルト':5,'化学':1,'クトゥルフ神話':0,'芸術':5,'経理':10,
+  '考古学':1,'コンピューター':1,'心理学':5,'人類学':1,'生物学':1,'地質学':1,
+  '電子工学':1,'天文学':1,'博物学':10,'物理学':1,'法律':5,'薬学':1,'歴史':20,
+};
+const INITIAL_VALUES_7 = {
+  '目星':25,'聞き耳':20,'図書館':20,'回避':1,
+  '近接戦闘':25,'投擲':20,'射撃':0,
+  '応急手当':30,'鍵開け':1,'手さばき':10,'隠密':20,'精神分析':1,'追跡':10,'登攀':20,
+  '鑑定':5,'運転':20,'機械修理':10,'重機械操作':1,'乗馬':5,'水泳':20,
+  '製作':5,'操縦':1,'跳躍':20,'電気修理':10,'ナビゲート':10,'変装':5,
+  '言いくるめ':5,'信用':0,'説得':10,'母国語':0,'威圧':15,'魅惑':15,
+  '言語':1,'医学':1,'オカルト':5,'クトゥルフ神話':0,'芸術':5,'経理':5,
+  '考古学':1,'コンピューター':5,'科学':1,'心理学':10,'人類学':1,'電子工学':1,
+  '自然':10,'法律':5,'歴史':5,'サバイバル':10,
+};
+
+function getInitialValue(skillName, ed) {
+  const table = ed === 6 ? INITIAL_VALUES_6 : INITIAL_VALUES_7;
+  // 完全一致
+  if (skillName in table) return table[skillName];
+  // 部分一致（サブスキル対応: 例「芸術（歌唱）」→「芸術」）
+  for (const key of Object.keys(table)) {
+    if (skillName.startsWith(key)) return table[key];
+  }
+  return null;
+}
+
+const diceIconSvg = `<svg viewBox="0 0 24 24"><path d="M19,3H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V5C21,3.9,20.1,3,19,3z M7,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,9,7,9z M7,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,19,7,19z M12,14c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S13.1,14,12,14z M17,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,9,17,9z M17,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,19,17,19z"/></svg>`;
+
+let edition = 7;
+let rawHtml = '';
+let allEntries = {}; // char -> [{ skill, expr, roll, threshold, judgement, kind, raw }]
+let skillState = {}; // char -> skill -> { checked, value, rolled, result }
+let charEnabled = {};
+let filterEnabled = { special:true, critical:true, success:true, initial:false, fail:false, fumble:false };
+
+// エディション切替
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    edition = parseInt(btn.dataset.ed);
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+    // 版に応じてフィルター初期値を切り替え
+    if (edition === 6) {
+      filterEnabled = { special:false, critical:true, success:false, initial:false, fail:false, fumble:false };
+    } else {
+      filterEnabled = { special:true, critical:true, success:true, initial:false, fail:false, fumble:false };
+    }
+    buildFilterTags();
+  });
+});
+
+// ガイド
+document.getElementById('guideHeader').addEventListener('click', () => {
+  const c = document.getElementById('guideContent');
+  const open = c.style.display === 'block';
+  c.style.display = open ? 'none' : 'block';
+  document.getElementById('guideArrow').textContent = open ? '▼' : '▲';
+});
+
+// ファイル
+function handleFile(file) {
+  if (!file) return;
+  document.getElementById('fileInfoBox').innerHTML =
+    `<b>選択中: ${file.name}</b><span style="display:block;font-size:0.85em;color:var(--text-sub);margin-top:4px;">別のファイルをドロップして入れ替えられます</span>`;
+  document.getElementById('fileInfoBox').style.display = 'block';
+  document.getElementById('dropText').style.display = 'none';
+  document.getElementById('resetBtn').style.display = 'inline-block';
+  const reader = new FileReader();
+  reader.onload = ev => { rawHtml = ev.target.result; document.getElementById('extractBtn').disabled = false; };
+  reader.readAsText(file, 'UTF-8');
+}
+document.getElementById('logFile').addEventListener('change', e => handleFile(e.target.files[0]));
+document.getElementById('dropZone').addEventListener('dragover', e => e.preventDefault());
+document.getElementById('dropZone').addEventListener('drop', e => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); });
+
+// リセット
+document.getElementById('resetBtn').addEventListener('click', () => {
+  rawHtml = ''; allEntries = {}; skillState = {}; charEnabled = {};
+  ['fileInfoBox','settingsSection','resultSection','outputSection'].forEach(id => document.getElementById(id).style.display = 'none');
+  document.getElementById('emptyState').style.display = 'block';
+  document.getElementById('dropText').style.display = 'block';
+  document.getElementById('extractBtn').disabled = true;
+  document.getElementById('resetBtn').style.display = 'none';
+  document.getElementById('status').textContent = '';
+  document.getElementById('logFile').value = '';
+});
+
+// ---- ログ行パース ----
+function parseLogLine(text, ed) {
+  // パターン: CCB<=74 図書館 ... ＞ 12 ＞ スペシャル
+  // または:   CCB<=50 【こぶし（パンチ）】 ... ＞ 7 ＞ スペシャル
+  // または:   1D100<=74 図書館 ＞ 12 ＞ 成功
+  const re = /(?:CCB?|1[Dd]100)\s*<=\s*(\d+)\s+([\s\S]*?)\s*(?:\(\s*1[Dd]100\s*<=\s*\d+\s*\))?\s*[>＞]+\s*(\d+)\s*[>＞]+\s*([^\n]+)/i;
+  const m = text.match(re);
+  if (!m) return null;
+
+  const threshold = parseInt(m[1]);
+  let skillRaw = m[2].trim();
+  const roll = parseInt(m[3]);
+  const judgement = m[4].trim();
+
+  // スキル名: 【】内を優先
+  const bm = skillRaw.match(/【([^】]+)】/);
+  const skill = (bm ? bm[1] : skillRaw).trim();
+  // 技能名が空またはボーナス系は除外
+  if (!skill || /^[\d+\-*/()]+$/.test(skill) || /ボーナス|ペナルティ|修正/.test(skill)) return null;
+
+  // 判定種別
+  let kind = null;
+  if (/クリティカル|決定的成功/.test(judgement))       kind = 'critical';
+  else if (/スペシャル/.test(judgement))               kind = 'special';
+  else if (/ファンブル|致命的失敗/.test(judgement))    kind = 'fumble';
+  else if (/失敗/.test(judgement))                     kind = 'fail';
+  else if (/成功|イクストリーム|ハード|レギュラー/.test(judgement)) {
+    // 初期値以下の成功は initial に分類
+    const initVal = getInitialValue(skill, ed);
+    if (initVal !== null && initVal > 0 && threshold <= initVal) kind = 'initial';
+    else kind = 'success';
+  }
+  if (!kind) return null;
+
+  // 6版: 出目1〜5はクリティカル扱い
+  if (ed === 6 && (kind === 'success' || kind === 'fail') && roll <= 5) {
+    kind = 'critical';
+  }
+
+  return { skill, expr: `${threshold} | 出目:${roll}`, roll, threshold, judgement: judgement.trim(), kind, raw: text.trim() };
+}
+
+// ---- 抽出 ----
+document.getElementById('extractBtn').addEventListener('click', extract);
+document.getElementById('applyBtn').addEventListener('click', () => applyFilter(true));
+
+function extract() {
+  allEntries = {}; skillState = {};
+
+  const doc = new DOMParser().parseFromString(rawHtml, 'text/html');
+  doc.querySelectorAll('p').forEach(p => {
+    const text = p.textContent.replace(/\s+/g, ' ').trim();
+    if (text.startsWith('system :') || text.includes('削除済')) return;
+    // キャラ名: [タブ名] キャラ名 : 発言
+    const cm = text.match(/\[.*?\]\s*(.+?)\s*:\s*([\s\S]+)/);
+    if (!cm) return;
+    const char = cm[1].trim();
+    const msg = cm[2].trim();
+    const parsed = parseLogLine(msg, edition);
+    if (!parsed) return;
+    if (!allEntries[char]) allEntries[char] = [];
+    allEntries[char].push(parsed);
+  });
+
+  const chars = Object.keys(allEntries);
+  if (!chars.length) {
+    document.getElementById('status').textContent = '⚠ 成長対象のロールが見つかりませんでした。';
+    return;
+  }
+
+  chars.forEach(c => { if (charEnabled[c] === undefined) charEnabled[c] = true; });
+  document.getElementById('status').textContent =
+    `${chars.length} 名、${Object.values(allEntries).flat().length} 件のロールを抽出しました`;
+
+  buildCharTags(chars);
+  buildFilterTags();
+  document.getElementById('settingsSection').style.display = 'block';
+  applyFilter(false);
+}
+
+function buildCharTags(names) {
+  const list = document.getElementById('charTagList');
+  list.innerHTML = '';
+  names.forEach(name => {
+    const tag = document.createElement('span');
+    tag.className = 'tag-item' + (charEnabled[name] ? ' on' : '');
+    tag.textContent = name;
+    tag.addEventListener('click', () => { charEnabled[name] = !charEnabled[name]; tag.classList.toggle('on', charEnabled[name]); });
+    list.appendChild(tag);
+  });
+  document.getElementById('charSelectAll').onclick = () => {
+    Object.keys(charEnabled).forEach(k => charEnabled[k] = true);
+    list.querySelectorAll('.tag-item').forEach(t => t.classList.add('on'));
+  };
+  document.getElementById('charDeselectAll').onclick = () => {
+    Object.keys(charEnabled).forEach(k => charEnabled[k] = false);
+    list.querySelectorAll('.tag-item').forEach(t => t.classList.remove('on'));
+  };
+}
+
+const FILTER_DEFS = [
+  { key:'special',  label:'スペシャル',   cls:'sp'  },
+  { key:'critical', label:'クリティカル', cls:'cr'  },
+  { key:'success',  label:'通常成功',     cls:'sc'  },
+  { key:'initial',  label:'初期値成功',   cls:'ini' },
+  { key:'fail',     label:'失敗',         cls:'fa'  },
+  { key:'fumble',   label:'ファンブル',   cls:'fu'  },
+];
+
+
+function buildFilterTags() {
+  const list = document.getElementById('filterTagList');
+  list.innerHTML = '';
+  const defs = FILTER_DEFS;
+  defs.forEach(def => {
+    const tag = document.createElement('span');
+    tag.className = 'tag-item ' + def.cls + (filterEnabled[def.key] ? ' on' : '');
+    tag.textContent = def.label;
+    tag.addEventListener('click', () => { filterEnabled[def.key] = !filterEnabled[def.key]; tag.classList.toggle('on', filterEnabled[def.key]); });
+    list.appendChild(tag);
+  });
+}
+
+function buildFiltered() {
+  const filtered = {};
+  Object.entries(allEntries).forEach(([char, entries]) => {
+    if (!charEnabled[char]) return;
+    const bySkill = {};
+    entries.forEach(e => {
+      if (!filterEnabled[e.kind]) return;
+      if (!bySkill[e.skill]) bySkill[e.skill] = [];
+      bySkill[e.skill].push(e);
+    });
+    if (Object.keys(bySkill).length) filtered[char] = bySkill;
+  });
+  return filtered;
+}
+
+function applyFilter(scroll) {
+  const filtered = buildFiltered();
+
+  // skillState同期（既存のvalue/result保持）
+  Object.entries(filtered).forEach(([char, bySkill]) => {
+    if (!skillState[char]) skillState[char] = {};
+    Object.keys(bySkill).forEach(skill => {
+      if (!skillState[char][skill]) {
+        const best = [...bySkill[skill]].sort((a,b) => (KIND_PRIORITY[a.kind]??9) - (KIND_PRIORITY[b.kind]??9))[0];
+        skillState[char][skill] = { checked:true, value: String(best.threshold), rolled:false, result:null };
+      }
+    });
+  });
+
+  renderResult(filtered);
+  const hasResult = Object.keys(filtered).length > 0;
+  document.getElementById('resultSection').style.display = hasResult ? 'block' : 'none';
+  document.getElementById('emptyState').style.display = hasResult ? 'none' : 'block';
+}
+
+// ---- バッジ ----
+function kindBadge(kind) {
+  const m = {
+    special:  ['★ SP',   'badge-sp'],
+    critical: ['◆ CR',   'badge-cr'],
+    success:  ['✓ 成功', 'badge-sc'],
+    fail:     ['✗ 失敗', 'badge-fa'],
+    fumble:   ['💀 FB',  'badge-fu'],
+    initial:  ['◎ 初期', 'badge-ini'],
+  };
+  const [label, cls] = m[kind] || ['?',''];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+const KIND_PRIORITY = { special:0, critical:1, success:2, initial:3, fail:4, fumble:5 };
+
+// ---- 結果描画 ----
+function renderResult(filtered) {
+  const container = document.getElementById('charBlocks');
+  container.innerHTML = '';
+
+  if (!Object.keys(filtered).length) {
+    container.innerHTML = '<p style="color:var(--text-sub);text-align:center;padding:20px;">対象のロールがありません</p>';
+    return;
+  }
+
+  Object.entries(filtered).forEach(([char, bySkill]) => {
+    const state_char = skillState[char] || {};
+    const block = document.createElement('div');
+    block.className = 'char-block';
+
+    const header = document.createElement('div');
+    header.className = 'char-header';
+    header.innerHTML = `<span class="char-name">${char}</span><span class="char-count">${Object.keys(bySkill).length} 技能</span><span class="char-toggle">▼</span>`;
+    header.addEventListener('click', () => {
+      const body = block.querySelector('.char-body');
+      const open = body.style.display !== 'none';
+      body.style.display = open ? 'none' : 'block';
+      header.querySelector('.char-toggle').textContent = open ? '▶' : '▼';
+    });
+
+    const body = document.createElement('div');
+    body.className = 'char-body';
+
+    // ヘッダ行
+    const hr = document.createElement('div');
+    hr.className = 'skill-row skill-row-header';
+    hr.innerHTML = '<div></div><div>技能名 / 出目</div><div>判定</div><div>成功値</div><div></div><div>成長結果</div>';
+    body.appendChild(hr);
+
+    Object.entries(bySkill)
+      .sort((a,b) => b[1].length - a[1].length)
+      .forEach(([skill, entries]) => {
+        const state = state_char[skill];
+        if (!state) return;
+        const best = [...entries].sort((a,b) => (KIND_PRIORITY[a.kind]??9) - (KIND_PRIORITY[b.kind]??9))[0];
+
+        const row = document.createElement('div');
+        row.className = 'skill-row' + (!state.checked ? ' excluded' : '');
+
+        // チェック
+        const chk = document.createElement('div');
+        chk.className = 'chk-box' + (state.checked ? ' on' : '');
+        chk.addEventListener('click', () => {
+          if (state.rolled) return;
+          state.checked = !state.checked;
+          chk.classList.toggle('on', state.checked);
+          row.classList.toggle('excluded', !state.checked);
+        });
+
+        // 技能名 + 出目サブテキスト
+        const nameCell = document.createElement('div');
+        nameCell.className = 'skill-name-cell';
+        const rollInfoLines = entries.map(e => `出目:${e.roll}`).join(' / ');
+        nameCell.innerHTML =
+          `<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${skill}${entries.length > 1 ? ` <span style="font-size:0.72rem;color:var(--text-sub);font-weight:400;">×${entries.length}</span>` : ''}</div>` +
+          `<div class="skill-roll-info">${rollInfoLines}</div>`;
+        nameCell.title = entries.map(e => e.raw).join('\n');
+
+        // バッジ
+        const badgeCell = document.createElement('div');
+        badgeCell.innerHTML = kindBadge(best.kind);
+
+        // 成功値（自動入力済み・手修正可）
+        const valInput = document.createElement('input');
+        valInput.type = 'number'; valInput.className = 'val-input';
+        valInput.min = 1; valInput.max = 99; valInput.placeholder = '--';
+        valInput.value = state.value || '';
+        valInput.disabled = state.rolled;
+        valInput.title = 'ログの成功値から自動入力。手動で変更可能です。';
+        valInput.addEventListener('input', () => { state.value = valInput.value; });
+
+        // ロールボタン
+        const rollBtn = document.createElement('button');
+        rollBtn.className = 'roll-btn'; rollBtn.innerHTML = diceIconSvg;
+        rollBtn.disabled = state.rolled;
+        rollBtn.title = '成長ロール';
+        rollBtn.addEventListener('click', () => {
+          const v = parseInt(valInput.value);
+          if (!v || v < 1 || v > 99) { valInput.focus(); valInput.style.borderColor = 'var(--col-fumble)'; setTimeout(() => valInput.style.borderColor = '', 1000); return; }
+          doRoll(char, skill, v);
+          renderResult(filtered);
+        });
+
+        // 結果
+        const resultCell = document.createElement('div');
+        resultCell.className = 'roll-result';
+        if (state.rolled && state.result) {
+          const r = state.result;
+          resultCell.textContent = r.grew ? `+${r.gain} → ${r.newVal}` : `出目${r.roll} 失敗`;
+          resultCell.className = 'roll-result ' + (r.grew ? 'rr-grew' : 'rr-same');
+        }
+
+        row.append(chk, nameCell, badgeCell, valInput, rollBtn, resultCell);
+        body.appendChild(row);
+      });
+
+    block.append(header, body);
+    container.appendChild(block);
+  });
+}
+
+// ---- ロール ----
+function doRoll(char, skill, currentVal) {
+  const state = skillState[char][skill];
+  const roll = Math.floor(Math.random() * 100) + 1;
+  const grew = edition === 7
+    ? (roll > currentVal || roll >= 96)
+    : (roll > currentVal);
+  const gain = grew ? (Math.floor(Math.random() * 10) + 1) : 0;
+  state.rolled = true;
+  state.value = String(currentVal);
+  state.result = { roll, grew, gain, newVal: grew ? currentVal + gain : currentVal };
+}
+
+document.getElementById('rollAllBtn').addEventListener('click', () => {
+  const filtered = buildFiltered();
+  let hasError = false;
+  Object.entries(filtered).forEach(([char, bySkill]) => {
+    Object.keys(bySkill).forEach(skill => {
+      const state = skillState[char]?.[skill];
+      if (!state || !state.checked || state.rolled) return;
+      const v = parseInt(state.value);
+      if (!v || v < 1 || v > 99) { hasError = true; return; }
+      doRoll(char, skill, v);
+    });
+  });
+  if (hasError) document.getElementById('status').textContent = '⚠ 現在値が未入力の技能があります。';
+  else document.getElementById('status').textContent = '';
+  renderResult(filtered);
+});
+
+// ---- テキスト書き出し ----
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const filtered = buildFiltered();
+  const edLabel = edition === 7 ? '新クトゥルフ神話TRPG (7版)' : 'クトゥルフ神話TRPG (6版)';
+  const KIND_LABEL = { special:'スペシャル', critical:'クリティカル', success:'成功', fail:'失敗', fumble:'ファンブル', initial:'初期値成功' };
+  const lines = [`=== IKATOOLBOX 成長チェック結果 ===`, `${edLabel}`, ``, ];
+
+  Object.entries(filtered).forEach(([char, bySkill]) => {
+    lines.push(`▼ ${char}`);
+    const grew_skills = [], unrolled = [];
+    Object.entries(bySkill).forEach(([skill, entries]) => {
+      const state = skillState[char]?.[skill];
+      if (!state || !state.checked) return;
+      const best = [...entries].sort((a,b) => (KIND_PRIORITY[a.kind]??9) - (KIND_PRIORITY[b.kind]??9))[0];
+      const kindStr = KIND_LABEL[best.kind] || best.kind;
+      if (state.rolled && state.result) {
+        const r = state.result;
+        if (r.grew) grew_skills.push(`  ✓ ${skill}（${kindStr}）  ${state.value} → ${r.newVal}（+${r.gain}、出目${r.roll}）`);
+      } else {
+        unrolled.push(`  ? ${skill}（${kindStr}）  現在値: ${state.value || '未入力'}`);
+      }
+    });
+    if (grew_skills.length) { lines.push('  【成長あり】'); grew_skills.forEach(l => lines.push(l)); }
+    if (unrolled.length)    { lines.push('  【未ロール】'); unrolled.forEach(l => lines.push(l)); }
+    lines.push('');
+  });
+
+  const text = lines.join('\n');
+  document.getElementById('outputArea').textContent = text;
+  document.getElementById('outputSection').style.display = 'block';
+  document.getElementById('outputSection').scrollIntoView({ behavior:'smooth', block:'start' });
+});
+
+document.getElementById('copyBtn').addEventListener('click', () => {
+  navigator.clipboard.writeText(document.getElementById('outputArea').textContent).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'コピーしました！';
+    setTimeout(() => btn.textContent = 'コピー', 2000);
+  });
+});
+</script>
+</body>
+</html>
