@@ -1007,19 +1007,12 @@ function exportLog() {
         }
     });
 
-    // キャラカラーをCSS変数としてまとめて出力（インラインstyleの削減）
-    let charColorStyles = "";
-    Object.keys(charSettings).forEach(key => {
-        const color = charSettings[key].color;
-        const resolvedColor = (!color || color.toUpperCase() === '#888888') ? dynamicAccent : color;
-        const safeCk = key.replace(/[^a-zA-Z0-9]/g, '_');
-        charColorStyles += `[data-ck="${safeCk}"] { --char-color: ${resolvedColor}; }`;
-    });
+
 
     let html = `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><title>${h1Title}</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet"><style>
-    :root { --outer-bg: #0f0f0f; --inner-bg: #050505; --block-bg: #111111; --text: #dbdee1; --accent: ${dynamicAccent}; --sub-line: #444; --border: #222; --tab-text: #666; --chat-text: #8a8a8a; --container-width: 680px; --char-color: #dbdee1; } 
+    :root { --outer-bg: #0f0f0f; --inner-bg: #050505; --block-bg: #111111; --text: #dbdee1; --accent: ${dynamicAccent}; --sub-line: #444; --border: #222; --tab-text: #666; --chat-text: #8a8a8a; --container-width: 680px; } 
     body { background: var(--outer-bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; margin: 0; padding: 0; line-height: 1.7; display: flex; flex-direction: column; align-items: center; } 
-    ${charColorStyles}
+    
     header { position: fixed; top: 0; left: 0; width: 100%; background: rgba(5, 5, 5, 0.98); backdrop-filter: blur(12px); z-index: 1000; border-bottom: 1px solid var(--border); display: flex; justify-content: center; padding: 0; } 
     .header-inner { width: 90%; max-width: var(--container-width); height: calc(60px + env(safe-area-inset-top)); display: flex; justify-content: space-between; align-items: center; padding-top: env(safe-area-inset-top); box-sizing: border-box; } 
     .header-title { font-family: 'Montserrat'; font-weight: 900; font-size: 0.85rem; color: #fff; letter-spacing: 0.2em; text-transform: uppercase; } 
@@ -1051,9 +1044,9 @@ function exportLog() {
     .container { width: 100%; max-width: var(--container-width); background: var(--inner-bg); min-height: 100vh; padding: calc(60px + env(safe-area-inset-top)) 0 100px; } 
     .log-row { padding: 12px 25px; border-bottom: 1px dashed #1a1a1a; } 
     .row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; } 
-    .row-name { font-weight: 900; font-size: 0.85rem; color: var(--char-color); display: flex; align-items: center; gap: 8px; } 
-    .name-line { display: none; } 
-    .style-chat .row-name { color: var(--char-color); } 
+    .row-name { font-weight: 900; font-size: 0.85rem; color: #fff; display: flex; align-items: center; gap: 8px; } 
+    .name-line { width: 3px; height: 1em; background: var(--sub-line); } 
+    .style-chat .row-name { color: var(--chat-text); } 
     .row-tab { font-family: 'Montserrat'; font-weight: 700; font-size: 0.55rem; color: var(--tab-text); } 
     .row-content { font-size: 0.95rem; color: #ccc; white-space: pre-wrap; } 
     
@@ -1064,8 +1057,6 @@ function exportLog() {
     .style-chat { margin-left: 10%; border-left: 1px solid #222; padding: 10px 15px; opacity: 0.8; } 
     .row-system { padding: 2.2em 25px !important; font-style: italic; color: #aaa; } 
     .info-separator { display: none; } 
-
-    .name-line { display: none; }
 
     ${customTabStyles} 
     footer { text-align: center; padding: 80px; font-family: 'Montserrat'; font-size: 0.6rem; opacity: 0.2; } 
@@ -1117,17 +1108,19 @@ function exportLog() {
         
         const isSystem = (char.displayName && char.displayName.toLowerCase() === 'system');
         if (isSystem) styleClass += ' row-system';
-
-        const safeCk = item.charKey.replace(/[^a-zA-Z0-9]/g, '_');
+        
+        const resolvedCharColor = (!char.color || char.color.toUpperCase() === '#888888') ? dynamicAccent : char.color;
+        let nameStyle = config.style === 'style-chat' ? `style="color:${resolvedCharColor}"` : "";
+        let lineStyle = (config.style === 'style-chat' || isSystem) ? `style="display:none;"` : `style="background:${resolvedCharColor}"`;
+        if (item.tab.toLowerCase() === 'info') lineStyle = `style="background:${config.color}"`;
         const tabNameDisplay = isSystem ? '' : item.tab;
         const nameDisplay = isSystem ? '' : char.displayName;
-
         const safeContent = item.content
             .split('\\n').join('<br>')
             .replace(/[｜|]([^｜|《》]+)《([^《》]+)》/g, '<ruby>$1<rt>$2</rt></ruby>')
             .replace(/([^ \n\t｜|《》]+)《([^《》]+)》/g, '<ruby>$1<rt>$2</rt></ruby>');
 
-        html += `<div class="log-row ${styleClass}" id="log-${i}" data-ck="${safeCk}"><div class="row-header"><div class="row-name"><span class="name-line"></span>${nameDisplay}</div><div class="row-tab">${tabNameDisplay}</div></div><hr class="info-separator"><div class="row-content">${safeContent}</div></div>`;
+        html += `<div class="log-row ${styleClass}" id="log-${i}"><div class="row-header"><div class="row-name" ${nameStyle}><span class="name-line" ${lineStyle}></span>${nameDisplay}</div><div class="row-tab">${tabNameDisplay}</div></div><hr class="info-separator"><div class="row-content">${safeContent}</div></div>`;
     });
 
     html += `</div><footer>✦ IKATOOLBOX</footer>
