@@ -383,7 +383,16 @@
 <script>
     let logData = []; 
     let charSettings = {}; 
-    let tabStyleMap = {}; 
+    let tabStyleMap = {};
+    // メインタブカラーのキャッシュ（毎行find()しない）
+    let _mainColorCache = null;
+    function _cachedMainColor() {
+        if (_mainColorCache) return _mainColorCache;
+        const k = Object.keys(tabStyleMap).find(k => tabStyleMap[k].style === 'style-default');
+        _mainColorCache = k ? tabStyleMap[k].color : '#C5373C';
+        return _mainColorCache;
+    }
+    function _clearMainColorCache() { _mainColorCache = null; } 
     let selectedIndices = [];
     let searchMatches = [];
     let currentSearchIdx = -1;
@@ -444,7 +453,7 @@
 
     async function processLog(file) {
         if (!file) return;
-        logData = []; charSettings = {}; tabStyleMap = {}; selectedIndices = []; lastSelectedIndex = -1;
+        logData = []; charSettings = {}; tabStyleMap = {}; selectedIndices = []; lastSelectedIndex = -1; _clearMainColorCache();
         const text = await file.text();
         const doc = new DOMParser().parseFromString(text, 'text/html');
         const baseTitle = file.name.replace('.html', '').replace(/\[all\]/gi, '').trim();
@@ -509,14 +518,8 @@
 
     function updateAllRowColors(key) {
         const color = charSettings[key].color;
-        function resolveColor(c) {
-            if (!c || c.toUpperCase() === '#888888' || c === '#888') {
-                const mainTab = Object.keys(tabStyleMap).find(k => tabStyleMap[k].style === 'style-default');
-                return mainTab ? tabStyleMap[mainTab].color : '#C5373C';
-            }
-            return c;
-        }
-        document.querySelectorAll(`.row-name[data-charkey="${key}"]`).forEach(el => el.style.color = resolveColor(color));
+        const resolved = (!color || color.toUpperCase() === '#888888' || color === '#888') ? _cachedMainColor() : color;
+        document.querySelectorAll(`.row-name[data-charkey="${key}"]`).forEach(el => el.style.color = resolved);
     }
     function updateAllRowNames(key) {
         const name = charSettings[key].displayName;
@@ -562,6 +565,7 @@ function renderTabSettings() {
 
     // タブカラー変更時の軽量更新（全再描画しない）
     function updateTabStyles(changedTab) {
+        _clearMainColorCache();
         function resolveColor(color) {
             if (!color || color.toUpperCase() === '#888888' || color === '#888') {
                 const mainTab = Object.keys(tabStyleMap).find(k => tabStyleMap[k].style === 'style-default');
@@ -580,8 +584,12 @@ function renderTabSettings() {
             const isInfo = item.tab.toLowerCase() === 'info';
             const accentColor = isInfo ? "#444" : (config.color || "#444");
 
-            // スタイルのみ更新
-            row.style.borderLeft = `4px solid ${accentColor}`;
+            // スタイルのみ更新（mainタブは左縦ライン非表示）
+            if (config.style === 'style-default') {
+                row.style.borderLeft = '4px solid transparent';
+            } else {
+                row.style.borderLeft = `4px solid ${accentColor}`;
+            }
 
             const nameEl = row.querySelector('.row-name');
             if (nameEl) nameEl.style.color = isInfo ? '#888' : resolveColor(char.color);
@@ -630,7 +638,7 @@ function renderEditor(fullInit = false) {
                     }
                 }
             });
-        }, { rootMargin: '500px 0px' });
+        }, { rootMargin: '300px 0px' });
 
         logData.forEach((item, index) => {
             const row = document.createElement('div');
@@ -646,16 +654,20 @@ function renderEditor(fullInit = false) {
         updatePreviewStyles();
     }
 
+    // 差分のみ更新（全行ループを最小化）
+    const selectedSet = new Set(selectedIndices);
     logData.forEach((item, index) => {
         const row = document.getElementById(`row-${index}`);
         if(!row) return;
-        const isSelected = selectedIndices.includes(index);
-        const isHit = searchTerm && item.content.toLowerCase().includes(searchTerm);
+        const isSelected = selectedSet.has(index);
+        const isHit = searchTerm ? item.content.toLowerCase().includes(searchTerm) : false;
         if (isHit) searchMatches.push(index);
-        row.classList.toggle('selected', isSelected);
-        row.classList.toggle('search-hit', isHit);
+        const wasSelected = row.classList.contains('selected');
+        const wasHit = row.classList.contains('search-hit');
+        if (wasSelected !== isSelected) row.classList.toggle('selected', isSelected);
+        if (wasHit !== isHit) row.classList.toggle('search-hit', isHit);
         const cb = row.querySelector('.row-checkbox');
-        if(cb) cb.checked = isSelected;
+        if(cb && cb.checked !== isSelected) cb.checked = isSelected;
     });
 
     if (fullInit) {
@@ -672,11 +684,10 @@ function renderRowContent(row, index) {
 
         const accentColor = isInfo ? "#444" : (currentTabConfig.color || "#444");
 
-        // #888888はデフォルト値なのでメインタブのカラーを代わりに使う
+        // #888888はデフォルト値なのでメインタブのカラーを代わりに使う（キャッシュ済み）
         function resolveColor(color) {
             if (!color || color.toUpperCase() === '#888888' || color === '#888') {
-                const mainTab = Object.keys(tabStyleMap).find(k => tabStyleMap[k].style === 'style-default');
-                return mainTab ? tabStyleMap[mainTab].color : '#C5373C';
+                return _cachedMainColor();
             }
             return color;
         }
@@ -719,8 +730,12 @@ function renderRowContent(row, index) {
         });
         row.querySelector('.row-content').addEventListener('input', function() {
             logData[getIdx()].content = this.value;
-            this.style.height = 'auto';
-            this.style.height = this.scrollHeight + 'px';
+            // requestAnimationFrameでreflowをまとめる
+            const el = this;
+            requestAnimationFrame(() => {
+                el.style.height = 'auto';
+                el.style.height = el.scrollHeight + 'px';
+            });
         });
         row.querySelector('.row-checkbox').addEventListener('change', function() { toggleSelect(getIdx()); });
         row.querySelector('.move-up').addEventListener('click', () => moveRow(getIdx(), -1));
@@ -729,7 +744,12 @@ function renderRowContent(row, index) {
 
         if (isSelected) row.classList.add('selected');
 
-        row.style.borderLeft = `4px solid ${accentColor}`;
+        // mainタブ(style-default)は左縦ライン非表示
+        if (currentTabConfig.style === 'style-default') {
+            row.style.borderLeft = '4px solid transparent';
+        } else {
+            row.style.borderLeft = `4px solid ${accentColor}`;
+        }
 
         if (currentTabConfig.style === 'style-secret') {
             const translucentColor = currentTabConfig.color + '44';
@@ -771,13 +791,26 @@ function renderRowContent(row, index) {
         } else {
             panel.style.display = 'none';
         }
-        renderEditor();
+        // チェックボックス操作は選択状態の更新だけでいい（fullInit不要）
+        requestAnimationFrame(() => renderEditor(false));
     }
 
     function deleteRow(index) {
         if (!confirm("この行を削除しますか？")) return;
+        // DOM直接削除（全再描画しない）
+        const rowEl = document.getElementById(`row-${index}`);
+        if (rowEl) rowEl.remove();
         logData.splice(index, 1);
-        renderEditor(true);
+        // 後続行のdata-indexを更新
+        for (let i = index; i < logData.length; i++) {
+            const r = document.getElementById(`row-${i + 1}`);
+            if (r) {
+                r.id = `row-${i}`;
+                updateRowIndex(r, i);
+            }
+        }
+        renderAnchorPanel();
+        renderEditor();
     }
 
     function deleteSelectedRows() {
@@ -884,7 +917,12 @@ function renderRowContent(row, index) {
             list.appendChild(el);
         });
     }
-    function handleSearch() { currentSearchIdx = -1; renderEditor(); }
+    let _searchTimer = null;
+    function handleSearch() {
+        currentSearchIdx = -1;
+        clearTimeout(_searchTimer);
+        _searchTimer = setTimeout(() => renderEditor(), 120);
+    }
     function navSearch(dir) {
         if (searchMatches.length === 0) return;
         currentSearchIdx = (currentSearchIdx + dir + searchMatches.length) % searchMatches.length;
