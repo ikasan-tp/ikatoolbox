@@ -184,6 +184,12 @@
 
   .fixed-footer { position: fixed; bottom: 10px; right: 15px; font-family: sans-serif; font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: 0.1em; font-weight: bold; pointer-events: none; z-index: 9999; }
 
+  /* カスタム設定パネル用の追加CSS */
+  .custom-input-group { display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.03); padding: 5px 10px; border-radius: 4px; }
+  .custom-label { font-family: 'Montserrat', sans-serif; font-size: 0.85rem; font-weight: 900; color: #fff; width: 40px; }
+  .custom-inp { background: #000; color: #fff; border: 1px solid var(--ui-border); border-radius: 3px; width: 35px; text-align: center; font-size: 0.8rem; height: 22px; outline: none; }
+  .custom-inp:focus { border-color: var(--accent); }
+
   @media screen and (max-width: 750px) {
     body { padding: 20px 10px; }
     .card { padding: 20px; }
@@ -256,8 +262,15 @@
           <button id="tab-7th" class="tab-btn active" onclick="switchEdition(7)">7th</button>
           <button id="tab-6th" class="tab-btn" onclick="switchEdition(6)">6th</button>
         </div>
+        <button id="custom-toggle" class="tab-btn" onclick="toggleCustom()" style="margin-right: 5px;">CUSTOM OFF</button>
         <button class="btn-all" onclick="rollAll()">ALL</button>
       </div>
+    </div>
+
+    <div id="custom-panel" style="display: none; background: #111; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--ui-border);">
+      <div style="font-size: 0.8rem; font-weight: bold; color: var(--accent); margin-bottom: 10px; font-family: 'Montserrat', sans-serif;">CUSTOM DICE SETTINGS</div>
+      <div id="custom-settings-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
+        </div>
     </div>
 
     <div class="top-stats">
@@ -384,6 +397,49 @@
     { id: "EDU", d: 3, f: 6, a: 3, min: 6, max: 21 }
   ];
 
+  /* カスタム設定用の変数と関数 */
+  let isCustomDice = false;
+  let customConfig7th = JSON.parse(JSON.stringify(config7th));
+  let customConfig6th = JSON.parse(JSON.stringify(config6th));
+
+  function toggleCustom() {
+    isCustomDice = !isCustomDice;
+    const btn = document.getElementById('custom-toggle');
+    btn.innerText = isCustomDice ? "CUSTOM ON" : "CUSTOM OFF";
+    btn.classList.toggle('active', isCustomDice);
+    document.getElementById('custom-panel').style.display = isCustomDice ? "block" : "none";
+    if (isCustomDice) renderCustomPanel();
+  }
+
+  function renderCustomPanel() {
+    const config = currentEdition === 7 ? customConfig7th : customConfig6th;
+    let html = "";
+    config.forEach(s => {
+      html += `
+        <div class="custom-input-group">
+          <span class="custom-label">${s.id}</span>
+          <input type="number" class="custom-inp" value="${s.d}" onchange="updateCustom('${s.id}', 'd', this.value)" min="1">
+          <span style="color:var(--text-sub); font-size:0.8rem;">D</span>
+          <input type="number" class="custom-inp" value="${s.f}" onchange="updateCustom('${s.id}', 'f', this.value)" min="1">
+          <span style="color:var(--text-sub); font-size:0.8rem;">+</span>
+          <input type="number" class="custom-inp" value="${s.a}" onchange="updateCustom('${s.id}', 'a', this.value)" min="0">
+        </div>
+      `;
+    });
+    document.getElementById('custom-settings-grid').innerHTML = html;
+  }
+
+  function updateCustom(id, key, val) {
+    const config = currentEdition === 7 ? customConfig7th : customConfig6th;
+    const stat = config.find(x => x.id === id);
+    if (stat) {
+      stat[key] = parseInt(val) || 0;
+      stat.min = stat.d * 1 + stat.a;
+      stat.max = stat.d * stat.f + stat.a;
+    }
+  }
+  /* ---------------------- */
+
   const traitList = [];
   for(let i=1; i<=7; i++) {
     for(let j=1; j<=10; j++) {
@@ -433,6 +489,8 @@
         <option value="EDU_SIZ">EDU×10 + SIZ×10</option>
         <option value="EDU_INT">EDU×10 + INT×10</option>`;
     }
+    
+    if (isCustomDice) renderCustomPanel();
     updateDisplay();
   }
 
@@ -451,7 +509,7 @@
   }
 
   function rollAll() {
-    const config = (currentEdition === 7) ? config7th : config6th;
+    const config = isCustomDice ? (currentEdition === 7 ? customConfig7th : customConfig6th) : ((currentEdition === 7) ? config7th : config6th);
     config.forEach(s => {
       const r = Array.from({length: s.d}, () => Math.floor(Math.random() * s.f) + 1);
       dmsg[s.id] = r.join('+') + (s.a ? `+${s.a}` : '');
@@ -467,7 +525,7 @@
 
   function reroll(id) {
     if(sumVals.STR === 0) return;
-    const config = (currentEdition === 7) ? config7th : config6th;
+    const config = isCustomDice ? (currentEdition === 7 ? customConfig7th : customConfig6th) : ((currentEdition === 7) ? config7th : config6th);
     const s = (id === 'LUK') ? { d: 3, f: 6, a: 0 } : config.find(x => x.id === id);
     const r = Array.from({length: s.d}, () => Math.floor(Math.random() * s.f) + 1);
     if (id === 'LUK') {
@@ -515,7 +573,7 @@
   }
 
   function updateDisplay() {
-    const config = (currentEdition === 7) ? config7th : config6th;
+    const config = isCustomDice ? (currentEdition === 7 ? customConfig7th : customConfig6th) : ((currentEdition === 7) ? config7th : config6th);
     let html = "";
     let total = 0;
     config.forEach(s => {
