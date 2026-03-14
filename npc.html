@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IKATOOLBOX | NPC GENERATOR</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%%22 y=%2250%%22 style=%22dominant-baseline:central;text-anchor:middle;font-size:80px;%22>🦑</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&family=Noto+Sans+JP:wght@400;500;700&family=Montserrat:wght@700;900&display=block" rel="stylesheet">
+<style>
+  :root {
+    --bg-dark: #1a1a1a;
+    --card-bg: #222222;
+    --ui-input: #111111;
+    --ui-border: #444444;
+    --accent: #C5373C;
+    --text-main: #dbdee1;
+    --text-sub: #b5bac1;
+  }
+  .material-symbols-outlined { display:inline-block; width:1em; height:1em; overflow:hidden; white-space:nowrap; direction:ltr; vertical-align:middle; }
+  *,*::before,*::after { box-sizing:border-box; }
+  body { font-family:'Noto Sans JP',sans-serif; line-height:1.6; max-width:1200px; margin:0 auto; padding:80px 20px 60px; background-color:var(--bg-dark); color:var(--text-main); min-height:100vh; position:relative; }
+
+  .back-link { position:absolute; top:30px; left:20px; display:flex; align-items:center; gap:8px; text-decoration:none; color:var(--text-sub); font-family:'Montserrat',sans-serif; font-size:0.8rem; font-weight:700; letter-spacing:0.1em; transition:0.3s; z-index:1000; }
+  .back-link:hover { color:var(--accent); transform:translateX(-5px); }
+
+  .card { background:var(--card-bg); padding:24px 28px; border-radius:12px; border:1px solid var(--ui-border); margin-bottom:12px; }
+  .ui-header { margin-bottom:16px; border-bottom:3px solid var(--accent); padding-bottom:12px; display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:10px; }
+  .ui-brand { font-family:'Montserrat',sans-serif; font-size:0.7rem; font-weight:900; color:var(--accent); letter-spacing:0.4em; display:block; margin-bottom:2px; }
+  .ui-title { font-family:'Montserrat','Noto Sans JP',sans-serif; font-size:1.3rem; font-weight:900; color:#fff; letter-spacing:0.05em; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
+  .ui-title-sub { color:var(--text-sub); font-size:0.8rem; font-weight:400; letter-spacing:0.1em; }
+
+  /* コントロール */
+  .controls { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .control-label { font-size:0.68rem; color:#666; font-weight:700; letter-spacing:0.04em; }
+  .toggle-group { display:flex; gap:2px; background:#111; padding:3px; border-radius:4px; }
+  .toggle-btn { background:transparent; color:var(--text-sub); border:none; padding:4px 12px; border-radius:3px; font-weight:900; cursor:pointer; transition:0.2s; font-family:'Montserrat',sans-serif; font-size:0.7rem; }
+  .toggle-btn.active { background:var(--accent); color:#fff; }
+
+  input[type="number"] { width:60px; background:var(--ui-input); border:1px solid var(--ui-border); color:#fff; padding:4px 8px; border-radius:4px; font-size:0.82rem; text-align:center; outline:none; font-family:'Montserrat',sans-serif; transition:border-color 0.15s; }
+  input[type="number"]:focus { border-color:var(--accent); }
+
+  /* ボタン */
+  .btn { padding:10px 28px; font-size:14px; cursor:pointer; background-color:var(--accent); color:#fff; border:none; border-radius:25px; font-weight:bold; transition:0.2s; font-family:'Montserrat',sans-serif; letter-spacing:0.05em; display:inline-flex; align-items:center; gap:6px; }
+  .btn:hover { filter:brightness(1.15); transform:translateY(-1px); }
+  .btn:active { transform:translateY(0); }
+  .btn .material-symbols-outlined { font-size:1rem; width:1rem; height:1rem; }
+  .btn-ghost { padding:9px 20px; font-size:13px; cursor:pointer; background:transparent; color:var(--text-sub); border:1px solid var(--ui-border); border-radius:25px; font-weight:bold; transition:0.2s; font-family:'Montserrat',sans-serif; display:inline-flex; align-items:center; gap:6px; }
+  .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-ghost:disabled { opacity:0.35; cursor:default; }
+  .btn-ghost .material-symbols-outlined { font-size:1rem; width:1rem; height:1rem; }
+
+  /* 結果エリア */
+  #resultArea { margin-top:0; }
+  .npc-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:12px; }
+
+  /* NPCカード */
+  .npc-card { background:#181818; border-radius:8px; border:1px solid var(--ui-border); overflow:hidden; }
+  .npc-card-head { padding:14px 16px 12px; border-bottom:1px solid #2a2a2a; display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+  .npc-name { font-weight:700; font-size:1rem; color:#fff; }
+  .npc-meta { font-size:0.72rem; color:var(--text-sub); white-space:nowrap; }
+  .npc-job { font-family:'Montserrat',sans-serif; font-size:0.62rem; font-weight:900; color:var(--accent); letter-spacing:0.08em; margin-top:2px; }
+
+  .npc-stats { display:grid; grid-template-columns:repeat(4, 1fr); gap:1px; background:#2a2a2a; border-bottom:1px solid #2a2a2a; }
+  .stat-cell { background:#181818; padding:8px 6px; text-align:center; }
+  .stat-cell-label { font-family:'Montserrat',sans-serif; font-size:0.55rem; font-weight:900; color:#555; letter-spacing:0.06em; display:block; margin-bottom:2px; }
+  .stat-cell-val { font-family:'Montserrat',sans-serif; font-size:1.1rem; font-weight:900; color:#fff; line-height:1; }
+  .stat-cell-val.hi { color:#5c7cfa; }
+  .stat-cell-val.lo { color:#ff6b6b; }
+
+  .npc-skills { padding:12px 14px; }
+  .skills-title { font-family:'Montserrat',sans-serif; font-size:0.6rem; font-weight:900; color:#444; letter-spacing:0.2em; margin-bottom:8px; }
+  .skill-list { display:grid; grid-template-columns:repeat(2, 1fr); gap:3px 16px; }
+  .skill-item { display:flex; justify-content:space-between; align-items:center; font-size:0.72rem; padding:2px 0; border-bottom:1px solid rgba(255,255,255,0.03); }
+  .skill-item:last-child { border-bottom:none; }
+  .skill-name { color:var(--text-sub); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .skill-val { font-family:'Montserrat',sans-serif; font-weight:900; font-size:0.78rem; color:#fff; flex-shrink:0; margin-left:6px; }
+  .skill-val.high { color:#5c7cfa; }
+
+  /* ステータス行 */
+  #status { margin-top:10px; font-size:0.82em; color:var(--text-sub); text-align:center; min-height:1.3em; }
+
+  /* アクションバー */
+  .action-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px; }
+  .action-bar-right { display:flex; gap:8px; flex-wrap:wrap; }
+
+  /* セクションラベル */
+  .section-label { font-family:'Montserrat',sans-serif; font-size:0.72rem; font-weight:900; color:var(--accent); letter-spacing:0.3em; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .section-label::after { content:""; flex:1; height:1px; background:var(--accent); opacity:0.2; }
+
+  /* カード内キャラ出力ボタン */
+  .npc-card-footer { padding:10px 14px; border-top:1px solid #2a2a2a; }
+  .btn-copy-char {
+    width:100%; padding:8px; font-size:0.7rem; cursor:pointer;
+    background:transparent; color:var(--text-sub);
+    border:1px solid var(--ui-border); border-radius:4px;
+    font-weight:700; transition:0.15s; font-family:'Montserrat',sans-serif;
+    letter-spacing:0.06em; display:flex; align-items:center; justify-content:center; gap:6px;
+  }
+  .btn-copy-char:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-copy-char.copied { border-color:#00e676; color:#00e676; }
+  .btn-copy-char .material-symbols-outlined { font-size:0.9rem; width:0.9rem; height:0.9rem; }
+
+  @media (max-width:640px) {
+    body { padding:60px 12px 60px; }
+    .back-link { top:10px; left:10px; }
+    .npc-grid { grid-template-columns:1fr; }
+    .npc-stats { grid-template-columns:repeat(4, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-link">
+  <span class="material-symbols-outlined" style="font-size:0.9rem;">arrow_back_ios</span>
+  BACK TO TOOLBOX
+</a>
+
+<div class="card">
+  <div class="ui-header">
+    <div>
+      <span class="ui-brand">IKATOOLBOX</span>
+      <div class="ui-title">NPC GENERATOR <span class="ui-title-sub">for CoC</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <div class="controls">
+        <span class="control-label">版</span>
+        <div class="toggle-group">
+          <button class="toggle-btn active" data-ed="7" onclick="setEdition(7)">7th</button>
+          <button class="toggle-btn" data-ed="6" onclick="setEdition(6)">6th</button>
+        </div>
+        <span class="control-label">生成数</span>
+        <input type="number" id="genCount" value="3" min="1" max="12">
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <button class="btn" onclick="generate()">
+      <span class="material-symbols-outlined">person_add</span>
+      生成する
+    </button>
+    <button class="btn-ghost" id="clearBtn" onclick="clearAll()" disabled>リセット</button>
+  </div>
+  <div id="status"></div>
+</div>
+
+<div id="resultArea" style="display:none;">
+  <div class="card">
+    <div class="action-bar">
+      <div class="section-label" style="margin-bottom:0;flex:1;">✦ 生成結果</div>
+      <div class="action-bar-right">
+        <button class="btn-ghost" onclick="generate()">
+          <span class="material-symbols-outlined">refresh</span>
+          再生成
+        </button>
+      </div>
+    </div>
+    <div id="npcGrid" class="npc-grid"></div>
+  </div>
+</div>
+
+<script>
+let currentEdition = 7;
+let generatedNpcs = [];
+
+// ---- 版切替 ----
+function setEdition(ed) {
+  currentEdition = ed;
+  document.querySelectorAll('.toggle-btn[data-ed]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.ed) === ed));
+}
+
+// ---- データ ----
+const SURNAMES = ['佐藤','鈴木','高橋','田中','渡辺','伊藤','山本','中村','小林','加藤','吉田','山田','佐々木','山口','松本','井上','木村','林','斎藤','清水','山崎','池田','阿部','橋本','石川','森','前田','小川','岡田','長谷川','藤田','後藤','近藤','村上','坂本','遠藤','青木','藤井','西村','福田','太田','三浦','藤原','岡本','松田','中島','中川','原田','小野','田村'];
+const GIVEN_M = ['雄一','健二','浩三','裕太','翔','拓哉','大輔','直樹','誠','剛','光','博','隆','明','敬','浩','徹','賢','正','宏','一郎','次郎','義雄','和夫','茂','薫','康夫','俊夫','哲也','信也'];
+const GIVEN_F = ['愛','恵','幸','美穂','奈々','由紀','千恵','裕子','麻衣','さくら','彩','莉子','菜々子','美咲','真由','亜希子','友美','智子','純子','典子','桜子','文子','道子','里子','和子','芳子','清子','雪子','春子','夏子'];
+
+// ptFormula: (s) => 職業技能P計算式。引数 s は gameStats（変換済み）
+// ageRange: その職業のリアルな年齢帯 [min, max]
+const JOBS = [
+  // ---- 医療従事者 ----
+  { name:'医師',           ed:[6,7], ageRange:[28,65], ptFormula: s => s.EDU*4,
+    skills:['医学','応急手当','科学','心理学','図書館','言いくるめ','聞き耳','目星'] },
+  { name:'看護師',         ed:[6,7], ageRange:[22,60], ptFormula: s => s.EDU*2 + s.DEX*2,
+    skills:['医学','応急手当','科学','聞き耳','説得','言いくるめ','目星','心理学'] },
+  { name:'薬剤師',         ed:[6,7], ageRange:[24,60], ptFormula: s => s.EDU*4,
+    skills:['医学','応急手当','科学','図書館','目星','言いくるめ','聞き耳','心理学'] },
+  { name:'救急救命士',     ed:[6,7], ageRange:[22,55], ptFormula: s => s.EDU*2 + s.DEX*2,
+    skills:['医学','応急手当','運転','科学','聞き耳','説得','目星','心理学'] },
+  // ---- 地方公務員 ----
+  { name:'警察官',         ed:[6,7], ageRange:[22,55], ptFormula: s => Math.max(s.EDU*2+s.DEX*2, s.EDU*2+s.STR*2),
+    skills:['応急手当','格闘','拳銃','心理学','法律','目星','聞き耳','運転'] },
+  { name:'刑事',           ed:[6,7], ageRange:[25,55], ptFormula: s => Math.max(s.EDU*2+s.DEX*2, s.EDU*2+s.STR*2),
+    skills:['聞き耳','変装','拳銃','心理学','法律','目星','説得','追跡'] },
+  { name:'消防士',         ed:[6,7], ageRange:[20,50], ptFormula: s => Math.max(s.EDU*2+s.DEX*2, s.EDU*2+s.STR*2),
+    skills:['運転','応急手当','登攀','跳躍','科学','目星','聞き耳','機械修理'] },
+  { name:'事務職公務員',   ed:[6,7], ageRange:[22,60], ptFormula: s => s.EDU*4,
+    skills:['経理','コンピューター','図書館','法律','説得','聞き耳','目星','心理学'] },
+  // ---- メディア関連 ----
+  { name:'ジャーナリスト', ed:[6,7], ageRange:[22,55], ptFormula: s => s.EDU*4,
+    skills:['写真術','心理学','図書館','歴史','母国語','説得','目星','聞き耳'] },
+  { name:'作家・脚本家',   ed:[6,7], ageRange:[25,65], ptFormula: s => s.EDU*4,
+    skills:['オカルト','芸術','心理学','図書館','歴史','母国語','言いくるめ','目星'] },
+  { name:'カメラマン',     ed:[6,7], ageRange:[22,55], ptFormula: s => s.EDU*4,
+    skills:['機械修理','写真術','心理学','目星','聞き耳','説得','図書館','追跡'] },
+  // ---- エンタメ関連 ----
+  { name:'芸人・タレント', ed:[6,7], ageRange:[18,50], ptFormula: s => s.EDU*2 + s.APP*2,
+    skills:['聞き耳','芸術','心理学','変装','言いくるめ','説得','目星','魅惑'] },
+  { name:'ミュージシャン', ed:[6,7], ageRange:[18,50], ptFormula: s => Math.max(s.EDU*2+s.DEX*2, s.EDU*2+s.POW*2),
+    skills:['聞き耳','芸術','心理学','説得','魅惑','目星','コンピューター','図書館'] },
+  { name:'役者',           ed:[6,7], ageRange:[18,55], ptFormula: s => Math.max(s.EDU*2+s.APP*2, s.EDU*2+s.POW*2),
+    skills:['聞き耳','芸術','心理学','変装','言いくるめ','説得','目星','魅惑'] },
+  // ---- 非正規・学生 ----
+  { name:'主婦・主夫',     ed:[6,7], ageRange:[23,60], ptFormula: s => s.EDU*2 + s.DEX*2,
+    skills:['聞き耳','芸術','経理','説得','目星','心理学','運転','図書館'] },
+  { name:'フリーター',     ed:[6,7], ageRange:[18,35], ptFormula: s => Math.max(s.EDU*2+s.DEX*2, s.EDU*2+s.STR*2),
+    skills:['運転','隠れる','聞き耳','コンピューター','説得','目星','心理学','言いくるめ'] },
+  { name:'ディレッタント', ed:[6,7], ageRange:[25,70], ptFormula: s => s.EDU*2 + s.APP*2,
+    skills:['聞き耳','芸術','拳銃','乗馬','説得','言いくるめ','目星','図書館'] },
+  // ---- 戦闘職 ----
+  { name:'自衛隊員',        ed:[6,7], ageRange:[18,45], ptFormula: s => Math.max(s.EDU*2+s.DEX*2, s.EDU*2+s.STR*2),
+    skills:['隠れる','回避','格闘','サバイバル','ライフル','登攀','応急手当','目星'] },
+  { name:'私立探偵',       ed:[6,7], ageRange:[25,60], ptFormula: s => s.EDU*2 + s.DEX*2,
+    skills:['写真術','心理学','図書館','変装','法律','目星','聞き耳','追跡'] },
+  { name:'ボディーガード', ed:[6,7], ageRange:[22,50], ptFormula: s => Math.max(s.EDU*2+s.DEX*2, s.EDU*2+s.STR*2),
+    skills:['運転','回避','聞き耳','格闘','拳銃','心理学','目星','説得'] },
+  // ---- IT関連 ----
+  { name:'プログラマー・SE',ed:[7],  ageRange:[22,50], ptFormula: s => s.EDU*4,
+    skills:['コンピューター','電気修理','電子工学','図書館','目星','言いくるめ','科学','聞き耳'] },
+  { name:'ウェブデザイナー',ed:[7],  ageRange:[22,45], ptFormula: s => s.EDU*2 + s.DEX*2,
+    skills:['コンピューター','芸術','図書館','心理学','説得','目星','聞き耳','経理'] },
+  // ---- 一次産業 ----
+  { name:'農家',           ed:[6,7], ageRange:[20,70], ptFormula: s => Math.max(s.EDU*2+s.DEX*2, s.EDU*2+s.STR*2),
+    skills:['運転','機械修理','芸術','博物学','重機械操作','追跡','目星','聞き耳'] },
+  { name:'漁師',           ed:[6,7], ageRange:[20,65], ptFormula: s => Math.max(s.EDU*2+s.DEX*2, s.EDU*2+s.STR*2),
+    skills:['機械修理','芸術','博物学','水泳','操縦','追跡','目星','聞き耳'] },
+  // ---- 宗教関連 ----
+  { name:'聖職者',         ed:[6,7], ageRange:[28,70], ptFormula: s => s.EDU*4,
+    skills:['聞き耳','経理','心理学','図書館','歴史','説得','聞き耳','オカルト'] },
+  // ---- 犯罪者・低社会性 ----
+  { name:'犯罪者',         ed:[6,7], ageRange:[18,55], ptFormula: s => Math.max(s.EDU*2+s.DEX*2, s.EDU*2+s.STR*2),
+    skills:['隠れる','心理学','目星','鍵開け','格闘','拳銃','変装','言いくるめ'] },
+  // ---- 教職・研究職 ----
+  { name:'大学教授',       ed:[6,7], ageRange:[35,70], ptFormula: s => s.EDU*4,
+    skills:['心理学','図書館','歴史','母国語','オカルト','考古学','科学','目星'] },
+  { name:'教諭',           ed:[6,7], ageRange:[23,60], ptFormula: s => s.EDU*4,
+    skills:['聞き耳','心理学','図書館','母国語','説得','目星','歴史','科学'] },
+  { name:'科学者・研究員', ed:[6,7], ageRange:[25,65], ptFormula: s => s.EDU*4,
+    skills:['コンピューター','心理学','図書館','科学','目星','歴史','聞き耳','博物学'] },
+  { name:'考古学者',       ed:[6,7], ageRange:[28,65], ptFormula: s => s.EDU*4,
+    skills:['考古学','歴史','図書館','登攀','目星','言語','オカルト','博物学'] },
+  // ---- 生産職・技術職 ----
+  { name:'料理人',         ed:[6,7], ageRange:[20,60], ptFormula: s => s.EDU*2 + s.DEX*2,
+    skills:['聞き耳','芸術','博物学','手さばき','目星','説得','図書館','心理学'] },
+  { name:'エンジニア・整備士',ed:[6,7],ageRange:[22,60],ptFormula: s => s.EDU*4,
+    skills:['科学','機械修理','芸術','重機械操作','電気修理','図書館','目星','電子工学'] },
+  { name:'大工',           ed:[6,7], ageRange:[20,65], ptFormula: s => Math.max(s.EDU*2+s.STR*2, s.EDU*2+s.DEX*2),
+    skills:['科学','機械修理','芸術','重機械操作','登攀','目星','聞き耳','図書館'] },
+  // ---- 接客業 ----
+  { name:'バーテンダー',   ed:[6,7], ageRange:[20,55], ptFormula: s => s.EDU*2 + s.APP*2,
+    skills:['聞き耳','芸術','心理学','図書館','目星','説得','魅惑','言いくるめ'] },
+  { name:'占い師',         ed:[6,7], ageRange:[25,65], ptFormula: s => s.EDU*2 + s.APP*2,
+    skills:['オカルト','聞き耳','心理学','図書館','歴史','説得','魅惑','目星'] },
+  // ---- 動物関連 ----
+  { name:'獣医師',         ed:[6,7], ageRange:[26,65], ptFormula: s => s.EDU*4,
+    skills:['医学','応急手当','科学','薬学','目星','聞き耳','言いくるめ','図書館'] },
+  // ---- 無職・学生 ----
+  { name:'無職',           ed:[6,7], ageRange:[18,60], ptFormula: s => s.EDU*2 + s.INT*2,
+    skills:['目星','聞き耳','格闘','忍び歩き','隠れる','値切り','運転','言いくるめ'] },
+  // 学生：年齢 16〜22 に固定
+  { name:'学生',           ed:[6,7], ageRange:[16,22], isStudent: true,
+    ptFormula: s => s.EDU*4,
+    skills:['図書館','目星','聞き耳','コンピューター','心理学','言いくるめ','歴史','科学'] },
+];
+
+// 7版用能力値別初期値
+
+// 7版用能力値別初期値
+const INIT_7 = {
+  '目星':25,'聞き耳':20,'図書館':20,'回避':1,'格闘':25,'投擲':20,'拳銃':20,'ライフル':20,'ショットガン':20,
+  '応急手当':30,'鍵開け':1,'手さばき':10,'隠密':20,'精神分析':1,'追跡':10,'登攀':20,'鑑定':5,
+  '運転':20,'機械修理':10,'重機械操作':1,'乗馬':5,'水泳':20,'製作':5,'操縦':1,'跳躍':20,
+  '電気修理':10,'ナビゲート':10,'変装':5,'言いくるめ':5,'信用':0,'説得':10,'母国語':0,'威圧':15,'魅惑':15,
+  '言語':1,'医学':1,'オカルト':5,'クトゥルフ神話':0,'芸術':5,'経理':5,'考古学':1,'コンピューター':5,
+  '科学':1,'心理学':10,'人類学':1,'電子工学':1,'自然':10,'法律':5,'歴史':5,'サバイバル':10,
+  '写真術':5,'博物学':10,'薬学':1,'動物学':1,'隠れる':20,'忍び歩き':20,
+};
+const INIT_6 = {
+  '目星':25,'聞き耳':25,'図書館':25,'回避':1,'こぶし':50,'キック':25,'組み付き':25,'頭突き':10,'投擲':25,
+  '拳銃':20,'ショットガン':30,'ライフル':25,'応急手当':30,'鍵開け':1,'隠す':15,'隠れる':10,'忍び歩き':10,
+  '写真術':10,'精神分析':1,'追跡':10,'登攀':40,'運転':20,'機械修理':20,'重機械操作':1,'乗馬':5,
+  '水泳':25,'製作':5,'操縦':1,'跳躍':25,'電気修理':10,'ナビゲート':10,'変装':1,'言いくるめ':5,
+  '信用':15,'説得':15,'値切り':5,'母国語':0,'医学':5,'オカルト':5,'化学':1,'クトゥルフ神話':0,
+  '芸術':5,'経理':10,'考古学':1,'コンピューター':1,'心理学':5,'人類学':1,'生物学':1,'地質学':1,
+  '電子工学':1,'天文学':1,'博物学':10,'物理学':1,'法律':5,'薬学':1,'歴史':20,'動物学':1,'格闘':25,
+  '鑑定':5,'値切り':5,'科学':1,
+};
+
+function getInit(skill, ed) {
+  const t = ed === 7 ? INIT_7 : INIT_6;
+  if (skill in t) return t[skill];
+  for (const k of Object.keys(t)) { if (skill.startsWith(k)) return t[k]; }
+  return 1;
+}
+
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function rollStats(ed) {
+  if (ed === 7) {
+    return {
+      STR: rand(3,18), CON: rand(3,18), POW: rand(3,18), DEX: rand(3,18),
+      APP: rand(3,18), SIZ: rand(8,18), INT: rand(8,18), EDU: rand(8,18),
+    };
+  } else {
+    return {
+      STR: rand(3,18), CON: rand(3,18), POW: rand(3,18), DEX: rand(3,18),
+      APP: rand(3,18), SIZ: rand(8,18), INT: rand(8,18), EDU: rand(8,21),
+    };
+  }
+}
+
+function calcDerived(gameStats, ed) {
+  // gameStats は変換済みの値（7版は×5済み）
+  if (ed === 7) {
+    return {
+      HP:  Math.floor((gameStats.CON + gameStats.SIZ) / 10),
+      MP:  Math.floor(gameStats.POW / 5),
+      SAN: gameStats.POW,
+      LUK: rand(3,18) * 5,
+    };
+  } else {
+    return {
+      HP:  Math.ceil((gameStats.CON + gameStats.SIZ) / 2),
+      MP:  gameStats.POW,
+      SAN: gameStats.POW * 5,
+      LUK: gameStats.POW * 5,
+    };
+  }
+}
+
+function allocSkills(job, gameStats, ed) {
+  // gameStats は変換済みの値（7版は×5済み）
+  // 職業ごとの ptFormula で職業技能P を計算
+  const jobPts   = job.ptFormula ? job.ptFormula(gameStats) : (ed === 7 ? gameStats.EDU * 4 : gameStats.EDU * 20);
+  const hobbyPts = ed === 7 ? gameStats.INT * 2 : gameStats.INT * 10;
+
+  const CAP = 75; // NPC技能上限
+  const result = {};
+
+  // 職業技能：各技能が base+20〜45 の範囲に収まるよう均等配分し、上限75でクリップ
+  const jobSkills = [...job.skills];
+  const perSkill = Math.floor(jobPts / jobSkills.length);
+  jobSkills.forEach(s => {
+    const base = getInit(s, ed);
+    // perSkill を中心に ±15 のばらつき
+    const add = rand(Math.max(0, perSkill - 15), perSkill + 15);
+    result[s] = Math.min(CAP, base + add);
+  });
+
+  // 武器・戦闘系は職業技能で明示されていない限り興味技能には出さない
+  const COMBAT_SKILLS = new Set([
+    '格闘','拳銃','ライフル','ショットガン','サブマシンガン','マシンガン','投擲',
+    'こぶし','キック','組み付き','頭突き','マーシャルアーツ','爆破','砲',
+    '回避', // 戦闘的文脈が強いため
+  ]);
+
+  // 興味技能：職業外から4〜6技能を選んで配分（1技能あたり平均15〜25程度）
+  const allSkillNames = Object.keys(ed === 7 ? INIT_7 : INIT_6)
+    .filter(k =>
+      !jobSkills.includes(k) &&
+      k !== 'クトゥルフ神話' &&
+      k !== '母国語' &&
+      !COMBAT_SKILLS.has(k)   // 武器系は興味技能では引かない
+    );
+  const hobbyCount = rand(4, 6);
+  const pool = [...allSkillNames];
+  const hobbySkills = [];
+  for (let i = 0; i < hobbyCount && pool.length; i++) {
+    const idx = Math.floor(Math.random() * pool.length);
+    hobbySkills.push(pool.splice(idx, 1)[0]);
+  }
+  const perHobby = Math.floor(hobbyPts / hobbySkills.length);
+  hobbySkills.forEach(s => {
+    const base = getInit(s, ed);
+    const add = rand(Math.max(0, perHobby - 10), perHobby + 10);
+    result[s] = Math.min(CAP, base + Math.max(0, add));
+  });
+
+  // 値の高い順にトップ10を返す
+  return Object.entries(result)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .reduce((acc, [k, v]) => { acc[k] = v; return acc; }, {});
+}
+
+// ---- 生成 ----
+function generateOne(ed) {
+  const sex = Math.random() < 0.5 ? 'M' : 'F';
+  const surname = pick(SURNAMES);
+  const given = pick(sex === 'M' ? GIVEN_M : GIVEN_F);
+  const name = surname + ' ' + given;
+  // 年齢をまず決定（16〜65）
+  const age = rand(16, 65);
+
+  // 学生年齢（16〜22）なら学生に固定、それ以外は年齢帯が合う職業からランダム
+  let job;
+  if (age <= 22) {
+    job = JOBS.find(j => j.isStudent && j.ed.includes(ed));
+  } else {
+    const candidates = JOBS.filter(j => !j.isStudent && j.ed.includes(ed) && age >= j.ageRange[0] && age <= j.ageRange[1]);
+    job = pick(candidates.length ? candidates : JOBS.filter(j => !j.isStudent && j.ed.includes(ed)));
+  }
+  const rawStats = rollStats(ed);
+  // 先にゲーム値（7版×5）に変換してから派生値・技能計算に使う
+  const gameStats = ed === 7
+    ? { STR: rawStats.STR*5, CON: rawStats.CON*5, POW: rawStats.POW*5, DEX: rawStats.DEX*5, APP: rawStats.APP*5, SIZ: rawStats.SIZ*5, INT: rawStats.INT*5, EDU: rawStats.EDU*5 }
+    : { ...rawStats };
+  const derived = calcDerived(gameStats, ed);
+  const skills  = allocSkills(job, gameStats, ed);
+
+  return { name, age, sex: sex === 'M' ? '男' : '女', job: job.name, stats: gameStats, derived, skills, ed };
+}
+
+function generate() {
+  const ed = currentEdition;
+  const count = Math.min(12, Math.max(1, parseInt(document.getElementById('genCount').value) || 3));
+  generatedNpcs = Array.from({ length: count }, () => generateOne(ed));
+  renderNpcs();
+  document.getElementById('resultArea').style.display = 'block';
+  document.getElementById('clearBtn').disabled = false;
+  document.getElementById('status').textContent = `${count} 体のNPCを生成しました`;
+}
+
+function renderNpcs() {
+  const grid = document.getElementById('npcGrid');
+  grid.innerHTML = '';
+  const allVals = generatedNpcs.flatMap(n => Object.values(n.stats));
+  const maxV = Math.max(...allVals), minV = Math.min(...allVals);
+
+  generatedNpcs.forEach(npc => {
+    const card = document.createElement('div');
+    card.className = 'npc-card';
+
+    // ヘッダー
+    const head = document.createElement('div');
+    head.className = 'npc-card-head';
+    head.innerHTML = `
+      <div>
+        <div class="npc-name">${npc.name}</div>
+        <div class="npc-job">${npc.job}</div>
+      </div>
+      <div class="npc-meta">${npc.age}歳 / ${npc.sex} / ${npc.ed}th</div>`;
+    card.appendChild(head);
+
+    // ステータスグリッド（8能力値）
+    const statsDiv = document.createElement('div');
+    statsDiv.className = 'npc-stats';
+    Object.entries(npc.stats).forEach(([k, v]) => {
+      const cls = v === maxV ? 'hi' : v === minV ? 'lo' : '';
+      statsDiv.innerHTML += `<div class="stat-cell"><span class="stat-cell-label">${k}</span><span class="stat-cell-val ${cls}">${v}</span></div>`;
+    });
+
+    // HP/MP/SAN/LUK
+    const derivedDiv = document.createElement('div');
+    derivedDiv.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#2a2a2a;border-bottom:1px solid #2a2a2a;';
+    Object.entries(npc.derived).forEach(([k, v]) => {
+      derivedDiv.innerHTML += `<div class="stat-cell"><span class="stat-cell-label">${k}</span><span class="stat-cell-val" style="font-size:0.95rem;">${v}</span></div>`;
+    });
+
+    card.appendChild(statsDiv);
+    card.appendChild(derivedDiv);
+
+    // 技能
+    const skillsDiv = document.createElement('div');
+    skillsDiv.className = 'npc-skills';
+    skillsDiv.innerHTML = `<div class="skills-title">SKILLS</div><div class="skill-list">` +
+      Object.entries(npc.skills).map(([s, v]) =>
+        `<div class="skill-item"><span class="skill-name">${s}</span><span class="skill-val${v >= 70 ? ' high' : ''}">${v}</span></div>`
+      ).join('') + `</div>`;
+
+    card.appendChild(skillsDiv);
+
+    // キャラ出力ボタン
+    const footer = document.createElement('div');
+    footer.className = 'npc-card-footer';
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'btn-copy-char';
+    copyBtn.innerHTML = '<span class="material-symbols-outlined">content_copy</span>キャラ出力';
+    copyBtn.addEventListener('click', () => {
+      const json = buildCharJson(npc);
+      navigator.clipboard.writeText(json).then(() => {
+        copyBtn.innerHTML = '<span class="material-symbols-outlined">check</span>コピーしました！';
+        copyBtn.classList.add('copied');
+        setTimeout(() => {
+          copyBtn.innerHTML = '<span class="material-symbols-outlined">content_copy</span>キャラ出力';
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      });
+    });
+    footer.appendChild(copyBtn);
+    card.appendChild(footer);
+
+    grid.appendChild(card);
+  });
+}
+
+// ---- 1体分のcocofolia駒JSON文字列を生成 ----
+function buildCharJson(npc) {
+  const obj = {
+    kind: 'character',
+    data: {
+      name: `${npc.name}（${npc.job} / ${npc.age}歳）`,
+      initiative: npc.stats.DEX,
+      commands: buildCommands(npc),
+      status: [
+        { label: 'HP',  value: npc.derived.HP,  max: npc.derived.HP  },
+        { label: 'MP',  value: npc.derived.MP,  max: npc.derived.MP  },
+        { label: 'SAN', value: npc.derived.SAN, max: npc.derived.SAN },
+        { label: '幸運', value: npc.derived.LUK, max: npc.derived.LUK },
+      ],
+      params: Object.entries(npc.stats).map(([label, value]) => ({ label, value: String(value) })),
+    }
+  };
+  return JSON.stringify(obj);
+}
+
+// ---- cocofolia駒JSON用 commands 生成 ----
+function buildCommands(npc) {
+  const ed = npc.ed;
+  const prefix = ed === 7 ? 'CC' : 'CC';
+  const lines = [];
+
+  // SAN ロール
+  lines.push(`1d100<={SAN} 【正気度ロール】`);
+
+  // 派生ロール
+  const intVal = npc.stats.INT;
+  const eduVal = npc.stats.EDU;
+  lines.push(`${prefix}<=${intVal} 【アイデア】`);
+  lines.push(`${prefix}<={幸運} 【幸運】`);
+  lines.push(`${prefix}<=${eduVal} 【知識】`);
+
+  // 技能ロール（生成された技能）
+  Object.entries(npc.skills).forEach(([name, val]) => {
+    lines.push(`${prefix}<=${val} 【${name}】`);
+  });
+
+  // ダメージ判定（DB）
+  const db = calcDB(npc.stats, ed);
+  if (db === '-1D6') lines.push(`1d6 【ダメージ判定（マイナス）】`);
+  else if (db === '-1D4') lines.push(`1d4 【ダメージ判定（マイナス）】`);
+  else if (db === '0')   lines.push(`1d3 【ダメージ判定】`);
+  else if (db === '+1D4') lines.push(`1d3+1D4 【ダメージ判定】`);
+  else if (db === '+1D6') lines.push(`1d6+1D4 【ダメージ判定】`);
+  else                   lines.push(`1d6+2D6 【ダメージ判定】`);
+
+  // 能力値ロール
+  ['STR','CON','POW','DEX','APP','SIZ','INT','EDU'].forEach(s => {
+    lines.push(`${prefix}<={${s}}　【${s}】`);
+  });
+
+  return lines.join('\n');
+}
+
+function calcDB(stats, ed) {
+  const sum = stats.STR + stats.SIZ;
+  if (ed === 7) {
+    if (sum <= 64)  return '-1D6';
+    if (sum <= 84)  return '-1D4';
+    if (sum <= 124) return '0';
+    if (sum <= 164) return '+1D4';
+    return '+1D6';
+  } else {
+    if (sum <= 12)  return '-1D6';
+    if (sum <= 16)  return '-1D4';
+    if (sum <= 24)  return '0';
+    if (sum <= 32)  return '+1D4';
+    if (sum <= 40)  return '+1D6';
+    return '+2D6';
+  }
+}
+
+
+
+// ---- リセット ----
+function clearAll() {
+  generatedNpcs = [];
+  document.getElementById('npcGrid').innerHTML = '';
+  document.getElementById('resultArea').style.display = 'none';
+  document.getElementById('clearBtn').disabled = true;
+  document.getElementById('status').textContent = '';
+}
+</script>
+
+<div style="position:fixed;bottom:10px;right:15px;font-family:sans-serif;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:0.1em;font-weight:bold;pointer-events:none;z-index:9999;">✦ IKATOOLBOX</div>
+</body>
+</html>
