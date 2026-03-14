@@ -11,7 +11,7 @@
 
     <style>
         :root {
-            --accent-color: #C5373C; --bg-rgb: 5, 5, 5; --bg-color: #050505; 
+            --accent-color: #C5373C; --bg-rgb: 5, 5, 5; --bg-color: #050505;
             --text-color: #ffffff; --sub-text-color: #888888; --border-color: rgba(255,255,255,0.1);
             --img-x: 0px; --img-y: 0px; --img-scale: 1;
             --v-x: 0px; --v-y: 0px; --v-scale: 1; --stat-max: 100;
@@ -19,44 +19,120 @@
         }
 
         body { background: #1a1a1a; color: #eee; margin: 0; display: flex; font-family: 'Montserrat', 'Noto Sans JP', sans-serif; height: 100vh; overflow: hidden; }
-        
-        /* UI Sidebar */
-        .sidebar { 
-            width: 420px; background: var(--ui-bg); border-right: 1px solid var(--ui-border); 
-            flex-shrink: 0; display: flex; flex-direction: column; 
+
+        /* ---- サイドバー ---- */
+        .sidebar {
+            width: 400px; background: var(--ui-bg); border-right: 1px solid var(--ui-border);
+            flex-shrink: 0; display: flex; flex-direction: column;
             transition: transform 0.3s ease; z-index: 2000;
         }
-        .sidebar-scroll { flex: 1; overflow-y: auto; padding: 25px 20px 80px; }
+        .sidebar-scroll { flex: 1; overflow-y: auto; padding: 20px 18px 80px; scrollbar-width: thin; scrollbar-color: #444 transparent; }
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
 
-        .back-link { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #888; font-size: 0.7rem; font-weight: 700; transition: 0.3s; margin-bottom: 20px; }
+        .back-link { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #666; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; transition: 0.2s; margin-bottom: 16px; }
         .back-link:hover { color: var(--ui-accent); transform: translateX(-3px); }
-        .ui-header { margin-bottom: 30px; border-bottom: 2px solid var(--ui-accent); padding-bottom: 15px; }
-        .ui-brand { font-size: 0.7rem; font-weight: 900; color: var(--ui-accent); letter-spacing: 0.4em; display: block; margin-bottom: 2px; }
-        .ui-title { font-size: 1.4rem; font-weight: 900; color: #fff; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px; }
 
-        .control-group { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #333; }
-        h2 { font-size: 0.75rem; color: #aaa; margin-bottom: 12px; letter-spacing: 0.05em; font-weight: 700; text-transform: uppercase; }
-        label { display: block; font-size: 0.65rem; margin-bottom: 2px; color: #777; font-weight: bold; }
-        textarea, input, select { width: 100%; background: var(--ui-input); border: 1px solid var(--ui-border); color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 0.8rem; box-sizing: border-box; font-family: inherit; margin-bottom: 6px; }
-        
-        .skill-manager { background: var(--ui-input); border: 1px solid var(--ui-border); border-radius: 4px; max-height: 200px; overflow-y: auto; padding: 2px; margin-top: 5px; }
-        .skill-manage-item { display: flex; align-items: center; padding: 6px 8px; border-bottom: 1px solid #222; cursor: pointer; transition: background 0.2s; }
-        .skill-manage-item:hover { background: #2a2a2a; }
-        .skill-manage-item input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; border: 2px solid #555; border-radius: 3px; margin-right: 10px; cursor: pointer; position: relative; flex-shrink: 0; }
+        .ui-header { margin-bottom: 20px; border-bottom: 3px solid var(--ui-accent); padding-bottom: 12px; }
+        .ui-brand { font-size: 0.68rem; font-weight: 900; color: var(--ui-accent); letter-spacing: 0.4em; display: block; margin-bottom: 2px; }
+        .ui-title { font-size: 1.3rem; font-weight: 900; color: #fff; letter-spacing: 0.05em; }
+
+        /* セクション */
+        .control-group { margin-bottom: 0; padding: 14px 0; border-bottom: 1px solid #2a2a2a; }
+        .control-group:last-child { border-bottom: none; }
+
+        h2 {
+            font-size: 0.62rem; color: var(--ui-accent); margin: 0 0 12px; letter-spacing: 0.2em;
+            font-weight: 900; text-transform: uppercase; display: flex; align-items: center; gap: 8px;
+        }
+        h2::after { content: ""; flex: 1; height: 1px; background: var(--ui-accent); opacity: 0.2; }
+
+        label { display: block; font-size: 0.62rem; margin-bottom: 3px; color: #666; font-weight: 700; letter-spacing: 0.04em; }
+
+        textarea, input[type="text"], input[type="number"] {
+            width: 100%; background: var(--ui-input); border: 1px solid var(--ui-border);
+            color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 0.78rem;
+            box-sizing: border-box; font-family: inherit; margin-bottom: 6px; outline: none;
+            transition: border-color 0.15s;
+        }
+        textarea:focus, input[type="text"]:focus, input[type="number"]:focus { border-color: var(--ui-accent); }
+        select {
+            width: 100%; background: var(--ui-input); border: 1px solid var(--ui-border);
+            color: #fff; padding: 5px 8px; border-radius: 4px; font-size: 0.78rem;
+            box-sizing: border-box; font-family: inherit; margin-bottom: 6px; outline: none; cursor: pointer;
+        }
+        textarea { resize: vertical; min-height: 70px; }
+
+        /* スキルマネージャー */
+        .skill-manager { background: var(--ui-input); border: 1px solid var(--ui-border); border-radius: 4px; max-height: 180px; overflow-y: auto; margin-top: 6px; scrollbar-width: thin; scrollbar-color: #444 transparent; }
+        .skill-manage-item { display: flex; align-items: center; padding: 5px 10px; border-bottom: 1px solid #1a1a1a; cursor: pointer; transition: background 0.15s; }
+        .skill-manage-item:last-child { border-bottom: none; }
+        .skill-manage-item:hover { background: #1e1e1e; }
+        .skill-manage-item input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 14px; height: 14px; border: 1.5px solid #555; border-radius: 3px; margin-right: 10px; cursor: pointer; position: relative; flex-shrink: 0; transition: 0.15s; }
         .skill-manage-item input[type="checkbox"]:checked { background: var(--ui-accent); border-color: var(--ui-accent); }
-        .skill-manage-item input[type="checkbox"]:checked::after { content: "✔"; position: absolute; color: white; font-size: 10px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-        .skill-manage-item label { color: #eee; font-size: 0.75rem; cursor: pointer; margin-bottom: 0; flex-grow: 1; }
+        .skill-manage-item input[type="checkbox"]:checked::after { content: "✔"; position: absolute; color: white; font-size: 9px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .skill-manage-item label { color: #ccc; font-size: 0.72rem; cursor: pointer; margin-bottom: 0; flex-grow: 1; letter-spacing: 0; }
 
+        /* グリッド */
         .grid-flex { display: flex; gap: 8px; flex-wrap: wrap; }
-        .grid-flex > div { flex: 1; min-width: 80px; }
+        .grid-flex > div { flex: 1; min-width: 72px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-        
-        .theme-btn, .edition-btn { flex: 1; padding: 8px; cursor: pointer; border: 1px solid var(--ui-border); background: var(--ui-input); color: #888; font-size: 0.7rem; font-weight: bold; border-radius: 4px; }
-        .theme-btn.active, .edition-btn.active { background: #444; color: #fff; border-color: #666; }
-        .save-btn { width: 100%; padding: 18px; background: var(--ui-accent); color: white; border: none; border-radius: 4px; font-weight: 900; font-size: 1rem; cursor: pointer; margin-top: 10px; transition: 0.3s; letter-spacing: 0.2em; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
 
-        /* Preview Area */
+        /* トグルボタン群（版・テーマ・秘匿モード） */
+        .toggle-group { display: flex; gap: 2px; background: #111; padding: 3px; border-radius: 4px; margin-bottom: 6px; }
+        .toggle-btn {
+            flex: 1; padding: 6px 4px; cursor: pointer;
+            border: none; background: transparent; color: #666;
+            font-size: 0.68rem; font-weight: 900; border-radius: 3px;
+            font-family: 'Montserrat', sans-serif; letter-spacing: 0.04em;
+            transition: 0.15s; white-space: nowrap;
+        }
+        .toggle-btn:hover { color: #aaa; }
+        .toggle-btn.active { background: var(--ui-accent); color: #fff; }
+        /* 秘匿モードONは別色で警告感 */
+        .toggle-btn.active.danger { background: #555; color: #ff9800; }
+
+        /* ファイル入力 */
+        .file-input-wrapper { position: relative; margin-bottom: 8px; }
+        .file-input-wrapper input[type="file"] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+        .custom-file-btn { display: flex; align-items: center; justify-content: center; gap: 6px; background: var(--ui-input); border: 1px dashed #555; color: #777; padding: 9px; border-radius: 4px; font-size: 0.72rem; font-weight: bold; transition: 0.2s; cursor: pointer; }
+        .custom-file-btn:hover { border-color: var(--ui-accent); color: #ccc; }
+        .custom-file-btn.mini { padding: 6px; font-size: 0.62rem; }
+        .custom-file-btn .material-symbols-outlined { font-size: 1rem; }
+
+        /* レンジスライダー */
+        input[type="range"] { -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer; width: 100%; height: 20px; margin: 0; }
+        input[type="range"]::-webkit-slider-runnable-track { background: #333; height: 3px; border-radius: 2px; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; margin-top: -6px; background-color: var(--ui-accent); height: 15px; width: 7px; border-radius: 2px; transition: 0.2s; }
+        input[type="range"]:hover::-webkit-slider-thumb { filter: brightness(1.2); }
+
+        /* カラーピッカー */
+        .color-picker-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+        .color-picker-wrap input[type="color"] { width: 36px; height: 30px; padding: 2px; border: 1px solid var(--ui-border); border-radius: 4px; background: var(--ui-input); cursor: pointer; flex-shrink: 0; }
+        .color-picker-wrap .color-hex { flex: 1; background: var(--ui-input); border: 1px solid var(--ui-border); color: #fff; padding: 5px 8px; border-radius: 4px; font-size: 0.78rem; font-family: monospace; margin-bottom: 0; }
+
+        /* 保存ボタン */
+        .save-btn {
+            width: 100%; padding: 13px; background: var(--ui-accent); color: white;
+            border: none; border-radius: 4px; font-weight: 900; font-size: 0.9rem;
+            cursor: pointer; margin-top: 8px; transition: 0.2s;
+            letter-spacing: 0.12em; font-family: 'Montserrat', sans-serif;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .save-btn:hover { filter: brightness(1.12); transform: translateY(-1px); }
+        .save-btn:active { transform: translateY(0); filter: brightness(0.95); }
+        .save-btn .material-symbols-outlined { font-size: 1.1rem; }
+
+        .clear-btn {
+            width: 100%; background: none; border: 1px solid #333; color: #555;
+            font-size: 0.68rem; font-weight: 700; cursor: pointer; margin-top: 8px;
+            padding: 7px; border-radius: 4px; font-family: 'Montserrat', sans-serif;
+            letter-spacing: 0.06em; transition: 0.2s;
+        }
+        .clear-btn:hover { border-color: #555; color: #888; }
+
+        /* ---- プレビューエリア ---- */
         .preview-area { flex: 1; display: flex; justify-content: center; align-items: center; background: #151515; padding: 20px; overflow: auto; position: relative; }
         #display-canvas { width: 800px; height: 800px; background: var(--bg-color); color: var(--text-color); display: flex; position: relative; overflow: hidden; flex-shrink: 0; }
         #display-canvas::before { content: "✦"; position: absolute; top: 25%; left: 75%; transform: translate(-50%, -50%); font-size: 850px; color: var(--accent-color); opacity: 0.05; z-index: 0; pointer-events: none; }
@@ -64,7 +140,7 @@
         .info-side { flex: 0 0 75%; padding: 45px 50px; display: flex; flex-direction: column; z-index: 10; background: linear-gradient(to right, rgba(var(--bg-rgb), 1) 0%, rgba(var(--bg-rgb), 1) 50%, rgba(var(--bg-rgb), 0.8) 65%, rgba(var(--bg-rgb), 0) 85%); box-sizing: border-box; position: relative; }
         .scenario-tag { align-self: flex-start; background: var(--accent-color); color: #fff; font-size: 0.7rem; font-weight: 900; padding: 4px 12px; margin-bottom: 10px; height: 1.2rem; display: flex; align-items: center; }
         .name-area { border-left: 10px solid var(--accent-color); padding-left: 20px; display: flex; flex-direction: column; justify-content: center; width: 100%; min-height: 100px; margin-bottom: 5px; }
-        
+
         ruby { display: flex; flex-direction: column-reverse; width: 100%; align-items: flex-start; }
         rt { font-size: 0.85rem; letter-spacing: 0.3em; color: var(--accent-color); margin-bottom: 2px; font-weight: 700; text-transform: uppercase; text-align: left; }
         #d-name-main { font-size: 3.8rem; font-weight: 900; line-height: 1; white-space: nowrap; transform-origin: left center; }
@@ -73,7 +149,7 @@
 
         .variants-row { display: flex; gap: 10px; margin: 15px 0 20px 0; height: 85px; }
         .v-slot { width: 85px; height: 85px; background: rgba(var(--bg-rgb), 0.2); border: 1px solid var(--border-color); overflow: hidden; position: relative; }
-        .v-slot img { position: absolute; left: 50%; top: 50%; width: 100%; transform: translate(calc(-50% + var(--v-x)), calc(-50% + var(--v-y))) scale(var(--v-scale)); object-fit: contain; display: none;}
+        .v-slot img { position: absolute; left: 50%; top: 50%; width: 100%; transform: translate(calc(-50% + var(--v-x)), calc(-50% + var(--v-y))) scale(var(--v-scale)); object-fit: contain; display: none; }
 
         .status-grid { display: grid; grid-template-columns: repeat(2, 160px); gap: 12px 40px; margin-bottom: 12px; }
         .stat-val-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; font-weight: 900; margin-bottom: 4px; }
@@ -95,64 +171,33 @@
         .skill-val { color: var(--accent-color); font-weight: 900; margin-left: auto; }
 
         .image-side { position: absolute; right: 0; top: 0; width: 100%; height: 100%; z-index: 1; display: flex; justify-content: flex-end; align-items: flex-end; overflow: hidden; }
-        .accent-bg { 
-            position: absolute; top: 0; right: 0; width: 100%; height: 100%; 
-            background: radial-gradient(circle at 110% 100%, var(--accent-color) 0%, transparent 70%); 
-            opacity: 0.7; z-index: 1; pointer-events: none; 
+        .accent-bg {
+            position: absolute; top: 0; right: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 110% 100%, var(--accent-color) 0%, transparent 70%);
+            opacity: 0.7; z-index: 1; pointer-events: none;
         }
         #main-img { height: 98%; z-index: 2; transform: translate(var(--img-x), var(--img-y)) scale(var(--img-scale)); display: none; pointer-events: none; }
 
-        .file-input-wrapper { position: relative; margin-bottom: 10px; }
-        .file-input-wrapper input[type="file"] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-        .custom-file-btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--ui-input); border: 1px dashed var(--ui-border); color: #aaa; padding: 10px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; transition: 0.2s; cursor: pointer; }
-        .custom-file-btn:hover { border-color: var(--ui-accent); color: #fff; background: #222; }
-        .custom-file-btn.mini { padding: 6px; font-size: 0.65rem; }
-        
-        input[type="range"] { -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer; width: 100%; height: 20px; margin: 0; }
-        input[type="range"]::-webkit-slider-runnable-track { background: #333; height: 4px; border-radius: 2px; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; margin-top: -6px; background-color: var(--ui-accent); height: 16px; width: 8px; border-radius: 2px; box-shadow: 0 0 10px rgba(197, 55, 60, 0.4); transition: 0.2s; }
-        input[type="range"]:hover::-webkit-slider-thumb { filter: brightness(1.2); transform: scaleX(1.5); }
-
+        /* モバイルメニューボタン */
         .mobile-menu-btn {
-            position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; border-radius: 50%;
+            position: fixed; bottom: 20px; right: 20px; width: 52px; height: 52px; border-radius: 50%;
             background: var(--ui-accent); color: white; display: none; align-items: center; justify-content: center;
-            border: none; z-index: 3000; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border: none; z-index: 3000; cursor: pointer;
         }
-
-        .mobile-menu-btn span { 
-            transition: transform 0.3s ease; 
-            display: inline-block;
-        }
-        .mobile-menu-btn.is-active span { 
-            transform: rotate(180deg); 
-        }
+        .mobile-menu-btn span { transition: transform 0.3s ease; display: inline-block; }
+        .mobile-menu-btn.is-active span { transform: rotate(180deg); }
 
         @media screen and (max-width: 1024px) {
             .mobile-menu-btn { display: flex; }
-            .sidebar { 
-                position: fixed; 
-                left: 0; 
-                top: 0; 
-                height: 100vh; 
-                width: 100%; 
-                box-sizing: border-box; 
-                transform: translateX(-100%); 
-                transition: transform 0.3s ease-out;
-                z-index: 2000;
+            .sidebar {
+                position: fixed; left: 0; top: 0; height: 100vh; width: 100%;
+                box-sizing: border-box; transform: translateX(-100%);
+                transition: transform 0.3s ease-out; z-index: 2000;
                 padding-bottom: env(safe-area-inset-bottom, 80px);
             }
-            .sidebar.active { 
-                transform: translateX(0); 
-                box-shadow: 10px 0 30px rgba(0,0,0,0.5); 
-            }
-            #display-canvas { 
-                transform: scale(0.45); 
-                transform-origin: center center; 
-            }
-            .preview-area { 
-                padding: 0; 
-                overflow: hidden; 
-            }
+            .sidebar.active { transform: translateX(0); }
+            #display-canvas { transform: scale(0.45); transform-origin: center center; }
+            .preview-area { padding: 0; overflow: hidden; }
         }
     </style>
 </head>
@@ -161,17 +206,20 @@
 <div class="sidebar">
     <div class="sidebar-scroll">
         <a href="index.html" class="back-link">
-            <span class="material-symbols-outlined" style="font-size: 1rem;">arrow_back_ios</span>
+            <span class="material-symbols-outlined" style="font-size: 0.9rem;">arrow_back_ios</span>
             BACK TO TOOLBOX
         </a>
-        <div class="ui-header"><span class="ui-brand">IKATOOLBOX</span><div class="ui-title">DISPLAY GENERATOR</div></div>
+        <div class="ui-header">
+            <span class="ui-brand">IKATOOLBOX</span>
+            <div class="ui-title">DISPLAY GENERATOR</div>
+        </div>
 
         <div class="control-group">
             <h2>1. データ取り込み</h2>
-            <textarea id="json-input" placeholder="駒データを貼り付け(変更された技能のみを推奨)" oninput="importData()"></textarea>
-            <div class="grid-2">
-                <button id="btn-7th" class="edition-btn active" onclick="setEdition(7)">7版</button>
-                <button id="btn-6th" class="edition-btn" onclick="setEdition(6)">6版</button>
+            <textarea id="json-input" placeholder="駒データを貼り付け（変更された技能のみを推奨）" oninput="importData()"></textarea>
+            <div class="toggle-group">
+                <button id="btn-7th" class="toggle-btn active" onclick="setEdition(7)">7版</button>
+                <button id="btn-6th" class="toggle-btn" onclick="setEdition(6)">6版</button>
             </div>
         </div>
 
@@ -181,16 +229,16 @@
                 <div><label>名前</label><input type="text" id="in-name" oninput="updateNameDisp()"></div>
                 <div><label>フリガナ</label><input type="text" id="in-ruby" oninput="updateRubyDisp()"></div>
             </div>
-		<div class="grid-2" style="margin-top:5px;">
+            <div class="grid-2">
                 <div><label>シナリオ名</label><input type="text" id="in-scenario" oninput="refreshScenarioDisplay()"></div>
-                <div><label>HO名(PC/KPC)</label><input type="text" id="in-ho" oninput="refreshScenarioDisplay()"></div>
+                <div><label>HO名（PC/KPC）</label><input type="text" id="in-ho" oninput="refreshScenarioDisplay()"></div>
             </div>
             <div class="grid-3">
                 <div><label>年齢</label><input type="text" id="in-age" oninput="refreshProfileDisplay()"></div>
                 <div><label>性別</label><input type="text" id="in-sex" oninput="refreshProfileDisplay()"></div>
                 <div><label>職業</label><input type="text" id="in-job" oninput="refreshProfileDisplay()"></div>
             </div>
-            <div class="grid-2" style="margin-top:5px;">
+            <div class="grid-2">
                 <div><label>特徴1</label><input type="text" id="in-t1-name" oninput="updateTrait()"></div>
                 <div><label>特徴2</label><input type="text" id="in-t2-name" oninput="updateTrait()"></div>
             </div>
@@ -210,7 +258,7 @@
                 <div><label>INT</label><input type="number" id="in-int" oninput="setBar('int', this.value)"></div>
                 <div><label>EDU</label><input type="number" id="in-edu" oninput="setBar('edu', this.value)"></div>
             </div>
-            <div class="grid-flex" style="margin-top:10px;">
+            <div class="grid-flex" style="margin-top:8px;">
                 <div><label>SAN</label><input type="number" id="in-san" oninput="updateVal('d-san', this.value, '0')"></div>
                 <div><label>LUK</label><input type="number" id="in-luk" oninput="updateVal('d-luk', this.value, '0')"></div>
                 <div><label>HP</label><input type="number" id="in-hp" oninput="updateVal('d-hp', this.value, '0')"></div>
@@ -229,15 +277,17 @@
             <h2>4. 立ち絵調整</h2>
             <label>メイン立ち絵</label>
             <div class="file-input-wrapper">
-                <label for="main-file" class="custom-file-btn"><span class="material-symbols-outlined">image</span> 画像を選択</label>
+                <label for="main-file" class="custom-file-btn">
+                    <span class="material-symbols-outlined">image</span> 画像を選択
+                </label>
                 <input type="file" id="main-file" onchange="loadImg(this, 'main-img')">
             </div>
             <div class="grid-3">
                 <div><label>左右</label><input type="range" min="-600" max="600" value="0" oninput="setPos('--img-x', this.value)"></div>
-		<div><label>上下</label><input type="range" min="-1500" max="1500" step="0.5" value="0" oninput="setPos('--img-y', this.value)"></div>
+                <div><label>上下</label><input type="range" min="-1500" max="1500" step="0.5" value="0" oninput="setPos('--img-y', this.value)"></div>
                 <div><label>拡大</label><input type="range" min="0.1" max="4" step="0.01" value="1" oninput="setPos('--img-scale', this.value)"></div>
             </div>
-            <label style="margin-top:10px;">差分スロット (1~3)</label>
+            <label style="margin-top:8px;">差分スロット（1〜3）</label>
             <div class="grid-3">
                 <div class="file-input-wrapper">
                     <label for="v1-file" class="custom-file-btn mini">#1</label>
@@ -259,30 +309,35 @@
             </div>
         </div>
 
-<div class="control-group">
+        <div class="control-group">
             <h2>5. カスタマイズ</h2>
             <label>キャンバス背景</label>
-            <div class="grid-2" style="margin-bottom:10px;">
-                <button id="btn-dark" class="theme-btn active" onclick="setCanvasTheme('dark')">DARK</button>
-                <button id="btn-light" class="theme-btn" onclick="setCanvasTheme('light')">LIGHT</button>
+            <div class="toggle-group" style="margin-bottom:12px;">
+                <button id="btn-dark" class="toggle-btn active" onclick="setCanvasTheme('dark')">DARK</button>
+                <button id="btn-light" class="toggle-btn" onclick="setCanvasTheme('light')">LIGHT</button>
             </div>
             <label>アクセントカラー</label>
-            <input type="color" id="color-picker" value="#C5373C" oninput="root.style.setProperty('--accent-color', this.value)" style="height:40px; cursor:pointer; border:none; width:100%; background:none;">
-            <div class="secret-mode-controls" style="margin-top: 10px;">
-                <label>秘匿モード</label>
-                <div style="display: flex; gap: 5px;">
-                    <button id="btn-secret-off" class="theme-btn active" onclick="setSecretMode(false)">OFF</button>
-                    <button id="btn-secret-on" class="theme-btn" onclick="setSecretMode(true)">ON</button>
-		</div>
-	</div>
+            <div class="color-picker-wrap">
+                <input type="color" id="color-picker" value="#C5373C" oninput="syncColor(this.value)">
+                <input type="text" id="color-hex" class="color-hex" value="#C5373C" maxlength="7" oninput="syncColorFromHex(this.value)">
+            </div>
+            <label>秘匿モード</label>
+            <div class="toggle-group">
+                <button id="btn-secret-off" class="toggle-btn active" onclick="setSecretMode(false)">OFF</button>
+                <button id="btn-secret-on" class="toggle-btn" onclick="setSecretMode(true)">ON</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <h2>6. 出力</h2>
+            <button class="save-btn" onclick="saveImage()">
+                <span class="material-symbols-outlined">download</span>
+                画像を保存する
+            </button>
+            <button class="clear-btn" onclick="location.reload()">入力をクリア</button>
+        </div>
+    </div>
 </div>
-        <div class="control-group"> <h2>6. 出力</h2>
-            <button class="save-btn" onclick="saveImage()">画像を保存する</button>
-            <button onclick="location.reload()" style="width:100%; background:none; border:none; color:#555; font-size:0.7rem; font-weight:bold; cursor:pointer; margin-top:15px; text-decoration:underline;">入力をクリア</button>
-	</div>
-	</div>
-	</div>
-	</div>
 
 <div class="preview-area">
     <div id="display-canvas">
@@ -331,7 +386,18 @@
     const root = document.documentElement;
     let allSkills = [];
 
-	document.getElementById('menu-toggle').onclick = function() {
+    function syncColor(val) {
+        root.style.setProperty('--accent-color', val);
+        document.getElementById('color-hex').value = val;
+    }
+    function syncColorFromHex(val) {
+        if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+            root.style.setProperty('--accent-color', val);
+            document.getElementById('color-picker').value = val;
+        }
+    }
+
+    document.getElementById('menu-toggle').onclick = function() {
         const sidebar = document.querySelector('.sidebar');
         sidebar.classList.toggle('active');
         this.classList.toggle('is-active');
@@ -567,7 +633,7 @@ function refreshScenarioDisplay() {
 window.setSecretMode = function(isOn) {
     const bOn = document.getElementById('btn-secret-on');
     const bOff = document.getElementById('btn-secret-off');
-    if (bOn) bOn.classList.toggle('active', isOn);
+    if (bOn) { bOn.classList.toggle('active', isOn); bOn.classList.toggle('danger', isOn); }
     if (bOff) bOff.classList.toggle('active', !isOn);
 
     const statIds = ["str","con","pow","dex","app","siz","int","edu","san","luk","hp","mp"];

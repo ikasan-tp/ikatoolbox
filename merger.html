@@ -21,85 +21,99 @@
     --text-sub: #b5bac1;
   }
 
-  body { 
-    font-family: 'Noto Sans JP', sans-serif; 
-    max-width: 800px; 
-    margin: 0 auto; 
-    padding: 100px 15px 40px; 
-    background-color: var(--bg-dark); 
-    color: var(--text-main); 
-    min-height: 100vh;
-    box-sizing: border-box;
-    position: relative;
+  .material-symbols-outlined {
+    display: inline-block; width: 1em; height: 1em;
+    overflow: hidden; white-space: nowrap; direction: ltr; vertical-align: middle;
   }
-  
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    max-width: 800px; margin: 0 auto; padding: 80px 15px 60px;
+    background-color: var(--bg-dark); color: var(--text-main);
+    min-height: 100vh; box-sizing: border-box; position: relative;
+  }
+
   .back-link {
-    position: absolute;
-    top: 70px; 
-    left: 20px;
+    position: absolute; top: 30px; left: 20px;
     display: flex; align-items: center; gap: 8px;
     text-decoration: none; color: var(--text-sub);
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.8rem; font-weight: 700;
-    letter-spacing: 0.1em; transition: 0.3s;
-    z-index: 1000;
+    font-family: 'Montserrat', sans-serif; font-size: 0.8rem; font-weight: 700;
+    letter-spacing: 0.1em; transition: 0.3s; z-index: 1000;
   }
   .back-link:hover { color: var(--accent); transform: translateX(-5px); }
 
-  .card { 
-    background: var(--card-bg); 
-    padding: 40px; 
-    border-radius: 12px; 
-    border: 1px solid var(--ui-border);
-    margin-bottom: 20px; 
+  .card {
+    background: var(--card-bg); padding: 24px 28px;
+    border-radius: 12px; border: 1px solid var(--ui-border); margin-bottom: 12px;
   }
 
-  .ui-header { text-align: left; margin-bottom: 25px; border-bottom: 3px solid var(--accent); padding-bottom: 12px; }
+  .ui-header { margin-bottom: 16px; border-bottom: 3px solid var(--accent); padding-bottom: 12px; }
   .ui-brand { font-family: 'Montserrat', sans-serif; font-size: 0.7rem; font-weight: 900; color: var(--accent); letter-spacing: 0.4em; display: block; margin-bottom: 2px; }
-  .ui-title { font-family: 'Montserrat', 'Noto Sans JP', sans-serif; font-size: 1.6rem; font-weight: 900; color: #fff; letter-spacing: 0.05em; display: flex; align-items: baseline; gap: 10px; }
+  .ui-title { font-family: 'Montserrat', 'Noto Sans JP', sans-serif; font-size: 1.3rem; font-weight: 900; color: #fff; letter-spacing: 0.05em; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
   .ui-title-sub { color: var(--text-sub); font-size: 0.8rem; font-weight: 400; letter-spacing: 0.1em; }
 
-  .drop-zone { 
-    border: 2px dashed #4f545c; 
-    padding: 40px 20px; 
-    border-radius: 8px; 
-    background: #313338; 
-    cursor: pointer; text-align: center; transition: 0.2s;
+  .privacy-note { font-size: 0.75em; color: var(--text-sub); margin-bottom: 16px; }
+
+  .drop-zone {
+    border: 2px dashed #4f545c; padding: 32px 20px;
+    border-radius: 8px; background: #2a2a2a;
+    cursor: pointer; text-align: center;
+    transition: border-color 0.2s, background 0.2s;
   }
-  .drop-zone:hover { border-color: var(--accent); background: #383a40; }
-  
-  .file-list { margin: 25px 0; display: flex; flex-direction: column; gap: 10px; }
-  .file-item { 
-    background: #1e1f22; padding: 12px 20px; border-radius: 6px; 
+  .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: #2e2020; }
+  .drop-zone-icon { font-size: 2.4rem !important; width: 2.4rem !important; height: 2.4rem !important; color: var(--accent); display: block; margin: 0 auto 8px; }
+  .drop-zone p { margin: 0; font-size: 0.82rem; color: var(--text-sub); }
+  .drop-zone-link { color: var(--accent); text-decoration: underline; font-weight: bold; }
+
+  .file-list { margin: 16px 0; display: flex; flex-direction: column; gap: 8px; }
+  .file-list-empty { text-align: center; color: var(--text-sub); font-size: 0.78em; padding: 20px; opacity: 0.5; }
+
+  .file-item {
+    background: #181818; padding: 10px 14px; border-radius: 6px;
     display: flex; justify-content: space-between; align-items: center;
-    border-left: 4px solid var(--accent);
+    border-left: 3px solid var(--accent); gap: 12px;
   }
-  .file-name { font-size: 0.85em; color: #fff; font-family: monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 400px; }
+  .file-item-order { display: flex; flex-direction: column; flex-shrink: 0; }
+  .file-item-info { flex: 1; min-width: 0; }
+  .file-name { font-size: 0.82em; color: #fff; font-family: monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+  .file-anchors { font-size: 0.68em; color: #555; margin-top: 2px; }
 
-  .btn { 
-    display: block; width: 100%; padding: 15px; font-size: 16px; cursor: pointer; 
-    background-color: var(--accent); color: white; border: none; border-radius: 30px; 
-    font-weight: bold; transition: 0.2s; margin-top: 20px;
+  .icon-btn {
+    background: transparent; color: #555; border: none; cursor: pointer; padding: 2px;
+    display: flex; align-items: center; justify-content: center; transition: color 0.15s;
   }
-  .btn:hover { filter: brightness(1.2); }
-  .btn:disabled { background: #4f545c; cursor: not-allowed; filter: none; color: #888; }
+  .icon-btn:hover:not(:disabled) { color: #ccc; }
+  .icon-btn:disabled { opacity: 0.15; cursor: default; }
+  .remove-btn:hover { color: #ff5252 !important; }
+  .icon-btn .material-symbols-outlined { font-size: 18px !important; width: 18px !important; height: 18px !important; }
 
-  .icon-btn { 
-    background: transparent; color: var(--text-sub); border: none; cursor: pointer; padding: 2px;
-    display: flex; align-items: center; justify-content: center;
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 13px; font-size: 0.9rem; cursor: pointer;
+    background-color: var(--accent); color: white; border: none; border-radius: 4px;
+    font-weight: 900; transition: 0.2s; margin-top: 14px;
+    font-family: 'Montserrat', sans-serif; letter-spacing: 0.12em; box-sizing: border-box;
   }
-  .icon-btn:hover:not(:disabled) { color: #fff; }
-  .icon-btn:disabled { opacity: 0.1; cursor: default; }
-  .remove-btn:hover { color: #ff5252; }
+  .btn:hover:not(:disabled) { filter: brightness(1.12); transform: translateY(-1px); }
+  .btn:active:not(:disabled) { transform: translateY(0); }
+  .btn:disabled { background: #2a2a2a; border: 1px solid #333; cursor: not-allowed; color: #555; transform: none; filter: none; }
+  .btn .material-symbols-outlined { font-size: 1.1rem !important; width: 1.1rem !important; height: 1.1rem !important; }
 
-  .material-symbols-outlined { font-size: 20px; }
+  #status { margin-top: 10px; font-size: 0.82em; color: var(--text-sub); text-align: center; min-height: 1.3em; }
+
+  @media screen and (max-width: 600px) {
+    body { padding: 60px 12px 60px; }
+    .card { padding: 18px 14px; }
+    .back-link { top: 10px; left: 10px; }
+    .file-name { font-size: 0.75em; }
+  }
 </style>
 </head>
 <body>
 
   <a href="generator.html" class="back-link">
-    <span class="material-symbols-outlined" style="font-size: 1.2rem;">arrow_back_ios</span>
-    BACK TO CONVERTER
+    <span class="material-symbols-outlined" style="font-size: 0.9rem;">arrow_back_ios</span>
+    BACK TO LOG EDITOR
   </a>
 
   <div class="card">
@@ -108,22 +122,23 @@
       <div class="ui-title">LOG MERGER <span class="ui-title-sub">for HTML LOG</span></div>
     </div>
 
-    <p style="font-size:0.8em; color:var(--text-sub); margin-bottom:25px;">
-      分割されたログを好きな順番で一本に結合します。目次・見出しはすべて維持されます。
-    </p>
-    
+    <p class="privacy-note">分割されたログを好きな順番で一本に結合します。目次・見出しはすべて維持されます。</p>
+
     <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-      <span class="material-symbols-outlined" style="font-size: 3rem; color: var(--accent); margin-bottom: 10px;">library_add</span>
-      <p style="margin:0;">HTMLログをドロップするか<br><span style="color:var(--accent); text-decoration:underline; font-weight:bold;">ファイルを選択</span></p>
+      <span class="material-symbols-outlined drop-zone-icon">library_add</span>
+      <p>HTMLログをドロップするか<br><span class="drop-zone-link">ファイルを選択</span></p>
       <input type="file" id="fileInput" multiple accept=".html" style="display:none" onchange="addFiles(event)">
     </div>
 
     <div id="fileList" class="file-list">
-      <p style="text-align:center; color:var(--text-sub); font-size:0.8em; padding:20px;">ファイルが追加されていません</p>
+      <p class="file-list-empty">ファイルが追加されていません</p>
     </div>
 
-    <button id="mergeBtn" class="btn" onclick="mergeHtmlLogs()" disabled>ログを結合して保存</button>
-    <div id="status" style="margin-top:15px; font-size: 0.9em; color: var(--text-sub); text-align:center;"></div>
+    <button id="mergeBtn" class="btn" onclick="mergeHtmlLogs()" disabled>
+      <span class="material-symbols-outlined">merge</span>
+      ログを結合して保存
+    </button>
+    <div id="status"></div>
   </div>
 
   <div style="position: fixed; bottom: 10px; right: 15px; font-family: sans-serif; font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: 0.1em; font-weight: bold; pointer-events: none; z-index: 9999;">✦ IKATOOLBOX</div>
@@ -131,15 +146,10 @@
   <script>
     let filesData = [];
 
-    // ドラッグ&ドロップ
     const dz = document.getElementById('dropZone');
-    ['dragover', 'dragleave', 'drop'].forEach(name => {
-      dz.addEventListener(name, (e) => { 
-        e.preventDefault(); 
-        dz.style.borderColor = (name === 'dragover') ? 'var(--accent)' : '#4f545c'; 
-      });
-    });
-    dz.addEventListener('drop', (e) => { e.preventDefault(); handleFiles(e.dataTransfer.files); });
+    dz.addEventListener('dragover',  (e) => { e.preventDefault(); dz.classList.add('dragover'); });
+    dz.addEventListener('dragleave', (e) => { e.preventDefault(); dz.classList.remove('dragover'); });
+    dz.addEventListener('drop',      (e) => { e.preventDefault(); dz.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
     function addFiles(e) { handleFiles(e.target.files); e.target.value = ''; }
 
     async function handleFiles(files) {
@@ -191,7 +201,7 @@
       const btn  = document.getElementById('mergeBtn');
 
       if (filesData.length === 0) {
-        list.innerHTML = '<p style="text-align:center; color:var(--text-sub); font-size:0.8em; padding:20px;">ファイルが追加されていません</p>';
+        list.innerHTML = '<p class="file-list-empty">ファイルが追加されていません</p>';
         btn.disabled = true;
         return;
       }
@@ -201,8 +211,8 @@
         const item = document.createElement('div');
         item.className = 'file-item';
         item.innerHTML = `
-          <div style="display:flex; align-items:center; gap:12px;">
-            <div style="display:flex; flex-direction:column; gap:0px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div class="file-item-order">
               <button class="icon-btn" ${i === 0 ? 'disabled' : ''} data-swap-a="${i}" data-swap-b="${i-1}">
                 <span class="material-symbols-outlined">expand_less</span>
               </button>
@@ -210,9 +220,9 @@
                 <span class="material-symbols-outlined">expand_more</span>
               </button>
             </div>
-            <div>
+            <div class="file-item-info">
               <span class="file-name">${i + 1}. ${f.name}</span>
-              <div style="font-size:0.7em; color:#666; margin-top:2px;">目次エントリ: ${f.anchors.length}件</div>
+              <div class="file-anchors">目次エントリ: ${f.anchors.length}件</div>
             </div>
           </div>
           <button class="icon-btn remove-btn" data-remove="${i}">

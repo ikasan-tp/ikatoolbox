@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
@@ -19,68 +19,95 @@
             --text-main: #dbdee1;
             --text-sub: #b5bac1;
             --selection-bg: rgba(197, 55, 60, 0.15);
-            --sidebar-width: 420px;
+            --sidebar-width: 400px;
         }
 
         .material-symbols-outlined { vertical-align: middle; font-size: 1.1rem; }
         body { background: var(--bg-dark); color: var(--text-main); margin: 0; display: flex; font-family: 'Noto Sans JP', 'Montserrat', sans-serif; height: 100vh; overflow: hidden; }
 
-        .sidebar { 
-            width: var(--sidebar-width); 
-            background: var(--card-bg); 
-            border-right: 1px solid var(--ui-border); 
-            display: flex; 
-            flex-direction: column; 
-            transition: transform 0.3s ease-out;
-            z-index: 1000;
-        }
-        .sidebar-scroll { flex: 1; overflow-y: auto; padding: 25px 20px; }
-        .sidebar-footer { padding: 20px; border-top: 1px solid var(--ui-border); background: var(--card-bg); }
+        .sidebar { width: var(--sidebar-width); background: var(--card-bg); border-right: 1px solid var(--ui-border); display: flex; flex-direction: column; transition: transform 0.3s ease-out; z-index: 1000; }
+        .sidebar-scroll { flex: 1; overflow-y: auto; padding: 20px 18px; scrollbar-width: thin; scrollbar-color: #444 transparent; }
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
+        .sidebar-footer { padding: 16px 18px; border-top: 1px solid var(--ui-border); background: var(--card-bg); }
 
-        .back-link { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #888; font-size: 0.7rem; font-weight: 700; transition: 0.3s; margin-bottom: 20px; }
-        .back-link:hover { color: #C5373C; transform: translateX(-3px); }
+        .back-link { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #666; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; transition: 0.2s; margin-bottom: 16px; }
+        .back-link:hover { color: var(--accent); transform: translateX(-3px); }
 
-        .ui-header { text-align: left; margin-bottom: 30px; border-bottom: 2px solid var(--accent); padding-bottom: 15px; }
-        .ui-brand { font-family: 'Montserrat', sans-serif; font-size: 0.7rem; font-weight: 900; color: var(--accent); letter-spacing: 0.4em; display: block; margin-bottom: 2px; }
-        .ui-title { font-family: 'Montserrat', sans-serif; font-size: 1.4rem; font-weight: 900; color: #fff; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px; }
+        .ui-header { margin-bottom: 20px; border-bottom: 3px solid var(--accent); padding-bottom: 12px; }
+        .ui-brand { font-family: 'Montserrat', sans-serif; font-size: 0.68rem; font-weight: 900; color: var(--accent); letter-spacing: 0.4em; display: block; margin-bottom: 2px; }
+        .ui-title { font-family: 'Montserrat', sans-serif; font-size: 1.3rem; font-weight: 900; color: #fff; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px; }
 
-        .control-group { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #333; }
-        h2 { font-size: 0.75rem; color: #aaa; margin-bottom: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
-        
-        input[type="text"] { width: 100%; background: var(--ui-input); border: 1px solid var(--ui-border); color: #fff; padding: 10px 12px; border-radius: 6px; font-size: 0.8rem; margin-bottom: 6px; box-sizing: border-box; }
+        .control-group { margin-bottom: 0; padding: 14px 0; border-bottom: 1px solid #2a2a2a; }
+        .control-group:last-child { border-bottom: none; }
 
-        .input-with-extension { display: flex; align-items: center; background: var(--ui-input); border: 1px solid var(--ui-border); border-radius: 6px; overflow: hidden; margin-bottom: 6px; }
-        .input-with-extension input { border: none; margin-bottom: 0; border-radius: 0; flex: 1; }
-        .extension-label { padding: 0 12px; color: #555; font-family: 'Montserrat'; font-weight: 900; font-size: 0.75rem; letter-spacing: 0.05em; border-left: 1px solid #333; height: 100%; display: flex; align-items: center; }
+        h2 { font-size: 0.62rem; color: var(--accent); margin: 0 0 12px; letter-spacing: 0.2em; font-weight: 900; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+        h2::after { content: ""; flex: 1; height: 1px; background: var(--accent); opacity: 0.2; }
 
-        .file-input-area { border: 2px dashed #4f545c; padding: 30px 20px; border-radius: 8px; background: #313338; cursor: pointer; margin-bottom: 20px; text-align: center; }
-        .file-label { color: var(--accent); text-decoration: underline; font-weight: bold; font-size: 0.85rem; }
+        .sub-label { font-size: 0.62rem; color: #666; font-weight: 700; letter-spacing: 0.04em; display: block; margin-bottom: 3px; }
 
-        .group-panel { background: var(--accent); color: #fff; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        input[type="text"], select { width: 100%; background: var(--ui-input); border: 1px solid var(--ui-border); color: #fff; padding: 6px 10px; border-radius: 4px; font-size: 0.78rem; margin-bottom: 6px; box-sizing: border-box; outline: none; font-family: inherit; transition: border-color 0.15s; }
+        input[type="text"]:focus { border-color: var(--accent); }
+        select { cursor: pointer; }
+
+        .input-with-extension { display: flex; align-items: center; background: var(--ui-input); border: 1px solid var(--ui-border); border-radius: 4px; overflow: hidden; margin-bottom: 6px; transition: border-color 0.15s; }
+        .input-with-extension:focus-within { border-color: var(--accent); }
+        .input-with-extension input { border: none; margin-bottom: 0; border-radius: 0; flex: 1; background: transparent; padding: 6px 10px; }
+        .extension-label { padding: 0 10px; color: #555; font-family: 'Montserrat'; font-weight: 900; font-size: 0.72rem; letter-spacing: 0.05em; border-left: 1px solid #333; height: 100%; display: flex; align-items: center; }
+
+        .file-input-area { border: 2px dashed #4f545c; padding: 24px 20px; border-radius: 8px; background: #2a2a2a; cursor: pointer; margin-bottom: 0; text-align: center; transition: border-color 0.2s, background 0.2s; }
+        .file-input-area:hover, .file-input-area.dragover { border-color: var(--accent); background: #2e2020; }
+        .file-label { color: var(--accent); text-decoration: underline; font-weight: bold; font-size: 0.82rem; }
+
+        .group-panel { background: var(--accent); color: #fff; padding: 14px; border-radius: 6px; margin-bottom: 12px; display: none; }
         .btn-wrap { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-        .group-panel button { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 6px 12px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; font-weight: bold; transition: 0.2s; display: flex; align-items: center; gap: 4px; }
-        .group-panel button:hover { background: rgba(0,0,0,0.6); }
+        .group-panel button { background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 0.68rem; cursor: pointer; font-weight: bold; transition: 0.15s; display: flex; align-items: center; gap: 4px; }
+        .group-panel button:hover { background: rgba(0,0,0,0.55); }
         .btn-delete { color: #ff8a8a !important; border: 1px solid rgba(255, 138, 138, 0.3) !important; }
 
-        .char-conf { background: var(--ui-input); border: 1px solid var(--ui-border); padding: 8px; border-radius: 4px; display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
-        .in-color-picker { width: 24px; height: 24px; padding: 0; border: none; background: none; cursor: pointer; flex-shrink: 0; }
+        .char-conf { background: var(--ui-input); border: 1px solid var(--ui-border); padding: 7px 8px; border-radius: 4px; display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+        .in-color-picker { width: 22px; height: 22px; padding: 0; border: none; background: none; cursor: pointer; flex-shrink: 0; }
         .in-color-picker::-webkit-color-swatch-wrapper { padding: 0; }
         .in-color-picker::-webkit-color-swatch { border: 1px solid #444; border-radius: 2px; }
-        .char-conf .in-name { flex: 1; background: transparent; border: none; color: #fff; font-size: 0.8rem; font-weight: bold; margin: 0; padding: 4px; }
-        .char-conf .in-color { width: 75px; background: #222; border: 1px solid #444; color: #888; font-size: 0.7rem; padding: 4px; margin: 0; text-align: center; border-radius: 2px; }
+        .char-conf .in-name { flex: 1; background: transparent; border: none; color: #fff; font-size: 0.78rem; font-weight: bold; margin: 0; padding: 3px 4px; outline: none; }
+        .char-conf .in-color { width: 72px; background: #1a1a1a; border: 1px solid #444; color: #888; font-size: 0.68rem; padding: 3px 4px; margin: 0; text-align: center; border-radius: 2px; }
 
-        .tab-config-item { background: #111; border-radius: 4px; padding: 10px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 8px; border: 1px solid #333; }
+        .tab-config-item { background: #181818; border-radius: 4px; padding: 10px 12px; margin-bottom: 6px; display: flex; flex-direction: column; gap: 8px; border: 1px solid #2a2a2a; }
         .tab-config-top { display: flex; align-items: center; justify-content: space-between; }
-        .tab-config-name { font-size: 0.75rem; font-weight: 900; color: #888; }
+        .tab-config-name { font-size: 0.72rem; font-weight: 900; color: #888; }
         .tab-config-controls { display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 8px; flex: 1; justify-content: flex-end; white-space: nowrap; }
-        .btn-toggle-input { background: none; border: none; color: #888; cursor: pointer; padding: 0; display: flex; align-items: center; } 
-        .btn-toggle-input:hover { color: #fff; } .hidden-input { display: none !important; }        
-        .style-select { background: #222; color: #eee; border: 1px solid #444; border-radius: 4px; padding: 4px 8px; font-size: 0.7rem; }
+        .btn-toggle-input { background: none; border: none; color: #666; cursor: pointer; padding: 0; display: flex; align-items: center; transition: color 0.15s; }
+        .btn-toggle-input:hover { color: #fff; }
+        .hidden-input { display: none !important; }
+        .style-select { background: #1a1a1a; color: #eee; border: 1px solid #444; border-radius: 4px; padding: 4px 8px; font-size: 0.68rem; margin-bottom: 0; width: auto; }
 
-        .search-box { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 6px; border: 1px solid #333; }
+        .search-box { background: #181818; padding: 12px; border-radius: 6px; border: 1px solid #2a2a2a; }
         .search-btns { display: flex; gap: 4px; margin-top: 4px; }
-        .search-btns button { flex: 1; padding: 6px; background: #333; border: none; color: #fff; font-size: 0.65rem; border-radius: 4px; cursor: pointer; }
-        .search-btns button:hover { background: #444; }
+        .search-btns button { flex: 1; padding: 5px; background: #2a2a2a; border: 1px solid #333; color: #aaa; font-size: 0.62rem; border-radius: 4px; cursor: pointer; transition: 0.15s; font-family: inherit; }
+        .search-btns button:hover { background: #333; color: #fff; }
+
+        .anchor-panel { display: none; border-bottom: 1px solid var(--ui-border); padding-bottom: 14px; margin-bottom: 14px; }
+        .anchor-panel.has-items { display: block; }
+        .anchor-panel-title { font-size: 0.68rem; font-weight: 900; color: #888; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+        .anchor-panel-title:hover { color: #fff; }
+        .anchor-panel-count { background: var(--accent); color: #fff; font-size: 0.58rem; padding: 1px 6px; border-radius: 10px; }
+        .anchor-list { display: flex; flex-direction: column; gap: 3px; max-height: 160px; overflow-y: auto; }
+        .anchor-toggle-icon { transition: transform 0.2s; font-size: 1rem !important; }
+        .anchor-panel.collapsed .anchor-toggle-icon { transform: rotate(-90deg); }
+        .anchor-panel.collapsed .anchor-list { display: none; }
+        .anchor-list-item { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 4px; cursor: pointer; transition: 0.15s; background: var(--ui-input); border: 1px solid transparent; }
+        .anchor-list-item:hover { border-color: var(--accent); background: var(--selection-bg); }
+        .anchor-list-num { font-family: 'Montserrat', sans-serif; font-size: 0.58rem; font-weight: 900; color: var(--accent); min-width: 18px; }
+        .anchor-list-name { font-size: 0.72rem; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+
+        .save-btn { width: 100%; padding: 13px; background: var(--accent); color: white; border: none; border-radius: 4px; font-weight: 900; cursor: pointer; font-size: 0.9rem; letter-spacing: 0.12em; transition: 0.2s; font-family: 'Montserrat', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .save-btn:hover:not(:disabled) { filter: brightness(1.12); transform: translateY(-1px); }
+        .save-btn:active:not(:disabled) { transform: translateY(0); }
+        .save-btn:disabled { background: #333; color: #555; cursor: default; transform: none; }
+        .save-btn .material-symbols-outlined { font-size: 1.1rem; }
+
+        .clear-btn { width: 100%; background: none; border: 1px solid #2a2a2a; color: #555; font-size: 0.68rem; font-weight: 700; cursor: pointer; margin-top: 8px; padding: 7px; border-radius: 4px; font-family: 'Montserrat', sans-serif; letter-spacing: 0.06em; transition: 0.2s; }
+        .clear-btn:hover { border-color: #444; color: #888; }
 
         .main-content { flex: 1; background: #0a0a0a; overflow-y: auto; padding: 40px 0; scroll-behavior: smooth; }
         .log-row { position: relative; width: 100%; max-width: 900px; margin: 0 auto; padding: 20px 15px; border-bottom: 1px solid #222; transition: 0.1s; border-left: 4px solid transparent; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px; }
@@ -105,47 +132,27 @@
 
         .row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 10px; }
         .row-name { font-weight: bold; font-size: 1rem; flex-shrink: 0; }
-        
+
         .anchor-area { display: flex; align-items: center; gap: 8px; flex: 1; justify-content: flex-end; }
         .anchor-check-label { font-size: 0.6rem; color: #555; display: flex; align-items: center; gap: 4px; cursor: pointer; }
         .anchor-input { background: rgba(255, 255, 255, 0.05) !important; border: 1px solid #333 !important; color: var(--accent) !important; font-size: 0.65rem !important; padding: 2px 8px !important; width: 180px !important; margin: 0 !important; display: none; }
         .anchor-check:checked + .anchor-input { display: block; }
 
-		.row-content { width: 100%; min-height: 40px; background: transparent; border: none; color: #ccc; font-family: inherit; font-size: 0.95rem; line-height: 1.6; resize: none; overflow: hidden; box-sizing: border-box; }
+        .row-content { width: 100%; min-height: 40px; background: transparent; border: none; color: #ccc; font-family: inherit; font-size: 0.95rem; line-height: 1.6; resize: none; overflow: hidden; box-sizing: border-box; }
         mark { background: #ffeb3b; color: #000; border-radius: 2px; }
 
-        .save-btn { width: 100%; padding: 16px; background: var(--accent); color: white; border: none; border-radius: 25px; font-weight: 900; cursor: pointer; letter-spacing: 0.1em; transition: 0.2s; }
+        #emptyState { text-align: center; color: #444; margin-top: 60px; }
+        .guide-container { max-width: 600px; margin: 30px auto; text-align: left; background: #111; padding: 36px; border-radius: 12px; border: 1px solid #222; }
+        .guide-welcome { margin-bottom: 24px; border-bottom: 1px solid #2a2a2a; padding-bottom: 18px; }
+        .guide-welcome h1 { font-family: 'Montserrat'; font-weight: 900; font-size: 1.6rem; color: #fff; margin: 0; letter-spacing: 0.05em; }
+        .guide-welcome p { font-size: 0.75rem; color: var(--accent); font-weight: bold; margin: 4px 0 0; letter-spacing: 0.1em; }
+        .guide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .guide-item { display: flex; gap: 12px; align-items: flex-start; }
+        .guide-icon { color: var(--accent); padding-top: 2px; font-size: 1.3rem !important; }
+        .guide-text b { color: #eee; font-size: 0.82rem; display: block; margin-bottom: 3px; }
+        .guide-text p { font-size: 0.72rem; color: #666; margin: 0; line-height: 1.5; }
 
-        .anchor-panel { display: none; border-top: 1px solid #333; padding-top: 16px; margin-bottom: 16px; }
-        .anchor-panel.has-items { display: block; }
-        .anchor-panel-title { font-size: 0.7rem; font-weight: 900; color: #aaa; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
-        .anchor-panel-count { background: var(--accent); color: #fff; font-size: 0.6rem; padding: 1px 6px; border-radius: 10px; }
-        .anchor-list { display: flex; flex-direction: column; gap: 4px; max-height: 180px; overflow-y: auto; }
-        .anchor-panel-title { cursor: pointer; user-select: none; }
-        .anchor-panel-title:hover { color: #fff; }
-        .anchor-toggle-icon { transition: transform 0.2s; font-size: 1rem !important; }
-        .anchor-panel.collapsed .anchor-toggle-icon { transform: rotate(-90deg); }
-        .anchor-panel.collapsed .anchor-list { display: none; }
-        .anchor-list-item { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 4px; cursor: pointer; transition: 0.15s; background: var(--ui-input); border: 1px solid transparent; }
-        .anchor-list-item:hover { border-color: var(--accent); background: var(--selection-bg); }
-        .anchor-list-num { font-family: 'Montserrat', sans-serif; font-size: 0.6rem; font-weight: 900; color: var(--accent); min-width: 18px; }
-        .anchor-list-name { font-size: 0.75rem; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
-        .save-btn:hover:not(:disabled) { filter: brightness(1.2); }
-        .save-btn:disabled { background: #444; opacity: 0.5; }
-        
-        #emptyState { text-align: center; color: #444; margin-top: 60px; font-family: 'Noto Sans JP', sans-serif; }
-        .guide-container { max-width: 600px; margin: 30px auto; text-align: left; background: #111; padding: 40px; border-radius: 12px; border: 1px solid #222; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .guide-welcome { margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 20px; }
-        .guide-welcome h1 { font-family: 'Montserrat'; font-weight: 900; font-size: 1.8rem; color: #fff; margin: 0; letter-spacing: 0.05em; }
-        .guide-welcome p { font-size: 0.8rem; color: var(--accent); font-weight: bold; margin: 5px 0 0; letter-spacing: 0.1em; }
-
-        .guide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .guide-item { margin-bottom: 10px; display: flex; gap: 15px; align-items: flex-start; }
-        .guide-icon { color: var(--accent); padding-top: 2px; font-size: 1.4rem !important; }
-        .guide-text b { color: #eee; font-size: 0.85rem; display: block; margin-bottom: 4px; }
-        .guide-text p { font-size: 0.75rem; color: #777; margin: 0; line-height: 1.5; }
-
-        .mobile-menu-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%; background: var(--accent); color: white; border: none; z-index: 10001; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .mobile-menu-btn { position: fixed; bottom: 20px; right: 20px; width: 52px; height: 52px; border-radius: 50%; background: var(--accent); color: white; border: none; z-index: 10001; cursor: pointer; display: none; align-items: center; justify-content: center; }
         .mobile-menu-btn span { transition: transform 0.3s ease; display: inline-block; }
         .mobile-menu-btn.is-active span { transform: rotate(90deg); }
 
@@ -153,37 +160,12 @@
             .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); height: 100%; width: 85%; max-width: 380px; }
             .sidebar.active { transform: translateX(0); box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
             .mobile-menu-btn { display: flex; }
-            .log-row { width: calc(100% - 20px); padding: 15px 15px 15px 55px; margin: 0 10px; min-height: 160px; }
+            .log-row { width: calc(100% - 20px); padding: 15px 15px 15px 55px; margin: 0 10px; min-height: 130px; }
             .col-select { left: 8px; }
             .guide-grid { grid-template-columns: 1fr; }
             input, textarea, select { font-size: 16px !important; }
-            .log-row { min-height: 130px; } 
-             .del-btn { padding: 8px; margin-top: 8px; }
+            .del-btn { padding: 8px; margin-top: 8px; }
         }
-.btn-clean-minimal {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px;
-    background: var(--accent);
-    border: none;
-    color: #fff;
-    font-size: 0.75rem;
-    font-weight: bold;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: filter 0.2s;
-}
-
-.btn-clean-minimal:hover {
-    filter: brightness(1.2);
-}
-
-.btn-clean-minimal .material-symbols-outlined {
-    font-size: 1.1rem;
-}
     </style>
 </head>
 <body>
@@ -207,7 +189,7 @@
     <div class="control-group">
         <h2>1. ファイル読込</h2>
         <input type="file" id="logFile" accept=".html" style="display:none" onchange="processLog(this.files[0])">
-        <div class="file-input-area" onclick="document.getElementById('logFile').click()">
+        <div class="file-input-area" id="dropZone" onclick="document.getElementById('logFile').click()">
             <p style="font-size:0.75rem; color:var(--text-sub); margin:0;">HTMLをドロップするか<br><span class="file-label">ファイルを選択</span></p>
         </div>
     </div>
@@ -215,17 +197,17 @@
    <div id="postUploadControls" style="display: none;">
         <div class="control-group">
             <h2>2. タイトル設定</h2>
-            <p style="font-size:0.6rem; color:var(--text-sub); margin-bottom:4px;">セッションタイトル</p>
+            <label style="font-size:0.62rem; color:#666; font-weight:700; letter-spacing:0.04em; display:block; margin-bottom:3px;">セッションタイトル</label>
             <input type="text" id="logTitleInput" placeholder="セッションタイトル">
 
-            <p style="font-size:0.6rem; color:var(--text-sub); margin-top:12px; margin-bottom:4px;">書き出しファイル名</p>
+            <label style="font-size:0.62rem; color:#666; font-weight:700; letter-spacing:0.04em; display:block; margin:10px 0 3px;">書き出しファイル名</label>
             <div class="input-with-extension">
                 <input type="text" id="fileNameInput" placeholder="export_log">
                 <span class="extension-label">.html</span>
             </div>
 
-            <p style="font-size:0.6rem; color:var(--text-sub); margin-top:12px; margin-bottom:4px;">システム名 (ヘッダー表示)</p>
-            <select id="systemSelect" class="style-select" style="width:100%; margin-bottom:6px; height:36px;" onchange="toggleCustomSystem(this.value)">
+            <label style="font-size:0.62rem; color:#666; font-weight:700; letter-spacing:0.04em; display:block; margin:10px 0 3px;">システム名（ヘッダー表示）</label>
+            <select id="systemSelect" class="style-select" style="width:100%; margin-bottom:6px; height:34px;" onchange="toggleCustomSystem(this.value)">
                 <option value="CALL OF CTHULHU 6th">Call of Cthulhu 6th</option>
                 <option value="CALL OF CTHULHU 7th">Call of Cthulhu 7th</option>
                 <option value="EMOKLORE">Emoklore</option>
@@ -235,28 +217,29 @@
         </div>
 
         <div class="control-group">
-            <h2>3. 検索・置換</h2>
-<div style="margin-bottom: 20px; text-align: right;">
-    <button onclick="cleanUpLogData()" class="btn-clean-minimal">
-        <span class="material-symbols-outlined">mop</span>
-        <span>ログを掃除する</span>
-    </button>
-</div>
+            <h2>3. 検索・置換・掃除</h2>
+            <div class="search-btns" style="margin-top:0; margin-bottom:10px;">
+                <button onclick="cleanUpLogData()" style="display:flex;align-items:center;justify-content:center;gap:4px;">
+                    <span class="material-symbols-outlined" style="font-size:0.9rem;">mop</span>ログを掃除する
+                </button>
+            </div>
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="検索ワード..." oninput="handleSearch()">
                 <div class="search-btns">
                     <button onclick="navSearch(-1)">前へ</button>
                     <button onclick="navSearch(1)">次へ</button>
                 </div>
-                <div style="margin-top:10px; border-top:1px solid #333; padding-top:10px;">
+                <div style="margin-top:10px; border-top:1px solid #2a2a2a; padding-top:10px;">
                     <input type="text" id="replaceInput" placeholder="置換後のワード...">
-                    <button onclick="handleReplace()" style="width:100%; margin-top:4px; padding:6px; background:var(--accent); border:none; color:#fff; font-size:0.65rem; border-radius:4px; font-weight:bold; cursor:pointer;">一括置換を実行</button>
+                    <div class="search-btns" style="margin-top:4px;">
+                        <button onclick="handleReplace()">一括置換</button>
+                    </div>
                 </div>
             </div>
-            
-            <div id="editorSettings" style="display:none; margin-top:15px;">
+
+            <div id="editorSettings" style="display:none; margin-top:12px;">
                 <div id="groupPanel" class="group-panel">
-                    <div id="selectionInfo" style="font-size: 0.65rem; font-weight: 900; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px;">選択した行をまとめて操作</div>
+                    <div id="selectionInfo" style="font-size: 0.62rem; font-weight: 900; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px;">選択した行をまとめて操作</div>
                     <div class="btn-wrap">
                         <button onclick="moveGroup(-1)"><span class="material-symbols-outlined">north</span> 上へ</button>
                         <button onclick="moveGroup(1)"><span class="material-symbols-outlined">south</span> 下へ</button>
@@ -289,13 +272,11 @@
         </div>
         <div class="anchor-list" id="anchorList"></div>
     </div>
-    <button class="save-btn" id="downloadBtn" disabled onclick="exportLog()">HTMLを書き出し</button>
-    <div style="width: 100%; text-align: center;">
-        <button onclick="if(confirm('入力をすべてクリアしますか？')) location.reload()" 
-                style="background:none; border:none; color:#555; font-size:0.7rem; font-weight:bold; cursor:pointer; margin-top:15px; text-decoration:underline; display: inline-block;">
-            入力をクリア
-        </button>
-    </div>
+    <button class="save-btn" id="downloadBtn" disabled onclick="exportLog()">
+        <span class="material-symbols-outlined">download</span>
+        HTMLを書き出し
+    </button>
+    <button class="clear-btn" onclick="if(confirm('入力をすべてクリアしますか？')) location.reload()">入力をクリア</button>
 </div>
     </aside>
 
@@ -383,16 +364,7 @@
 <script>
     let logData = []; 
     let charSettings = {}; 
-    let tabStyleMap = {};
-    // メインタブカラーのキャッシュ（毎行find()しない）
-    let _mainColorCache = null;
-    function _cachedMainColor() {
-        if (_mainColorCache) return _mainColorCache;
-        const k = Object.keys(tabStyleMap).find(k => tabStyleMap[k].style === 'style-default');
-        _mainColorCache = k ? tabStyleMap[k].color : '#C5373C';
-        return _mainColorCache;
-    }
-    function _clearMainColorCache() { _mainColorCache = null; } 
+    let tabStyleMap = {}; 
     let selectedIndices = [];
     let searchMatches = [];
     let currentSearchIdx = -1;
@@ -432,7 +404,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-    const dropArea = document.querySelector('.file-input-area');
+    const dropArea = document.getElementById('dropZone');
     if (!dropArea) return;
 
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -442,7 +414,10 @@
         }, false);
     });
 
+    dropArea.addEventListener('dragenter', () => dropArea.classList.add('dragover'));
+    dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
     dropArea.addEventListener('drop', (e) => {
+        dropArea.classList.remove('dragover');
         const dt = e.dataTransfer;
         const files = dt.files;
         if (files && files[0]) {
@@ -453,7 +428,7 @@
 
     async function processLog(file) {
         if (!file) return;
-        logData = []; charSettings = {}; tabStyleMap = {}; selectedIndices = []; lastSelectedIndex = -1; _clearMainColorCache();
+        logData = []; charSettings = {}; tabStyleMap = {}; selectedIndices = []; lastSelectedIndex = -1;
         const text = await file.text();
         const doc = new DOMParser().parseFromString(text, 'text/html');
         const baseTitle = file.name.replace('.html', '').replace(/\[all\]/gi, '').trim();
@@ -518,8 +493,7 @@
 
     function updateAllRowColors(key) {
         const color = charSettings[key].color;
-        const resolved = (!color || color.toUpperCase() === '#888888' || color === '#888') ? _cachedMainColor() : color;
-        document.querySelectorAll(`.row-name[data-charkey="${key}"]`).forEach(el => el.style.color = resolved);
+        document.querySelectorAll(`.row-name[data-charkey="${key}"]`).forEach(el => el.style.color = color);
     }
     function updateAllRowNames(key) {
         const name = charSettings[key].displayName;
@@ -541,7 +515,7 @@ function renderTabSettings() {
                     <span class="tab-config-name">${tab}</span>
                     <div class="tab-config-controls">
                         <input type="color" class="in-color-picker" value="${tabStyleMap[tab].color}" 
-                            oninput="tabStyleMap['${tab}'].color=this.value.toUpperCase(); this.nextElementSibling.nextElementSibling.value=this.value.toUpperCase(); updateTabStyles('${tab}')">
+                            oninput="tabStyleMap['${tab}'].color=this.value.toUpperCase(); this.nextElementSibling.nextElementSibling.value=this.value.toUpperCase(); renderEditor(true)">
                         
                         <button class="btn-toggle-input" onclick="this.nextElementSibling.classList.toggle('hidden-input')" title="カラーコード入力を表示">
                             <span class="material-symbols-outlined" style="font-size: 18px;">settings</span>
@@ -549,7 +523,7 @@ function renderTabSettings() {
 
                         <input type="text" class="in-color hidden-input" value="${tabStyleMap[tab].color}" 
                             style="width: 75px; background: #222; border: 1px solid #444; color: #888; font-size: 0.7rem; padding: 4px; margin: 0; text-align: center; border-radius: 2px;"
-                            oninput="if(/^#[0-9A-F]{6}$/i.test(this.value)){tabStyleMap['${tab}'].color=this.value.toUpperCase(); this.previousElementSibling.previousElementSibling.value=this.value.toUpperCase(); updateTabStyles('${tab}')}">
+                            oninput="if(/^#[0-9A-F]{6}$/i.test(this.value)){tabStyleMap['${tab}'].color=this.value.toUpperCase(); this.previousElementSibling.previousElementSibling.value=this.value.toUpperCase(); renderEditor(true)}">
                         
                         <select class="style-select" 
                             onchange="tabStyleMap['${tab}'].style=this.value; renderEditor(true)">
@@ -561,47 +535,6 @@ function renderTabSettings() {
             container.appendChild(div);
         });
         renderEditor(true);
-    }
-
-    // タブカラー変更時の軽量更新（全再描画しない）
-    function updateTabStyles(changedTab) {
-        _clearMainColorCache();
-        function resolveColor(color) {
-            if (!color || color.toUpperCase() === '#888888' || color === '#888') {
-                const mainTab = Object.keys(tabStyleMap).find(k => tabStyleMap[k].style === 'style-default');
-                return mainTab ? tabStyleMap[mainTab].color : '#C5373C';
-            }
-            return color;
-        }
-
-        logData.forEach((item, index) => {
-            if (changedTab && item.tab !== changedTab) return;
-            const row = document.getElementById(`row-${index}`);
-            if (!row || row.getAttribute('data-rendered') !== 'true') return;
-
-            const config = tabStyleMap[item.tab] || {};
-            const char = charSettings[item.charKey] || {};
-            const isInfo = item.tab.toLowerCase() === 'info';
-            const accentColor = isInfo ? "#444" : (config.color || "#444");
-
-            // スタイルのみ更新（mainタブは左縦ライン非表示）
-            if (config.style === 'style-default') {
-                row.style.borderLeft = '4px solid transparent';
-            } else {
-                row.style.borderLeft = `4px solid ${accentColor}`;
-            }
-
-            const nameEl = row.querySelector('.row-name');
-            if (nameEl) nameEl.style.color = isInfo ? '#888' : resolveColor(char.color);
-
-            if (config.style === 'style-secret') {
-                row.style.setProperty('background-color', config.color + '44', 'important');
-            } else {
-                row.style.removeProperty('background-color');
-            }
-        });
-
-        updatePreviewStyles();
     }
 
     function updatePreviewStyles() {
@@ -638,7 +571,7 @@ function renderEditor(fullInit = false) {
                     }
                 }
             });
-        }, { rootMargin: '300px 0px' });
+        }, { rootMargin: '500px 0px' });
 
         logData.forEach((item, index) => {
             const row = document.createElement('div');
@@ -654,20 +587,16 @@ function renderEditor(fullInit = false) {
         updatePreviewStyles();
     }
 
-    // 差分のみ更新（全行ループを最小化）
-    const selectedSet = new Set(selectedIndices);
     logData.forEach((item, index) => {
         const row = document.getElementById(`row-${index}`);
         if(!row) return;
-        const isSelected = selectedSet.has(index);
-        const isHit = searchTerm ? item.content.toLowerCase().includes(searchTerm) : false;
+        const isSelected = selectedIndices.includes(index);
+        const isHit = searchTerm && item.content.toLowerCase().includes(searchTerm);
         if (isHit) searchMatches.push(index);
-        const wasSelected = row.classList.contains('selected');
-        const wasHit = row.classList.contains('search-hit');
-        if (wasSelected !== isSelected) row.classList.toggle('selected', isSelected);
-        if (wasHit !== isHit) row.classList.toggle('search-hit', isHit);
+        row.classList.toggle('selected', isSelected);
+        row.classList.toggle('search-hit', isHit);
         const cb = row.querySelector('.row-checkbox');
-        if(cb && cb.checked !== isSelected) cb.checked = isSelected;
+        if(cb) cb.checked = isSelected;
     });
 
     if (fullInit) {
@@ -683,19 +612,12 @@ function renderRowContent(row, index) {
         const isInfo = item.tab.toLowerCase() === 'info';
 
         const accentColor = isInfo ? "#444" : (currentTabConfig.color || "#444");
-
-        // #888888はデフォルト値なのでメインタブのカラーを代わりに使う（キャッシュ済み）
-        function resolveColor(color) {
-            if (!color || color.toUpperCase() === '#888888' || color === '#888') {
-                return _cachedMainColor();
-            }
-            return color;
-        }
+        const nameBarColor = isInfo ? (currentTabConfig.color || "#888") : char.color;
 
         // イベントはdata-indexから行番号を読み取る方式で登録（インデックスをHTMLへ直接埋め込まない）
         row.innerHTML = `
             <div class="row-header">
-                <span class="row-name" data-charkey="${item.charKey}" style="color:${isInfo ? '#888' : resolveColor(char.color)}">
+                <span class="row-name" data-charkey="${item.charKey}" style="color:${isInfo ? '#888' : char.color}; border-left: 3px solid ${nameBarColor}; padding-left: 8px;">
                     ${char.displayName} <small style="color:#444; font-size:0.6rem;">[${item.tab}]</small>
                 </span>
                 <div class="anchor-area" style="display: flex; gap: 10px; align-items: center;">
@@ -730,12 +652,8 @@ function renderRowContent(row, index) {
         });
         row.querySelector('.row-content').addEventListener('input', function() {
             logData[getIdx()].content = this.value;
-            // requestAnimationFrameでreflowをまとめる
-            const el = this;
-            requestAnimationFrame(() => {
-                el.style.height = 'auto';
-                el.style.height = el.scrollHeight + 'px';
-            });
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
         });
         row.querySelector('.row-checkbox').addEventListener('change', function() { toggleSelect(getIdx()); });
         row.querySelector('.move-up').addEventListener('click', () => moveRow(getIdx(), -1));
@@ -744,12 +662,7 @@ function renderRowContent(row, index) {
 
         if (isSelected) row.classList.add('selected');
 
-        // mainタブ(style-default)は左縦ライン非表示
-        if (currentTabConfig.style === 'style-default') {
-            row.style.borderLeft = '4px solid transparent';
-        } else {
-            row.style.borderLeft = `4px solid ${accentColor}`;
-        }
+        row.style.borderLeft = `4px solid ${accentColor}`;
 
         if (currentTabConfig.style === 'style-secret') {
             const translucentColor = currentTabConfig.color + '44';
@@ -791,26 +704,13 @@ function renderRowContent(row, index) {
         } else {
             panel.style.display = 'none';
         }
-        // チェックボックス操作は選択状態の更新だけでいい（fullInit不要）
-        requestAnimationFrame(() => renderEditor(false));
+        renderEditor();
     }
 
     function deleteRow(index) {
         if (!confirm("この行を削除しますか？")) return;
-        // DOM直接削除（全再描画しない）
-        const rowEl = document.getElementById(`row-${index}`);
-        if (rowEl) rowEl.remove();
         logData.splice(index, 1);
-        // 後続行のdata-indexを更新
-        for (let i = index; i < logData.length; i++) {
-            const r = document.getElementById(`row-${i + 1}`);
-            if (r) {
-                r.id = `row-${i}`;
-                updateRowIndex(r, i);
-            }
-        }
-        renderAnchorPanel();
-        renderEditor();
+        renderEditor(true);
     }
 
     function deleteSelectedRows() {
@@ -917,12 +817,7 @@ function renderRowContent(row, index) {
             list.appendChild(el);
         });
     }
-    let _searchTimer = null;
-    function handleSearch() {
-        currentSearchIdx = -1;
-        clearTimeout(_searchTimer);
-        _searchTimer = setTimeout(() => renderEditor(), 120);
-    }
+    function handleSearch() { currentSearchIdx = -1; renderEditor(); }
     function navSearch(dir) {
         if (searchMatches.length === 0) return;
         currentSearchIdx = (currentSearchIdx + dir + searchMatches.length) % searchMatches.length;
@@ -1045,8 +940,6 @@ function exportLog() {
         }
     });
 
-
-
     let html = `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><title>${h1Title}</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet"><style>
     :root { --outer-bg: #0f0f0f; --inner-bg: #050505; --block-bg: #111111; --text: #dbdee1; --accent: ${dynamicAccent}; --sub-line: #444; --border: #222; --tab-text: #666; --chat-text: #8a8a8a; --container-width: 680px; } 
     body { background: var(--outer-bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; margin: 0; padding: 0; line-height: 1.7; display: flex; flex-direction: column; align-items: center; } 
@@ -1084,7 +977,6 @@ function exportLog() {
     .row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; } 
     .row-name { font-weight: 900; font-size: 0.85rem; color: #fff; display: flex; align-items: center; gap: 8px; } 
     .name-line { width: 3px; height: 1em; background: var(--sub-line); } 
-    .style-chat .row-name { color: var(--chat-text); } 
     .row-tab { font-family: 'Montserrat'; font-weight: 700; font-size: 0.55rem; color: var(--tab-text); } 
     .row-content { font-size: 0.95rem; color: #ccc; white-space: pre-wrap; } 
     
@@ -1147,9 +1039,8 @@ function exportLog() {
         const isSystem = (char.displayName && char.displayName.toLowerCase() === 'system');
         if (isSystem) styleClass += ' row-system';
         
-        const resolvedCharColor = (!char.color || char.color.toUpperCase() === '#888888') ? dynamicAccent : char.color;
-        let nameStyle = config.style === 'style-chat' ? `style="color:${resolvedCharColor}"` : "";
-        let lineStyle = (config.style === 'style-chat' || isSystem) ? `style="display:none;"` : `style="background:${resolvedCharColor}"`;
+        let nameStyle = config.style === 'style-chat' ? `style="color:${char.color}"` : "";
+        let lineStyle = (config.style === 'style-chat' || isSystem) ? `style="display:none;"` : `style="background:${char.color}"`;
         if (item.tab.toLowerCase() === 'info') lineStyle = `style="background:${config.color}"`;
         const tabNameDisplay = isSystem ? '' : item.tab;
         const nameDisplay = isSystem ? '' : char.displayName;
@@ -1157,6 +1048,7 @@ function exportLog() {
             .split('\\n').join('<br>')
             .replace(/[｜|]([^｜|《》]+)《([^《》]+)》/g, '<ruby>$1<rt>$2</rt></ruby>')
             .replace(/([^ \n\t｜|《》]+)《([^《》]+)》/g, '<ruby>$1<rt>$2</rt></ruby>');
+
 
         html += `<div class="log-row ${styleClass}" id="log-${i}"><div class="row-header"><div class="row-name" ${nameStyle}><span class="name-line" ${lineStyle}></span>${nameDisplay}</div><div class="row-tab">${tabNameDisplay}</div></div><hr class="info-separator"><div class="row-content">${safeContent}</div></div>`;
     });
