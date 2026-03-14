@@ -24,222 +24,204 @@
   }
 
   .material-symbols-outlined {
-    display: inline-block;
-    width: 1em; height: 1em;
-    overflow: hidden; white-space: nowrap;
-    direction: ltr; vertical-align: middle;
+    display: inline-block; width: 1em; height: 1em;
+    overflow: hidden; white-space: nowrap; direction: ltr; vertical-align: middle;
   }
 
-  body { 
-    font-family: 'Noto Sans JP', sans-serif; 
-    background-color: var(--bg-dark); 
-    color: var(--text-main); 
-    margin: 0; padding: 40px 15px 40px;
-    position: relative;
-    min-height: 100vh;
-    box-sizing: border-box;
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    margin: 0; padding: 40px 15px 60px;
+    position: relative; min-height: 100vh; box-sizing: border-box;
   }
 
-  .container { 
-    max-width: 850px; margin: 0 auto; 
-  }
+  .container { max-width: 850px; margin: 0 auto; }
 
   .back-link {
     display: flex; align-items: center; gap: 8px;
     text-decoration: none; color: var(--text-sub);
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.8rem; font-weight: 700;
-    letter-spacing: 0.1em; transition: 0.3s;
-    margin-bottom: 15px;
-    width: fit-content;
+    font-family: 'Montserrat', sans-serif; font-size: 0.8rem; font-weight: 700;
+    letter-spacing: 0.1em; transition: 0.3s; margin-bottom: 15px; width: fit-content;
   }
   .back-link:hover { color: var(--accent); transform: translateX(-5px); }
 
-  .card { 
-    background: var(--card-bg); 
-    padding: 40px; border-radius: 12px; 
-    border: 1px solid var(--ui-border);
+  .card {
+    background: var(--card-bg); padding: 32px 36px;
+    border-radius: 12px; border: 1px solid var(--ui-border);
   }
 
-  .ui-header { text-align: left; margin-bottom: 25px; border-bottom: 3px solid var(--accent); padding-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end; }
+  .ui-header { margin-bottom: 22px; border-bottom: 3px solid var(--accent); padding-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end; }
   .ui-brand { font-family: 'Montserrat', sans-serif; font-size: 0.7rem; font-weight: 900; color: var(--accent); letter-spacing: 0.4em; display: block; margin-bottom: 2px; }
-  .ui-title { font-family: 'Montserrat', 'Noto Sans JP', sans-serif; font-size: 1.6rem; font-weight: 900; color: #fff; letter-spacing: 0.05em; display: flex; align-items: baseline; gap: 10px; line-height: 1.2; }
-  
+  .ui-title { font-family: 'Montserrat', 'Noto Sans JP', sans-serif; font-size: 1.5rem; font-weight: 900; color: #fff; letter-spacing: 0.05em; line-height: 1.2; }
   .header-left { display: flex; flex-direction: column; }
-  .header-right { display: flex; align-items: center; gap: 15px; padding-bottom: 4px; }
+  .header-right { display: flex; align-items: center; gap: 12px; padding-bottom: 4px; }
 
   .edition-tabs { display: flex; gap: 2px; background: #111; padding: 3px; border-radius: 4px; }
-  .tab-btn { 
-    background: transparent; color: var(--text-sub); border: none; padding: 4px 12px; 
-    border-radius: 3px; font-weight: 900; cursor: pointer; transition: 0.2s; font-family: 'Montserrat', sans-serif; font-size: 0.7rem;
-  }
+  .tab-btn { background: transparent; color: var(--text-sub); border: none; padding: 4px 12px; border-radius: 3px; font-weight: 900; cursor: pointer; transition: 0.2s; font-family: 'Montserrat', sans-serif; font-size: 0.7rem; }
   .tab-btn.active { background: var(--accent); color: #fff; }
 
-  .btn-all { 
-    background: var(--accent); color: #fff; border: none; padding: 10px 28px; 
+  /* ALLボタン — 主アクションとして目立たせる */
+  .btn-all {
+    background: var(--accent); color: #fff; border: none; padding: 10px 24px;
     border-radius: 20px; font-weight: 900; cursor: pointer; transition: 0.2s;
-    font-size: 14px;
-    font-family: 'Montserrat', sans-serif;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    letter-spacing: 0.05em;
+    font-size: 13px; font-family: 'Montserrat', sans-serif;
+    white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    letter-spacing: 0.08em;
   }
-  .btn-all:hover { filter: brightness(1.2); }
+  .btn-all:hover { filter: brightness(1.15); transform: translateY(-1px); }
+  .btn-all:active { transform: translateY(0); filter: brightness(0.95); }
+  .btn-all svg { width: 14px; height: 14px; fill: currentColor; }
 
-  .top-stats { display: flex; gap: 10px; margin-bottom: 30px; }
-  .top-box { flex: 1; background: #111; padding: 15px; text-align: center; border-bottom: 2px solid var(--accent); position: relative; min-height: 60px; display: flex; flex-direction: column; justify-content: center; }
-  .top-label { font-size: 0.7rem; font-weight: 900; color: var(--accent); display: block; margin-bottom: 4px; font-family: 'Montserrat', sans-serif; }
-  .top-val { font-size: 2rem; font-weight: 900; color: #fff; line-height: 1; }
-
-  .main-layout { display: flex; gap: 30px; align-items: stretch; }
-  .stat-column { flex: 1.3; display: flex; flex-direction: column; gap: 6px; } 
-  .calc-column { flex: 1; display: flex; flex-direction: column; gap: 10px; }
-
-  .stat-row { 
-    display: flex; align-items: center; background: rgba(255,255,255,0.03); 
-    padding: 0 15px; gap: 12px; border-radius: 4px; height: 46px;
-    position: relative;
+  /* 初期状態インジケーター */
+  .idle-hint {
+    text-align: center; padding: 28px 0 20px;
+    font-family: 'Montserrat', sans-serif; font-size: 0.72rem;
+    font-weight: 900; letter-spacing: 0.2em; color: var(--text-sub); opacity: 0.25;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
   }
-  .stat-id { font-family: 'Montserrat', sans-serif; font-size: 0.95rem; font-weight: 900; color: #fff; width: 45px; }
-  .stat-dice { font-size: 0.65rem; color: var(--text-sub); font-family: monospace; width: 55px; opacity: 0.4; }
-  .stat-num { font-size: 1.8rem; font-weight: 900; color: #fff; width: 55px; text-align: center; }
+  .idle-arrow { font-size: 1.4rem; opacity: 0.5; animation: bounce 1.6s ease-in-out infinite; }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+
+  /* top-stats: ロール前は薄く */
+  .top-stats { display: flex; gap: 8px; margin-bottom: 26px; }
+  .top-box {
+    flex: 1; background: #181818; padding: 14px 10px; text-align: center;
+    border-bottom: 2px solid #333; position: relative;
+    min-height: 56px; display: flex; flex-direction: column; justify-content: center;
+    transition: border-color 0.3s;
+  }
+  .top-box.active { border-bottom-color: var(--accent); }
+  .top-label { font-size: 0.68rem; font-weight: 900; color: var(--text-sub); display: block; margin-bottom: 3px; font-family: 'Montserrat', sans-serif; }
+  .top-val { font-size: 1.9rem; font-weight: 900; color: var(--text-sub); line-height: 1; transition: color 0.3s; }
+  .top-val.active { color: #fff; }
+
+  /* stat rows */
+  .main-layout { display: flex; gap: 24px; align-items: stretch; }
+  .stat-column { flex: 1.3; display: flex; flex-direction: column; gap: 4px; }
+  .calc-column { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+
+  .stat-row {
+    display: flex; align-items: center; background: rgba(255,255,255,0.03);
+    padding: 0 12px; gap: 10px; border-radius: 4px; height: 46px;
+    position: relative; transition: background 0.15s;
+  }
+  .stat-row:hover { background: rgba(255,255,255,0.05); }
+  .stat-id { font-family: 'Montserrat', sans-serif; font-size: 0.9rem; font-weight: 900; color: #fff; width: 42px; }
+  .stat-dice { font-size: 0.62rem; color: var(--text-sub); font-family: monospace; width: 52px; opacity: 0.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .stat-num { font-size: 1.75rem; font-weight: 900; color: #fff; width: 52px; text-align: center; }
   .is-max { color: var(--stat-max) !important; }
   .is-min { color: var(--stat-min) !important; }
-  
-  .stat-jp-hint { font-size: 0.7rem; color: var(--text-sub); flex: 1; text-align: right; opacity: 0.6; }
-  .stat-jp-hint b { color: #fff; font-family: 'Montserrat', sans-serif; font-size: 0.85rem; }
 
-  .dice-btn { 
+  /* hint列: ロール後のみ表示 */
+  .stat-jp-hint { font-size: 0.68rem; color: var(--text-sub); flex: 1; text-align: right; opacity: 0; transition: opacity 0.3s; }
+  .stat-jp-hint.visible { opacity: 0.7; }
+  .stat-jp-hint b { color: #fff; font-family: 'Montserrat', sans-serif; font-size: 0.82rem; }
+
+  .dice-btn {
     background: transparent; border: 1px solid var(--ui-border); color: var(--text-sub);
-    padding: 5px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: 0.2s; width: 30px; height: 30px;
+    padding: 5px; border-radius: 4px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: 0.2s; width: 28px; height: 28px; flex-shrink: 0;
   }
-  .dice-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(197, 55, 60, 0.1); }
-  .dice-btn svg { width: 16px; height: 16px; fill: currentColor; }
+  .dice-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(197,55,60,0.1); }
+  .dice-btn svg { width: 14px; height: 14px; fill: currentColor; }
 
-  .luk-dice-btn { position: absolute; top: 6px; right: 6px; margin-top: 0; }
+  .luk-dice-btn { position: absolute; top: 6px; right: 6px; margin: 0; }
 
-  .calc-card { 
-    background: #111; padding: 12px 18px; border-radius: 4px; border-left: 4px solid var(--ui-border); 
+  /* calc cards */
+  .calc-card {
+    background: #181818; padding: 12px 16px; border-radius: 6px;
+    border-left: 3px solid var(--ui-border);
     display: flex; flex-direction: column; flex: 1; justify-content: center;
   }
   .calc-card.accent { border-left-color: var(--accent); }
-  
+
   .total-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-  .calc-label { font-size: 0.75rem; font-weight: bold; color: var(--text-sub); display: block; }
-  .calc-val { font-size: 2.2rem; font-weight: 900; color: #fff; line-height: 1; }
-  
-  .calc-card.total-box { flex: 1.2; padding: 15px 20px; } 
-  .calc-card.total-box .calc-val { font-size: 2.8rem; color: #fff; }
+  .calc-label { font-size: 0.72rem; font-weight: bold; color: var(--text-sub); display: block; font-family: 'Montserrat', sans-serif; letter-spacing: 0.05em; }
+  .calc-val { font-size: 2rem; font-weight: 900; color: #fff; line-height: 1; }
 
-  .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 2; }
+  .calc-card.total-box { flex: 1.2; padding: 14px 18px; }
+  .calc-card.total-box .calc-val { font-size: 2.6rem; }
+
+  .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex: 2; }
   .calc-val-center { text-align: center; width: 100%; display: block; }
-  
-  .calc-card.compact-grid { flex: 1; padding: 8px 18px; min-height: 40px; }
-  .calc-card.compact-grid .calc-val { font-size: 1.2rem; }
 
-  #trait-dice-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 90px;
-  }
-  .trait-main-display {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 34px;
-  }
+  .calc-card.compact-grid { flex: 1; padding: 8px 16px; min-height: 40px; }
+  .calc-card.compact-grid .calc-val { font-size: 1.15rem; }
 
+  #trait-dice-card { display: flex; flex-direction: column; justify-content: space-between; min-height: 90px; }
+  .trait-main-display { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 34px; }
   .trait-dice-area { display: flex; gap: 6px; align-items: center; margin-top: 5px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); justify-content: space-between; }
-  .trait-btn-sub { 
-    background: #222; border: 1px solid var(--ui-border); color: #fff; 
+  .trait-btn-sub {
+    background: #2a2a2a; border: 1px solid var(--ui-border); color: #fff;
     font-size: 0.65rem; font-weight: 900; padding: 4px 10px; border-radius: 4px; cursor: pointer;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Montserrat', sans-serif; transition: 0.2s;
   }
   .trait-btn-sub:hover { border-color: var(--accent); color: var(--accent); }
 
   .card-content-wrap { flex: 1; display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
   .card-footer { height: 26px; display: flex; align-items: center; justify-content: center; margin-top: 8px; }
-  .hint-text { font-size: 0.7rem; color: var(--text-sub); opacity: 0.4; font-family: 'Montserrat', sans-serif; letter-spacing: 0.1em; }
+  .hint-text { font-size: 0.68rem; color: var(--text-sub); opacity: 0.4; font-family: 'Montserrat', sans-serif; letter-spacing: 0.1em; }
 
-  select { 
-    background: #000; color: #fff; border: 1px solid var(--ui-border); 
-    padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; outline: none; width: 100%; height: 26px;
+  select {
+    background: #111; color: #fff; border: 1px solid var(--ui-border);
+    padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; outline: none; width: 100%; height: 26px;
+    cursor: pointer;
   }
+  select:focus { border-color: var(--accent); }
 
-  .edu-check-card { cursor: pointer; transition: 0.2s; border-left-color: #666; flex: 1; }
-  .edu-check-card:hover { background: #1a1a1a; border-left-color: var(--accent); }
-  .edu-check-btn-label { font-size: 0.65rem; color: var(--accent); font-weight: 900; letter-spacing: 0.1em; opacity: 0.8; }
-
-  .footer-ctrl { margin-top: 30px; border-top: 1px solid var(--ui-border); padding-top: 30px; }
-  .btn-ui { 
-    width: 100%; background: var(--card-bg); border: 1px solid var(--ui-border); color: #fff;
-    padding: 16px; border-radius: 4px; font-size: 0.95rem; font-weight: bold; cursor: pointer; transition: 0.2s;
+  /* EDU上達 */
+  .edu-check-card {
+    cursor: pointer; transition: 0.2s; border-left-color: #555; flex: 1; position: relative; overflow: hidden;
   }
-  .btn-ui:hover { border-color: var(--accent); color: var(--accent); }
+  .edu-check-card::after {
+    content: 'CLICK TO ROLL';
+    position: absolute; bottom: 10px; right: 14px;
+    font-family: 'Montserrat', sans-serif; font-size: 0.6rem; font-weight: 900;
+    letter-spacing: 0.12em; color: var(--accent); opacity: 0.5;
+  }
+  .edu-check-card:hover { background: #1e1e1e; border-left-color: var(--accent); }
+  .edu-check-card:hover::after { opacity: 1; }
+
+  /* フッター */
+  .footer-ctrl { margin-top: 24px; border-top: 1px solid var(--ui-border); padding-top: 20px; display: flex; justify-content: flex-end; }
+  .btn-iachara {
+    background: transparent; border: 1px solid var(--ui-border);
+    color: var(--text-sub); padding: 9px 20px;
+    border-radius: 20px; font-size: 0.8rem; font-weight: bold; cursor: pointer; transition: 0.2s;
+    font-family: 'Montserrat', 'Noto Sans JP', sans-serif; letter-spacing: 0.04em;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-iachara:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-iachara svg { width: 13px; height: 13px; fill: currentColor; opacity: 0.6; }
 
   .fixed-footer { position: fixed; bottom: 10px; right: 15px; font-family: sans-serif; font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: 0.1em; font-weight: bold; pointer-events: none; z-index: 9999; }
 
-  /* カスタム設定パネル用の追加CSS */
-  .custom-input-group { display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.03); padding: 5px 10px; border-radius: 4px; }
-  .custom-label { font-family: 'Montserrat', sans-serif; font-size: 0.85rem; font-weight: 900; color: #fff; width: 40px; }
-  .custom-inp { background: #000; color: #fff; border: 1px solid var(--ui-border); border-radius: 3px; width: 35px; text-align: center; font-size: 0.8rem; height: 22px; outline: none; }
-  .custom-inp:focus { border-color: var(--accent); }
-
   @media screen and (max-width: 750px) {
-    body { padding: 20px 10px; }
-    .card { padding: 20px; }
-    
-    .ui-header { 
-      flex-direction: column; 
-      align-items: flex-start; 
-      gap: 15px; 
-      border-bottom-width: 2px;
-    }
+    body { padding: 20px 10px 60px; }
+    .card { padding: 20px 16px; }
+    .ui-header { flex-direction: column; align-items: flex-start; gap: 12px; border-bottom-width: 2px; }
     .header-left { width: 100%; }
-    .header-right { 
-      width: 100%; 
-      justify-content: space-between; 
-      align-items: center;
-      padding-bottom: 0;
-    }
-    
-    .btn-all { 
-      padding: 8px 16px; 
-      font-size: 12px;
-      border-radius: 15px;
-      min-width: 60px;
-    }
-
+    .header-right { width: 100%; justify-content: space-between; align-items: center; padding-bottom: 0; }
+    .btn-all { padding: 8px 18px; font-size: 12px; }
     .top-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
     .top-box { padding: 10px; }
-    .top-val { font-size: 1.6rem; }
-
-    .main-layout { flex-direction: column; gap: 20px; }
-    
-    .stat-row { 
-      height: auto; padding: 10px 15px; flex-wrap: wrap; 
-      justify-content: flex-start; align-items: center;
-    }
+    .top-val { font-size: 1.5rem; }
+    .main-layout { flex-direction: column; gap: 16px; }
+    .stat-row { height: auto; padding: 10px 12px; flex-wrap: wrap; }
     .stat-id { width: 40px; font-size: 0.85rem; }
     .stat-dice { width: 50px; }
-    .stat-num { width: 45px; font-size: 1.5rem; text-align: left; }
-    .stat-jp-hint { 
-      width: 100%; text-align: left; flex: none; order: 10;
-      margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.05);
-    }
+    .stat-num { width: 44px; font-size: 1.5rem; text-align: left; }
+    .stat-jp-hint { width: 100%; text-align: left; flex: none; order: 10; margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.05); }
     .dice-btn { position: absolute; right: 10px; top: 10px; }
-
-    .calc-column { gap: 10px; }
     .calc-grid { grid-template-columns: 1fr; }
-    .calc-card { min-height: 80px; }
+    .calc-card { min-height: 70px; }
     .calc-card.compact-grid { min-height: 50px; }
     .calc-val { font-size: 1.8rem; }
-    .calc-card.total-box .calc-val { font-size: 2.2rem; }
+    .calc-card.total-box .calc-val { font-size: 2rem; }
+    .footer-ctrl { justify-content: stretch; }
+    .btn-iachara { width: 100%; justify-content: center; }
   }
 </style>
 </head>
@@ -262,31 +244,32 @@
           <button id="tab-7th" class="tab-btn active" onclick="switchEdition(7)">7th</button>
           <button id="tab-6th" class="tab-btn" onclick="switchEdition(6)">6th</button>
         </div>
-        <button id="custom-toggle" class="tab-btn" onclick="toggleCustom()" style="margin-right: 5px;">CUSTOM OFF</button>
-        <button class="btn-all" onclick="rollAll()">ALL</button>
-      </div>
-    </div>
-
-    <div id="custom-panel" style="display: none; background: #111; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--ui-border);">
-      <div style="font-size: 0.8rem; font-weight: bold; color: var(--accent); margin-bottom: 10px; font-family: 'Montserrat', sans-serif;">CUSTOM DICE SETTINGS</div>
-      <div id="custom-settings-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
-        </div>
-    </div>
-
-    <div class="top-stats">
-      <div class="top-box"><span class="top-label">HP</span><span class="top-val" id="hp-val">0</span></div>
-      <div class="top-box"><span class="top-label">MP</span><span class="top-val" id="mp-val">0</span></div>
-      <div class="top-box"><span class="top-label">SAN</span><span class="top-val" id="san-val">0</span></div>
-      <div class="top-box">
-        <span class="top-label">幸運</span>
-        <span class="top-val" id="luk-val">0</span>
-        <button class="dice-btn luk-dice-btn" id="luk-reroll" onclick="reroll('LUK')" style="display:none;">
-          <svg viewBox="0 0 24 24"><path d="M19,3H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V5C21,3.9,20.1,3,19,3z M7,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,9,7,9z M7,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,19,7,19z M12,14c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S13.1,14,12,14z M17,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,9,17,19z M17,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,19,17,19z"/></svg>
+        <button class="btn-all" onclick="rollAll()">
+          <svg viewBox="0 0 24 24"><path d="M19,3H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V5C21,3.9,20.1,3,19,3z M7,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,9,7,9z M7,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,19,7,19z M12,14c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S13.1,14,12,14z M17,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,9,17,9z M17,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,19,17,19z"/></svg>
+          ALL ROLL
         </button>
       </div>
     </div>
 
-    <div class="main-layout">
+    <div class="top-stats">
+      <div class="top-box" id="top-hp"><span class="top-label">HP</span><span class="top-val" id="hp-val">—</span></div>
+      <div class="top-box" id="top-mp"><span class="top-label">MP</span><span class="top-val" id="mp-val">—</span></div>
+      <div class="top-box" id="top-san"><span class="top-label">SAN</span><span class="top-val" id="san-val">—</span></div>
+      <div class="top-box" id="top-luk">
+        <span class="top-label">幸運</span>
+        <span class="top-val" id="luk-val">—</span>
+        <button class="dice-btn luk-dice-btn" id="luk-reroll" onclick="reroll('LUK')" style="display:none;">
+          <svg viewBox="0 0 24 24"><path d="M19,3H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V5C21,3.9,20.1,3,19,3z M7,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,9,7,9z M7,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,19,7,19z M12,14c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S13.1,14,12,14z M17,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,9,17,9z M17,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,19,17,19z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="idle-hint" id="idleHint">
+      <span>START TO ALL ROLL</span>
+      <span class="idle-arrow">↑</span>
+    </div>
+
+    <div class="main-layout" id="mainLayout" style="display:none;">
       <div class="stat-column" id="stat-list"></div>
       <div class="calc-column">
         <div class="calc-card accent total-box">
@@ -337,7 +320,7 @@
             <div class="total-row">
               <span class="calc-label">特徴表</span>
               <button class="dice-btn" onclick="rollTraitList()">
-                <svg viewBox="0 0 24 24"><path d="M19,3H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V5C21,3.9,20.1,3,19,3z M7,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,9,7,9z M7,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,19,7,19z M12,14c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S13.1,14,12,14z M17,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,9,17,19z M17,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,19,17,19z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M19,3H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V5C21,3.9,20.1,3,19,3z M7,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,9,7,9z M7,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,19,7,19z M12,14c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S13.1,14,12,14z M17,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,9,17,9z M17,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,19,17,19z"/></svg>
               </button>
             </div>
             <div class="trait-main-display">
@@ -355,15 +338,15 @@
             <span class="calc-label">EDU上達</span>
             <span class="calc-val" id="edu-display-val" style="font-size:1.4rem; color:var(--text-sub);">未実施</span>
           </div>
-          <div class="card-footer" style="height: auto; margin-top: 5px; justify-content: flex-start;">
-            <span class="edu-check-btn-label">CLICK TO ROLL</span>
-          </div>
         </div>
       </div>
     </div>
 
     <div class="footer-ctrl">
-      <button class="btn-ui" onclick="outputToIachara()">いあきゃらでキャラ作成</button>
+      <button class="btn-iachara" onclick="outputToIachara()">
+        <svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7h-2v7zM14 3v2h3.59L7.76 14.83l1.41 1.41L19 5.41V9h2V3h-7z"/></svg>
+        いあきゃらでキャラ作成
+      </button>
     </div>
   </div>
 </div>
@@ -397,49 +380,6 @@
     { id: "EDU", d: 3, f: 6, a: 3, min: 6, max: 21 }
   ];
 
-  /* カスタム設定用の変数と関数 */
-  let isCustomDice = false;
-  let customConfig7th = JSON.parse(JSON.stringify(config7th));
-  let customConfig6th = JSON.parse(JSON.stringify(config6th));
-
-  function toggleCustom() {
-    isCustomDice = !isCustomDice;
-    const btn = document.getElementById('custom-toggle');
-    btn.innerText = isCustomDice ? "CUSTOM ON" : "CUSTOM OFF";
-    btn.classList.toggle('active', isCustomDice);
-    document.getElementById('custom-panel').style.display = isCustomDice ? "block" : "none";
-    if (isCustomDice) renderCustomPanel();
-  }
-
-  function renderCustomPanel() {
-    const config = currentEdition === 7 ? customConfig7th : customConfig6th;
-    let html = "";
-    config.forEach(s => {
-      html += `
-        <div class="custom-input-group">
-          <span class="custom-label">${s.id}</span>
-          <input type="number" class="custom-inp" value="${s.d}" onchange="updateCustom('${s.id}', 'd', this.value)" min="1">
-          <span style="color:var(--text-sub); font-size:0.8rem;">D</span>
-          <input type="number" class="custom-inp" value="${s.f}" onchange="updateCustom('${s.id}', 'f', this.value)" min="1">
-          <span style="color:var(--text-sub); font-size:0.8rem;">+</span>
-          <input type="number" class="custom-inp" value="${s.a}" onchange="updateCustom('${s.id}', 'a', this.value)" min="0">
-        </div>
-      `;
-    });
-    document.getElementById('custom-settings-grid').innerHTML = html;
-  }
-
-  function updateCustom(id, key, val) {
-    const config = currentEdition === 7 ? customConfig7th : customConfig6th;
-    const stat = config.find(x => x.id === id);
-    if (stat) {
-      stat[key] = parseInt(val) || 0;
-      stat.min = stat.d * 1 + stat.a;
-      stat.max = stat.d * stat.f + stat.a;
-    }
-  }
-  /* ---------------------- */
-
   const traitList = [];
   for(let i=1; i<=7; i++) {
     for(let j=1; j<=10; j++) {
@@ -447,7 +387,7 @@
     }
   }
 
-  const diceIcon = `<svg viewBox="0 0 24 24"><path d="M19,3H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V5C21,3.9,20.1,3,19,3z M7,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,9,7,9z M7,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,19,7,19z M12,14c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S13.1,14,12,14z M17,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,9,17,19z M17,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,19,17,19z"/></svg>`;
+  const diceIcon = `<svg viewBox="0 0 24 24"><path d="M19,3H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V5C21,3.9,20.1,3,19,3z M7,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,9,7,9z M7,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S8.1,19,7,19z M12,14c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S13.1,14,12,14z M17,9c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,9,17,9z M17,19c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S18.1,19,17,19z"/></svg>`;
 
   function switchEdition(ed) {
     currentEdition = ed;
@@ -489,8 +429,6 @@
         <option value="EDU_SIZ">EDU×10 + SIZ×10</option>
         <option value="EDU_INT">EDU×10 + INT×10</option>`;
     }
-    
-    if (isCustomDice) renderCustomPanel();
     updateDisplay();
   }
 
@@ -509,7 +447,7 @@
   }
 
   function rollAll() {
-    const config = isCustomDice ? (currentEdition === 7 ? customConfig7th : customConfig6th) : ((currentEdition === 7) ? config7th : config6th);
+    const config = (currentEdition === 7) ? config7th : config6th;
     config.forEach(s => {
       const r = Array.from({length: s.d}, () => Math.floor(Math.random() * s.f) + 1);
       dmsg[s.id] = r.join('+') + (s.a ? `+${s.a}` : '');
@@ -520,12 +458,19 @@
     document.getElementById('edu-display-val').style.color = "var(--text-sub)";
     document.getElementById('trait-val').innerText = "--";
     document.getElementById('extra-trait-dice').style.display = 'none';
+    // 初回ロールでレイアウト表示
+    document.getElementById('idleHint').style.display = 'none';
+    document.getElementById('mainLayout').style.display = 'flex';
+    ['top-hp','top-mp','top-san','top-luk'].forEach(id => {
+      document.getElementById(id).classList.add('active');
+    });
+    document.querySelectorAll('.top-val').forEach(el => el.classList.add('active'));
     updateDisplay();
   }
 
   function reroll(id) {
     if(sumVals.STR === 0) return;
-    const config = isCustomDice ? (currentEdition === 7 ? customConfig7th : customConfig6th) : ((currentEdition === 7) ? config7th : config6th);
+    const config = (currentEdition === 7) ? config7th : config6th;
     const s = (id === 'LUK') ? { d: 3, f: 6, a: 0 } : config.find(x => x.id === id);
     const r = Array.from({length: s.d}, () => Math.floor(Math.random() * s.f) + 1);
     if (id === 'LUK') {
@@ -573,9 +518,10 @@
   }
 
   function updateDisplay() {
-    const config = isCustomDice ? (currentEdition === 7 ? customConfig7th : customConfig6th) : ((currentEdition === 7) ? config7th : config6th);
+    const config = (currentEdition === 7) ? config7th : config6th;
     let html = "";
     let total = 0;
+    const hasRolled = sumVals.STR !== 0;
     config.forEach(s => {
       const val = (currentEdition === 7) ? Math.floor(sumVals[s.id] * 5) : sumVals[s.id];
       total += val;
@@ -584,19 +530,19 @@
       if (currentEdition === 7) {
         let eduVal = Math.floor(sumVals.EDU * 5);
         let hintVal = (s.id === "EDU") ? (val * 4) : (eduVal * 2 + val * 2);
-        hintHtml = `${(s.id === "EDU") ? '基本' : '候補'}: <b>${hintVal}</b>`;
+        hintHtml = `${(s.id === "EDU") ? '基本' : '職業P'}: <b>${hintVal}</b>`;
       } else {
         let eduVal = sumVals.EDU;
         let statVal = sumVals[s.id];
         let hintVal = (s.id === "EDU") ? (statVal * 20) : (eduVal * 10 + statVal * 10);
-        hintHtml = `${(s.id === "EDU") ? '基本' : '候補'}: <b>${hintVal}</b>`;
+        hintHtml = `${(s.id === "EDU") ? '基本' : '職業P'}: <b>${hintVal}</b>`;
       }
       html += `
         <div class="stat-row">
           <span class="stat-id">${s.id}</span>
           <span class="stat-dice">${dmsg[s.id] || ""}</span>
           <span class="stat-num ${colorClass}">${val}</span>
-          <span class="stat-jp-hint">${hintHtml}</span>
+          <span class="stat-jp-hint${hasRolled ? ' visible' : ''}">${hintHtml}</span>
           <button class="dice-btn" onclick="reroll('${s.id}')">${diceIcon}</button>
         </div>`;
     });
@@ -629,7 +575,7 @@
       document.getElementById('int-p').innerText = curINT * 2;
     } else {
       let jobVal = 0;
-      if (sel === 'EDU_20') { jobVal = curEDU * 20; } 
+      if (sel === 'EDU_20') { jobVal = curEDU * 20; }
       else {
         const statKey = sel.split('_')[1];
         const secondStat = sumVals[statKey];
@@ -641,10 +587,10 @@
     let db = "0", bld = 0;
     if (currentEdition === 7) {
       const ds7 = curSTR + curSIZ;
-      if (ds7 <= 64) { db = "-2"; bld = "-2"; } 
-      else if (ds7 <= 84) { db = "-1"; bld = "-1"; } 
-      else if (ds7 <= 124) { db = "0"; bld = "0"; } 
-      else if (ds7 <= 164) { db = "+1D4"; bld = "1"; } 
+      if (ds7 <= 64) { db = "-2"; bld = "-2"; }
+      else if (ds7 <= 84) { db = "-1"; bld = "-1"; }
+      else if (ds7 <= 124) { db = "0"; bld = "0"; }
+      else if (ds7 <= 164) { db = "+1D4"; bld = "1"; }
       else { db = "+1D6"; bld = "2"; }
       document.getElementById('build-val').innerText = bld;
     } else {
