@@ -39,7 +39,9 @@
     gap:20px;
     align-items:start;
   }
-  .left-panel { position:sticky; top:20px; }
+  .left-panel { position:sticky; top:20px; max-height:calc(100vh - 40px); overflow-y:auto; scrollbar-width:thin; scrollbar-color:#444 transparent; }
+  .left-panel::-webkit-scrollbar { width:4px; }
+  .left-panel::-webkit-scrollbar-thumb { background:#444; border-radius:2px; }
   .right-panel { min-width:0; }
   .back-link {
     position:absolute; top:30px; left:20px;
@@ -49,56 +51,102 @@
     letter-spacing:0.1em; transition:0.3s; z-index:1000;
   }
   .back-link:hover { color:var(--accent); transform:translateX(-5px); }
-  .card { background:var(--card-bg); padding:28px; border-radius:12px; border:1px solid var(--ui-border); margin-bottom:16px; }
-  .ui-header { margin-bottom:20px; border-bottom:3px solid var(--accent); padding-bottom:12px; display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:10px; }
+  .card { background:var(--card-bg); padding:24px 28px; border-radius:12px; border:1px solid var(--ui-border); margin-bottom:12px; }
+  .ui-header { margin-bottom:16px; border-bottom:3px solid var(--accent); padding-bottom:12px; display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:10px; }
   .ui-brand { font-family:'Montserrat',sans-serif; font-size:0.7rem; font-weight:900; color:var(--accent); letter-spacing:0.4em; display:block; margin-bottom:2px; }
   .ui-title { font-family:'Montserrat','Noto Sans JP',sans-serif; font-size:1.3rem; font-weight:900; color:#fff; letter-spacing:0.05em; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
   .ui-title-sub { color:var(--text-sub); font-size:0.8rem; font-weight:400; letter-spacing:0.1em; }
   .edition-tabs { display:flex; gap:2px; background:#111; padding:3px; border-radius:4px; }
   .tab-btn { background:transparent; color:var(--text-sub); border:none; padding:4px 12px; border-radius:3px; font-weight:900; cursor:pointer; transition:0.2s; font-family:'Montserrat',sans-serif; font-size:0.7rem; }
   .tab-btn.active { background:var(--accent); color:#fff; }
-  .privacy-note { font-size:0.75em; color:var(--text-sub); margin-bottom:20px; }
-  .guide-container { background:#313338; border-radius:8px; margin-bottom:20px; overflow:hidden; }
-  .guide-header { padding:10px 20px; background:#383a40; cursor:pointer; font-size:0.9em; font-weight:bold; display:flex; justify-content:space-between; align-items:center; }
-  .guide-content { padding:20px; font-size:0.85em; display:none; }
-  .file-input-area { border:2px dashed #4f545c; padding:18px 16px; border-radius:8px; background:#313338; cursor:pointer; margin-bottom:16px; text-align:center; }
+  .privacy-note { font-size:0.75em; color:var(--text-sub); margin-bottom:16px; }
+
+  /* ステップインジケーター */
+  .step-indicator { display:flex; align-items:center; gap:0; margin-bottom:16px; }
+  .step-dot { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Montserrat',sans-serif; font-size:0.6rem; font-weight:900; flex-shrink:0; transition:0.3s; }
+  .step-dot.done  { background:var(--accent); color:#fff; }
+  .step-dot.active{ background:#fff; color:#1a1a1a; }
+  .step-dot.idle  { background:#333; color:var(--text-sub); border:1px solid #444; }
+  .step-line { flex:1; height:2px; background:#333; transition:0.3s; }
+  .step-line.done { background:var(--accent); }
+
+  .guide-container { background:#2a2a2a; border-radius:8px; margin-bottom:16px; overflow:hidden; border:1px solid #333; }
+  .guide-header { padding:10px 16px; background:#2e2e2e; cursor:pointer; font-size:0.85em; font-weight:bold; display:flex; justify-content:space-between; align-items:center; user-select:none; }
+  .guide-header:hover { background:#333; }
+  .guide-content { padding:16px 20px; font-size:0.82em; display:none; }
+  .guide-content li { line-height:2; }
+
+  .file-input-area { border:2px dashed #4f545c; padding:18px 16px; border-radius:8px; background:#2a2a2a; cursor:pointer; margin-bottom:12px; text-align:center; transition:border-color 0.2s, background 0.2s; }
+  .file-input-area:hover, .file-input-area.dragover { border-color:var(--accent); background:#2e2020; }
   input[type="file"] { display:none; }
   .file-label { color:var(--accent); text-decoration:underline; font-weight:bold; }
-  .file-info-box { font-size:0.85em; color:var(--accent); margin:16px auto 0; background:rgba(197,55,60,0.1); padding:12px; border-radius:6px; border-left:4px solid var(--accent); max-width:500px; text-align:left; display:none; }
+  .file-info-box { font-size:0.85em; color:var(--accent); margin:12px auto 0; background:rgba(197,55,60,0.1); padding:10px 12px; border-radius:6px; border-left:3px solid var(--accent); text-align:left; display:none; }
   .btn-group { display:flex; justify-content:center; gap:10px; margin-top:10px; flex-wrap:wrap; }
   .btn { padding:10px 28px; font-size:14px; cursor:pointer; background-color:var(--accent); color:#fff; border:none; border-radius:25px; font-weight:bold; transition:0.2s; font-family:'Montserrat',sans-serif; letter-spacing:0.05em; }
-  .btn:hover { filter:brightness(1.2); }
-  .btn:disabled { opacity:0.4; cursor:default; filter:none; }
+  .btn:hover { filter:brightness(1.15); transform:translateY(-1px); }
+  .btn:active { transform:translateY(0); filter:brightness(0.95); }
+  .btn:disabled { opacity:0.4; cursor:default; filter:none; transform:none; }
   .btn-ghost { padding:9px 20px; font-size:13px; cursor:pointer; background:transparent; color:var(--text-sub); border:1px solid var(--ui-border); border-radius:25px; font-weight:bold; transition:0.2s; font-family:'Montserrat',sans-serif; }
   .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
-  #settingsSection { margin-top:0; }
-  .settings-grid { display:grid; grid-template-columns:1fr; gap:12px; }
-  .settings-box { background:#111; border-radius:8px; padding:16px 20px; }
-  .settings-box-title { font-family:'Montserrat',sans-serif; font-size:0.7rem; font-weight:900; color:var(--accent); letter-spacing:0.3em; margin-bottom:12px; }
-  .tag-list { display:flex; flex-wrap:wrap; gap:8px; }
-  .tag-item { background:#1e1f22; padding:6px 14px; border-radius:20px; font-size:0.8em; cursor:pointer; transition:0.2s; color:var(--text-sub); border:1px solid transparent; user-select:none; }
+  .btn-ghost:disabled { opacity:0.4; cursor:default; }
+
+  /* フィルター設定（抽出後に表示） */
+  #settingsSection { margin-top:0; display:none; }
+  .settings-grid { display:grid; grid-template-columns:1fr; gap:10px; }
+  .settings-box { background:#181818; border-radius:8px; padding:14px 16px; }
+  .settings-box-title { font-family:'Montserrat',sans-serif; font-size:0.68rem; font-weight:900; color:var(--accent); letter-spacing:0.3em; margin-bottom:10px; }
+  .tag-list { display:flex; flex-wrap:wrap; gap:6px; }
+  .tag-item { background:#252525; padding:5px 12px; border-radius:20px; font-size:0.78em; cursor:pointer; transition:0.15s; color:var(--text-sub); border:1px solid transparent; user-select:none; }
+  .tag-item:hover { background:#2e2e2e; }
   .tag-item.on { color:#fff; border-color:#6e7278; background:#383a40; }
-  .tag-item.on.sp  { border-color:var(--col-special);  color:var(--col-special); }
-  .tag-item.on.cr  { border-color:var(--col-critical); color:var(--col-critical); }
-  .tag-item.on.sc  { border-color:var(--col-success);  color:var(--col-success); }
+  .tag-item.on.sp  { border-color:var(--col-special);  color:var(--col-special);  background:rgba(255,215,64,0.08); }
+  .tag-item.on.cr  { border-color:var(--col-critical); color:var(--col-critical); background:rgba(255,152,0,0.08); }
+  .tag-item.on.sc  { border-color:var(--col-success);  color:var(--col-success);  background:rgba(0,230,118,0.08); }
   .tag-item.on.fa  { border-color:var(--ui-border);    color:var(--text-main); }
-  .tag-item.on.fu  { border-color:var(--col-fumble);   color:var(--col-fumble); }
-  .tag-item.on.ini { border-color:var(--col-initial);  color:var(--col-initial); }
+  .tag-item.on.fu  { border-color:var(--col-fumble);   color:var(--col-fumble);   background:rgba(255,82,82,0.08); }
+  .tag-item.on.ini { border-color:var(--col-initial);  color:var(--col-initial);  background:rgba(0,188,212,0.08); }
   .select-links { display:flex; gap:8px; margin-bottom:8px; }
-  .select-link { font-size:0.75rem; color:var(--text-sub); cursor:pointer; text-decoration:underline; }
+  .select-link { font-size:0.72rem; color:var(--text-sub); cursor:pointer; text-decoration:underline; transition:color 0.15s; }
   .select-link:hover { color:var(--accent); }
-  #resultSection { display:block; margin-top:0; }
+
+  /* ステータスメッセージ */
+  #status { margin-top:10px; font-size:0.82em; color:var(--text-sub); text-align:center; min-height:1.3em; }
+  #status.warn { color:#ff9800; }
+  #status.ok   { color:var(--col-success); }
+
+  /* 成長チェックエリア */
+  #resultSection { display:none; margin-top:0; }
   .section-label { font-family:'Montserrat',sans-serif; font-size:0.72rem; font-weight:900; color:var(--accent); letter-spacing:0.3em; margin-bottom:14px; }
-  .char-block { background:#111; border-radius:8px; margin-bottom:0; border:1px solid var(--ui-border); overflow:hidden; }
-  #charBlocks { display:flex; flex-direction:column; gap:10px; }
-  .char-header { padding:12px 20px; background:#1a1a1a; display:flex; align-items:center; gap:12px; cursor:pointer; user-select:none; }
-  .char-name { font-weight:700; font-size:1rem; color:#fff; flex:1; }
-  .char-count { font-family:'Montserrat',sans-serif; font-size:0.7rem; color:var(--text-sub); }
-  .char-toggle { color:var(--text-sub); font-size:0.8rem; }
-  .char-body { padding:10px 14px 14px; }
+
+  /* 進捗バー */
+  .progress-bar-wrap { background:#181818; border-radius:4px; height:6px; margin-bottom:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; background:var(--accent); border-radius:4px; transition:width 0.4s ease; }
+  .progress-label { font-family:'Montserrat',sans-serif; font-size:0.68rem; color:var(--text-sub); margin-bottom:6px; display:flex; justify-content:space-between; }
+  .progress-label span { color:var(--text-main); font-weight:700; }
+
+  /* 成長サマリー */
+  #growthSummary { display:none; background:#181818; border-radius:8px; padding:14px 16px; margin-bottom:14px; border-left:3px solid var(--col-success); }
+  .summary-row { display:flex; gap:24px; flex-wrap:wrap; align-items:center; }
+  .summary-item { font-size:0.82em; color:var(--text-sub); }
+  .summary-item strong { color:#fff; font-family:'Montserrat',sans-serif; font-size:1.1em; }
+  .summary-item.grew strong { color:var(--col-success); font-size:1.3em; }
+
+  .char-block { background:#181818; border-radius:8px; margin-bottom:0; border:1px solid var(--ui-border); overflow:hidden; }
+  #charBlocks { display:flex; flex-direction:column; gap:8px; }
+  .char-header { padding:11px 18px; background:#1e1e1e; display:flex; align-items:center; gap:12px; cursor:pointer; user-select:none; transition:background 0.15s; }
+  .char-header:hover { background:#252525; }
+  .char-name { font-weight:700; font-size:0.95rem; color:#fff; flex:1; }
+  .char-meta { display:flex; align-items:center; gap:10px; }
+  .char-count { font-family:'Montserrat',sans-serif; font-size:0.68rem; color:var(--text-sub); }
+  .char-progress-mini { font-family:'Montserrat',sans-serif; font-size:0.68rem; padding:2px 8px; border-radius:10px; background:#111; color:var(--text-sub); }
+  .char-progress-mini.has-grew { color:var(--col-success); background:rgba(0,230,118,0.1); }
+  .char-toggle { color:var(--text-sub); font-size:0.75rem; transition:transform 0.2s; }
+  .char-toggle.open { transform:rotate(0deg); }
+  .char-toggle.closed { transform:rotate(-90deg); }
+  .char-body { padding:8px 12px 12px; }
   .skill-row {
     display:grid;
-    grid-template-columns: 20px 1fr 72px 58px 28px 84px;
+    grid-template-columns: 20px 1fr 72px 58px 28px 1fr;
     gap:8px; align-items:center;
     padding:7px 6px; border-radius:4px; font-size:0.84rem;
     border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.15s;
@@ -106,11 +154,13 @@
   .skill-row:last-child { border-bottom:none; }
   .skill-row:hover { background:rgba(255,255,255,0.03); }
   .skill-row.excluded { opacity:0.3; }
-  .skill-row-header { font-family:'Montserrat',sans-serif; font-size:0.63rem; color:var(--text-sub); letter-spacing:0.05em; border-bottom:1px solid var(--ui-border) !important; padding-bottom:8px !important; }
+  .skill-row.rolled-grew { background:rgba(0,230,118,0.04); }
+  .skill-row-header { font-family:'Montserrat',sans-serif; font-size:0.62rem; color:var(--text-sub); letter-spacing:0.05em; border-bottom:1px solid var(--ui-border) !important; padding-bottom:8px !important; }
   .chk-box { width:16px; height:16px; border-radius:3px; border:2px solid var(--ui-border); cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:0.15s; }
   .chk-box.on { background:var(--accent); border-color:var(--accent); }
   .chk-box.on::after { content:'✓'; color:#fff; font-size:0.65rem; font-weight:bold; }
-  .skill-name-cell { font-weight:700; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:default; }
+  .skill-name-cell { font-weight:700; color:#fff; overflow:hidden; cursor:default; }
+  .skill-name-text { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .badge { display:inline-block; padding:2px 7px; border-radius:3px; font-size:0.68rem; font-weight:900; font-family:'Montserrat',sans-serif; white-space:nowrap; }
   .badge-sp  { background:rgba(255,215,64,0.15);  color:var(--col-special); }
   .badge-cr  { background:rgba(255,152,0,0.15);   color:var(--col-critical); }
@@ -118,30 +168,35 @@
   .badge-fa  { background:rgba(181,186,193,0.1);  color:var(--text-sub); }
   .badge-fu  { background:rgba(255,82,82,0.15);   color:var(--col-fumble); }
   .badge-ini { background:rgba(0,188,212,0.15);   color:var(--col-initial); }
-  .dice-expr { font-family:monospace; font-size:0.75rem; color:var(--text-sub); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .skill-roll-info { font-size:0.68rem; color:var(--text-sub); font-family:monospace; margin-top:1px; opacity:0.7; }
-  .val-input { width:100%; background:#1a1a1a; border:1px solid var(--ui-border); color:#fff; border-radius:4px; padding:3px 6px; font-size:0.82rem; font-weight:700; text-align:center; outline:none; font-family:'Montserrat',sans-serif; box-sizing:border-box; }
-  .val-input:focus { border-color:var(--accent); }
+  .skill-roll-info { font-size:0.65rem; color:var(--text-sub); font-family:monospace; margin-top:1px; opacity:0.65; }
+  .val-input { width:100%; background:#111; border:1px solid var(--ui-border); color:#fff; border-radius:4px; padding:3px 6px; font-size:0.82rem; font-weight:700; text-align:center; outline:none; font-family:'Montserrat',sans-serif; box-sizing:border-box; transition:border-color 0.15s; }
+  .val-input:focus { border-color:var(--accent); background:#1a1a1a; }
   .val-input:disabled { opacity:0.5; }
+  .val-input.error { border-color:var(--col-fumble) !important; }
   .roll-btn { background:transparent; border:1px solid var(--ui-border); color:var(--text-sub); width:26px; height:26px; border-radius:4px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s; padding:0; flex-shrink:0; }
-  .roll-btn:hover:not(:disabled) { border-color:var(--accent); color:var(--accent); }
+  .roll-btn:hover:not(:disabled) { border-color:var(--accent); color:var(--accent); background:rgba(197,55,60,0.1); }
   .roll-btn:disabled { opacity:0.25; cursor:default; }
   .roll-btn svg { width:13px; height:13px; fill:currentColor; }
-  .roll-result { font-family:'Montserrat',sans-serif; font-size:0.76rem; font-weight:900; text-align:right; white-space:nowrap; }
+  .roll-result { font-family:'Montserrat',sans-serif; font-size:0.76rem; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .rr-grew { color:var(--col-success); }
   .rr-same { color:var(--text-sub); }
+
   #outputSection { display:none; margin-top:0; }
-  .output-area { background:#111; border:1px solid var(--ui-border); border-radius:8px; padding:20px; font-family:monospace; font-size:0.82rem; line-height:1.9; color:var(--text-main); white-space:pre-wrap; word-break:break-all; max-height:380px; overflow-y:auto; }
-  #status { margin-top:12px; font-size:0.85em; color:var(--text-sub); text-align:center; min-height:1.4em; }
-  hr.div { border:none; border-top:1px solid var(--ui-border); margin:20px 0; }
+  .output-area { background:#111; border:1px solid var(--ui-border); border-radius:8px; padding:16px 20px; font-family:monospace; font-size:0.82rem; line-height:1.9; color:var(--text-main); white-space:pre-wrap; word-break:break-all; max-height:380px; overflow-y:auto; }
+  hr.div { border:none; border-top:1px solid var(--ui-border); margin:16px 0; }
+
+  /* emptyState */
+  #emptyState { text-align:center; padding:60px 20px; color:var(--text-sub); }
+
   @media (max-width:900px) {
     .page-layout { grid-template-columns:1fr; }
-    .left-panel { position:static; }
+    .left-panel { position:static; max-height:none; overflow-y:visible; }
   }
   @media (max-width:640px) {
-    .card { padding:20px 14px; }
+    body { padding:60px 14px 60px; }
+    .card { padding:18px 14px; }
     .back-link { top:10px; left:10px; }
-    .skill-row { grid-template-columns:18px 1fr 58px 50px 26px 70px; }
+    .skill-row { grid-template-columns:18px 1fr 60px 48px 26px 1fr; gap:5px; font-size:0.8rem; }
     .ui-header { flex-direction:column; align-items:flex-start; gap:10px; }
   }
 </style>
@@ -169,6 +224,20 @@
         </div>
       </div>
 
+      <!-- ステップインジケーター -->
+      <div class="step-indicator" id="stepIndicator">
+        <div class="step-dot active" id="sd1">1</div>
+        <div class="step-line" id="sl1"></div>
+        <div class="step-dot idle" id="sd2">2</div>
+        <div class="step-line" id="sl2"></div>
+        <div class="step-dot idle" id="sd3">3</div>
+        <div class="step-line" id="sl3"></div>
+        <div class="step-dot idle" id="sd4">4</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.6rem;color:var(--text-sub);font-family:'Montserrat',sans-serif;letter-spacing:0.04em;margin-bottom:14px;padding:0 2px;">
+        <span>読み込み</span><span style="margin-left:10px;">絞り込み</span><span>ロール</span><span>書き出し</span>
+      </div>
+
       <p class="privacy-note">※ログはサーバーに送信されず、ブラウザ内でのみ処理されます。</p>
 
       <div class="guide-container">
@@ -177,7 +246,7 @@
           <ul style="margin:0;padding-left:18px;line-height:2.1;font-size:0.82em;">
             <li>6版/7版をタブで選択してください。</li>
             <li>[all]ログ（HTML）を読み込み「抽出する」を押します。</li>
-            <li>キャラクターと判定種別を絞り込んで「表示を更新」。</li>
+            <li>キャラクターと判定種別を絞り込みます（変更は即時反映）。</li>
             <li>成功値は自動入力済み。必要なら手動で変更可能です。</li>
             <li>個別またはまとめてロールし「テキスト書き出し」で出力できます。</li>
           </ul>
@@ -201,7 +270,7 @@
 
     <div id="settingsSection">
       <div class="card">
-        <div class="section-label">✦ 抽出設定</div>
+        <div class="section-label">✦ 絞り込み</div>
         <div class="settings-grid">
           <div class="settings-box">
             <div class="settings-box-title">対象キャラクター</div>
@@ -212,13 +281,11 @@
             <div class="tag-list" id="charTagList"></div>
           </div>
           <div class="settings-box">
-            <div class="settings-box-title">抽出する判定種別</div>
+            <div class="settings-box-title">判定種別</div>
             <div class="tag-list" id="filterTagList"></div>
           </div>
         </div>
-        <div style="text-align:center;margin-top:16px;">
-          <button id="applyBtn" class="btn">表示を更新</button>
-        </div>
+        <p style="font-size:0.72rem;color:var(--text-sub);text-align:center;margin-top:10px;margin-bottom:0;">タグをクリックすると即時反映されます</p>
       </div>
     </div>
   </div>
@@ -227,13 +294,28 @@
   <div class="right-panel">
     <div id="resultSection">
       <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
           <div class="section-label" style="margin-bottom:0;">✦ 成長チェック</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button id="rollAllBtn" class="btn">全技能をロール</button>
             <button id="exportBtn" class="btn-ghost">テキスト書き出し</button>
           </div>
         </div>
+
+        <!-- 進捗表示 -->
+        <div id="progressWrap">
+          <div class="progress-label">
+            <span id="progressText">0 / 0 ロール済み</span>
+            <span id="progressGrew"></span>
+          </div>
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+        </div>
+
+        <!-- 成長サマリー -->
+        <div id="growthSummary">
+          <div class="summary-row" id="summaryRow"></div>
+        </div>
+
         <div id="charBlocks"></div>
       </div>
 
@@ -248,8 +330,11 @@
       </div>
     </div>
 
-    <div id="emptyState" class="card" style="text-align:center;padding:60px 20px;color:var(--text-sub);">
-      <div style="font-family:'Montserrat',sans-serif;font-size:0.8rem;font-weight:900;letter-spacing:0.2em;opacity:0.3;">ログを読み込んで<br>抽出するとここに表示されます</div>
+    <div id="emptyState" class="card">
+      <div style="text-align:center;padding:40px 20px;color:var(--text-sub);">
+        <div style="font-family:'Montserrat',sans-serif;font-size:2rem;font-weight:900;opacity:0.08;margin-bottom:12px;">GROWTH</div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:0.78rem;font-weight:900;letter-spacing:0.2em;opacity:0.3;">ログを読み込んで<br>抽出するとここに表示されます</div>
+      </div>
     </div>
   </div>
 
@@ -336,23 +421,51 @@ function handleFile(file) {
   document.getElementById('dropText').style.display = 'none';
   document.getElementById('resetBtn').style.display = 'inline-block';
   const reader = new FileReader();
-  reader.onload = ev => { rawHtml = ev.target.result; document.getElementById('extractBtn').disabled = false; };
+  reader.onload = ev => {
+    rawHtml = ev.target.result;
+    document.getElementById('extractBtn').disabled = false;
+    updateSteps(1);
+  };
   reader.readAsText(file, 'UTF-8');
 }
 document.getElementById('logFile').addEventListener('change', e => handleFile(e.target.files[0]));
 document.getElementById('dropZone').addEventListener('dragover', e => e.preventDefault());
-document.getElementById('dropZone').addEventListener('drop', e => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); });
+
+function updateSteps(step) {
+  const dots = ['sd1','sd2','sd3','sd4'];
+  const lines = ['sl1','sl2','sl3'];
+  dots.forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.className = 'step-dot ' + (i+1 < step ? 'done' : i+1 === step ? 'active' : 'idle');
+  });
+  lines.forEach((id, i) => {
+    document.getElementById(id).className = 'step-line' + (i+1 < step ? ' done' : '');
+  });
+}
+
+// ---- dragover視覚フィードバック ----
+document.getElementById('dropZone').addEventListener('dragenter', () => document.getElementById('dropZone').classList.add('dragover'));
+document.getElementById('dropZone').addEventListener('dragleave', () => document.getElementById('dropZone').classList.remove('dragover'));
+document.getElementById('dropZone').addEventListener('drop', e => { document.getElementById('dropZone').classList.remove('dragover'); e.preventDefault(); handleFile(e.dataTransfer.files[0]); });
+
+
 
 // リセット
 document.getElementById('resetBtn').addEventListener('click', () => {
   rawHtml = ''; allEntries = {}; skillState = {}; charEnabled = {};
-  ['fileInfoBox','settingsSection','resultSection','outputSection'].forEach(id => document.getElementById(id).style.display = 'none');
+  ['fileInfoBox','outputSection'].forEach(id => document.getElementById(id).style.display = 'none');
+  document.getElementById('settingsSection').style.display = 'none';
+  document.getElementById('resultSection').style.display = 'none';
   document.getElementById('emptyState').style.display = 'block';
+  document.getElementById('growthSummary').style.display = 'none';
   document.getElementById('dropText').style.display = 'block';
   document.getElementById('extractBtn').disabled = true;
   document.getElementById('resetBtn').style.display = 'none';
-  document.getElementById('status').textContent = '';
+  const statusEl = document.getElementById('status');
+  statusEl.className = '';
+  statusEl.textContent = '';
   document.getElementById('logFile').value = '';
+  updateSteps(1);
 });
 
 // ---- ログ行パース ----
@@ -399,7 +512,6 @@ function parseLogLine(text, ed) {
 
 // ---- 抽出 ----
 document.getElementById('extractBtn').addEventListener('click', extract);
-document.getElementById('applyBtn').addEventListener('click', () => applyFilter(true));
 
 function extract() {
   allEntries = {}; skillState = {};
@@ -421,17 +533,21 @@ function extract() {
 
   const chars = Object.keys(allEntries);
   if (!chars.length) {
-    document.getElementById('status').textContent = '⚠ 成長対象のロールが見つかりませんでした。';
+    const statusEl = document.getElementById('status');
+    statusEl.className = 'warn';
+    statusEl.textContent = '⚠ 成長対象のロールが見つかりませんでした。';
     return;
   }
 
   chars.forEach(c => { if (charEnabled[c] === undefined) charEnabled[c] = true; });
-  document.getElementById('status').textContent =
-    `${chars.length} 名、${Object.values(allEntries).flat().length} 件のロールを抽出しました`;
+  const statusEl = document.getElementById('status');
+  statusEl.className = 'ok';
+  statusEl.textContent = `${chars.length} 名、${Object.values(allEntries).flat().length} 件のロールを抽出しました`;
 
   buildCharTags(chars);
   buildFilterTags();
   document.getElementById('settingsSection').style.display = 'block';
+  updateSteps(2);
   applyFilter(false);
 }
 
@@ -442,16 +558,22 @@ function buildCharTags(names) {
     const tag = document.createElement('span');
     tag.className = 'tag-item' + (charEnabled[name] ? ' on' : '');
     tag.textContent = name;
-    tag.addEventListener('click', () => { charEnabled[name] = !charEnabled[name]; tag.classList.toggle('on', charEnabled[name]); });
+    tag.addEventListener('click', () => {
+      charEnabled[name] = !charEnabled[name];
+      tag.classList.toggle('on', charEnabled[name]);
+      applyFilter(false);
+    });
     list.appendChild(tag);
   });
   document.getElementById('charSelectAll').onclick = () => {
     Object.keys(charEnabled).forEach(k => charEnabled[k] = true);
     list.querySelectorAll('.tag-item').forEach(t => t.classList.add('on'));
+    applyFilter(false);
   };
   document.getElementById('charDeselectAll').onclick = () => {
     Object.keys(charEnabled).forEach(k => charEnabled[k] = false);
     list.querySelectorAll('.tag-item').forEach(t => t.classList.remove('on'));
+    applyFilter(false);
   };
 }
 
@@ -473,7 +595,11 @@ function buildFilterTags() {
     const tag = document.createElement('span');
     tag.className = 'tag-item ' + def.cls + (filterEnabled[def.key] ? ' on' : '');
     tag.textContent = def.label;
-    tag.addEventListener('click', () => { filterEnabled[def.key] = !filterEnabled[def.key]; tag.classList.toggle('on', filterEnabled[def.key]); });
+    tag.addEventListener('click', () => {
+      filterEnabled[def.key] = !filterEnabled[def.key];
+      tag.classList.toggle('on', filterEnabled[def.key]);
+      applyFilter(false);
+    });
     list.appendChild(tag);
   });
 }
@@ -508,9 +634,11 @@ function applyFilter(scroll) {
   });
 
   renderResult(filtered);
+  updateProgress(filtered);
   const hasResult = Object.keys(filtered).length > 0;
   document.getElementById('resultSection').style.display = hasResult ? 'block' : 'none';
   document.getElementById('emptyState').style.display = hasResult ? 'none' : 'block';
+  if (hasResult) updateSteps(3);
 }
 
 // ---- バッジ ----
@@ -529,6 +657,42 @@ function kindBadge(kind) {
 
 const KIND_PRIORITY = { special:0, critical:1, success:2, initial:3, fail:4, fumble:5 };
 
+// ---- 進捗・サマリー更新 ----
+function updateProgress(filtered) {
+  let total = 0, rolled = 0, grew = 0;
+  Object.entries(filtered).forEach(([char, bySkill]) => {
+    Object.keys(bySkill).forEach(skill => {
+      const state = skillState[char]?.[skill];
+      if (!state || !state.checked) return;
+      total++;
+      if (state.rolled) {
+        rolled++;
+        if (state.result?.grew) grew++;
+      }
+    });
+  });
+  const pct = total > 0 ? Math.round((rolled / total) * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${rolled} / ${total} ロール済み`;
+  const grewEl = document.getElementById('progressGrew');
+  grewEl.textContent = rolled > 0 ? `成長 ${grew} 技能` : '';
+  grewEl.style.color = grew > 0 ? 'var(--col-success)' : 'var(--text-sub)';
+
+  // 全ロール完了時にサマリー表示
+  const summaryEl = document.getElementById('growthSummary');
+  if (total > 0 && rolled === total) {
+    const failed = rolled - grew;
+    document.getElementById('summaryRow').innerHTML =
+      `<div class="summary-item grew"><strong>${grew}</strong> 技能成長</div>` +
+      `<div class="summary-item"><strong>${failed}</strong> 変化なし</div>` +
+      `<div class="summary-item"><strong>${total}</strong> 技能合計</div>`;
+    summaryEl.style.display = 'block';
+    updateSteps(4);
+  } else {
+    summaryEl.style.display = 'none';
+  }
+}
+
 // ---- 結果描画 ----
 function renderResult(filtered) {
   const container = document.getElementById('charBlocks');
@@ -546,12 +710,26 @@ function renderResult(filtered) {
 
     const header = document.createElement('div');
     header.className = 'char-header';
-    header.innerHTML = `<span class="char-name">${char}</span><span class="char-count">${Object.keys(bySkill).length} 技能</span><span class="char-toggle">▼</span>`;
+
+    // キャラクター別ロール進捗を計算
+    const skillList = Object.keys(bySkill);
+    const charRolled = skillList.filter(s => skillState[char]?.[s]?.rolled).length;
+    const charGrew   = skillList.filter(s => skillState[char]?.[s]?.result?.grew).length;
+    let miniText = charRolled > 0 ? `${charRolled}/${skillList.length} ロール済` : `${skillList.length} 技能`;
+    if (charRolled === skillList.length && skillList.length > 0) miniText = `成長 ${charGrew}/${skillList.length}`;
+
+    header.innerHTML =
+      `<span class="char-name">${char}</span>` +
+      `<div class="char-meta">` +
+        `<span class="char-progress-mini${charGrew > 0 ? ' has-grew' : ''}">${miniText}</span>` +
+        `<span class="char-toggle ${true ? 'open' : 'closed'}">▼</span>` +
+      `</div>`;
     header.addEventListener('click', () => {
       const body = block.querySelector('.char-body');
       const open = body.style.display !== 'none';
       body.style.display = open ? 'none' : 'block';
       header.querySelector('.char-toggle').textContent = open ? '▶' : '▼';
+      header.querySelector('.char-toggle').className = 'char-toggle ' + (open ? 'closed' : 'open');
     });
 
     const body = document.createElement('div');
@@ -571,7 +749,7 @@ function renderResult(filtered) {
         const best = [...entries].sort((a,b) => (KIND_PRIORITY[a.kind]??9) - (KIND_PRIORITY[b.kind]??9))[0];
 
         const row = document.createElement('div');
-        row.className = 'skill-row' + (!state.checked ? ' excluded' : '');
+        row.className = 'skill-row' + (!state.checked ? ' excluded' : state.rolled && state.result?.grew ? ' rolled-grew' : '');
 
         // チェック
         const chk = document.createElement('div');
@@ -588,7 +766,7 @@ function renderResult(filtered) {
         nameCell.className = 'skill-name-cell';
         const rollInfoLines = entries.map(e => `出目:${e.roll}`).join(' / ');
         nameCell.innerHTML =
-          `<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${skill}${entries.length > 1 ? ` <span style="font-size:0.72rem;color:var(--text-sub);font-weight:400;">×${entries.length}</span>` : ''}</div>` +
+          `<div class="skill-name-text">${skill}${entries.length > 1 ? ` <span style="font-size:0.72rem;color:var(--text-sub);font-weight:400;">×${entries.length}</span>` : ''}</div>` +
           `<div class="skill-roll-info">${rollInfoLines}</div>`;
         nameCell.title = entries.map(e => e.raw).join('\n');
 
@@ -612,9 +790,15 @@ function renderResult(filtered) {
         rollBtn.title = '成長ロール';
         rollBtn.addEventListener('click', () => {
           const v = parseInt(valInput.value);
-          if (!v || v < 1 || v > 99) { valInput.focus(); valInput.style.borderColor = 'var(--col-fumble)'; setTimeout(() => valInput.style.borderColor = '', 1000); return; }
+          if (!v || v < 1 || v > 99) {
+            valInput.focus();
+            valInput.classList.add('error');
+            setTimeout(() => valInput.classList.remove('error'), 1000);
+            return;
+          }
           doRoll(char, skill, v);
           renderResult(filtered);
+          updateProgress(filtered);
         });
 
         // 結果
@@ -660,9 +844,11 @@ document.getElementById('rollAllBtn').addEventListener('click', () => {
       doRoll(char, skill, v);
     });
   });
-  if (hasError) document.getElementById('status').textContent = '⚠ 現在値が未入力の技能があります。';
-  else document.getElementById('status').textContent = '';
+  const statusEl = document.getElementById('status');
+  if (hasError) { statusEl.className = 'warn'; statusEl.textContent = '⚠ 現在値が未入力の技能があります。'; }
+  else { statusEl.className = ''; statusEl.textContent = ''; }
   renderResult(filtered);
+  updateProgress(filtered);
 });
 
 // ---- テキスト書き出し ----
@@ -696,6 +882,7 @@ document.getElementById('exportBtn').addEventListener('click', () => {
   document.getElementById('outputArea').textContent = text;
   document.getElementById('outputSection').style.display = 'block';
   document.getElementById('outputSection').scrollIntoView({ behavior:'smooth', block:'start' });
+  updateSteps(4);
 });
 
 document.getElementById('copyBtn').addEventListener('click', () => {
