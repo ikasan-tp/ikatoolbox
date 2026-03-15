@@ -285,12 +285,29 @@
             align-items: flex-end;
             gap: 20px;
         }
+        .footer-left {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-shrink: 0;
+        }
         .footer-brand {
             font-family: 'Montserrat', sans-serif;
             font-size: 0.58rem; font-weight: 900;
             color: #1e1e1e; letter-spacing: 0.45em;
             white-space: nowrap;
         }
+        .policy-link {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.55rem; font-weight: 700;
+            color: #555; letter-spacing: 0.12em;
+            text-decoration: none;
+            border-bottom: 1px solid #333;
+            padding-bottom: 1px;
+            transition: color 0.2s, border-color 0.2s;
+            white-space: nowrap;
+        }
+        .policy-link:hover { color: #C5373C; border-color: #C5373C; }
         .license-container {
             font-size: 0.52rem;
             color: #3a3a3a; line-height: 1.8;
@@ -314,6 +331,7 @@
             .section-sub { margin-top: 0; }
             .card-row { grid-template-columns: 1fr; }
             .footer { flex-direction: column; align-items: flex-start; gap: 10px; padding-bottom: 40px; }
+            .footer-left { flex-direction: row; align-items: baseline; gap: 16px; }
             .license-container { text-align: left; }
         }
     </style>
@@ -394,14 +412,6 @@
                     </div>
                     <div class="card-arrow"><span class="material-symbols-outlined">arrow_outward</span></div>
                 </a>
-                <a href="recap.html" class="tool-card">
-                    <div class="card-icon"><span class="material-symbols-outlined">summarize</span></div>
-                    <div class="card-text">
-                        <div class="card-title">RECAP BUILDER</div>
-                        <div class="card-desc">セッション記録をまとめて<br>テキスト出力</div>
-                    </div>
-                    <div class="card-arrow"><span class="material-symbols-outlined">arrow_outward</span></div>
-                </a>
                 <a href="houserule.html" class="tool-card">
                     <div class="card-icon"><span class="material-symbols-outlined">gavel</span></div>
                     <div class="card-text">
@@ -414,7 +424,7 @@
                     <div class="card-icon"><span class="material-symbols-outlined">summarize</span></div>
                     <div class="card-text">
                         <div class="card-title">RECAP BUILDER</div>
-                        <div class="card-desc">セッションのあらすじを<br>Discordに貼れる形で出力</div>
+                        <div class="card-desc">セッションのあらすじを<br>テキストで出力</div>
                     </div>
                     <div class="card-arrow"><span class="material-symbols-outlined">arrow_outward</span></div>
                 </a>
@@ -459,12 +469,15 @@
 
     <!-- フッター -->
     <footer class="footer">
-        <div class="footer-brand">✦ IKATOOLBOX</div>
-        <a href="policy.html" style="font-family:'Montserrat',sans-serif;font-size:0.55rem;color:#333;letter-spacing:0.15em;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#C5373C'" onmouseout="this.style.color='#333'">PRIVACY POLICY &amp; TERMS</a>
+        <div class="footer-left">
+            <div class="footer-brand">✦ IKATOOLBOX</div>
+            <a href="policy.html" class="policy-link">PRIVACY POLICY &amp; TERMS</a>
+        </div>
         <div class="license-container">
             <p>当サイトで公開されているツールは、「株式会社アークライト」及び「株式会社KADOKAWA」が権利を有する『クトゥルフ神話TRPG』シリーズの二次創作物です。</p>
             <p>Call of Cthulhu is copyright ©1981, 2015, 2019 by Chaosium Inc. ;all rights reserved. Arranged by Arclight Inc.</p>
             <p>Call of Cthulhu is a registered trademark of Chaosium Inc. / PUBLISHED BY KADOKAWA CORPORATION</p>
+            <p style="margin-top:4px;">当サイトには、ダイスタス・チームが著作権を有する『エモクロアTRPG』のサポートツールが含まれます。本コンテンツは「ダイスタス・コモンズ」に基づき制作された二次著作物です。『エモクロアTRPG』© ダイスタス・チーム</p>
         </div>
     </footer>
 
