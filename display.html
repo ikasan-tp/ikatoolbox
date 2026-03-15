@@ -217,9 +217,15 @@
         <div class="control-group">
             <h2>1. データ取り込み</h2>
             <textarea id="json-input" placeholder="駒データを貼り付け（変更された技能のみを推奨）" oninput="importData()"></textarea>
-            <div class="toggle-group">
-                <button id="btn-7th" class="toggle-btn active" onclick="setEdition(7)">7版</button>
-                <button id="btn-6th" class="toggle-btn" onclick="setEdition(6)">6版</button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                <div class="toggle-group">
+                    <button id="btn-sys-coc" class="toggle-btn active" onclick="setSystem('coc')">CoC</button>
+                    <button id="btn-sys-emo" class="toggle-btn" onclick="setSystem('emo')">EmoCroa</button>
+                </div>
+                <div class="toggle-group" id="coc-edition-toggle">
+                    <button id="btn-7th" class="toggle-btn active" onclick="setEdition(7)">7版</button>
+                    <button id="btn-6th" class="toggle-btn" onclick="setEdition(6)">6版</button>
+                </div>
             </div>
         </div>
 
@@ -238,29 +244,34 @@
                 <div><label>性別</label><input type="text" id="in-sex" oninput="refreshProfileDisplay()"></div>
                 <div><label>職業</label><input type="text" id="in-job" oninput="refreshProfileDisplay()"></div>
             </div>
-            <div class="grid-2">
+            <div id="trait-coc" class="grid-2">
                 <div><label>特徴1</label><input type="text" id="in-t1-name" oninput="updateTrait()"></div>
                 <div><label>特徴2</label><input type="text" id="in-t2-name" oninput="updateTrait()"></div>
+            </div>
+            <div id="trait-emo" style="display:none;">
+                <div style="margin-bottom:6px;"><label>共鳴感情・表</label><input type="text" id="in-emo-omote" oninput="updateTrait()"></div>
+                <div style="margin-bottom:6px;"><label>共鳴感情・裏</label><input type="text" id="in-emo-ura" oninput="updateTrait()"></div>
+                <div><label>共鳴感情・ルーツ</label><input type="text" id="in-emo-roots" oninput="updateTrait()"></div>
             </div>
         </div>
 
         <div class="control-group">
             <h2>3. ステータス & 技能</h2>
             <div class="grid-flex">
-                <div><label>STR</label><input type="number" id="in-str" oninput="setBar('str', this.value)"></div>
-                <div><label>CON</label><input type="number" id="in-con" oninput="setBar('con', this.value)"></div>
-                <div><label>POW</label><input type="number" id="in-pow" oninput="setBar('pow', this.value)"></div>
-                <div><label>DEX</label><input type="number" id="in-dex" oninput="setBar('dex', this.value)"></div>
+                <div><label id="lbl-s0">STR</label><input type="number" id="in-str" oninput="setBar('str', this.value)"></div>
+                <div><label id="lbl-s1">CON</label><input type="number" id="in-con" oninput="setBar('con', this.value)"></div>
+                <div><label id="lbl-s2">POW</label><input type="number" id="in-pow" oninput="setBar('pow', this.value)"></div>
+                <div><label id="lbl-s3">DEX</label><input type="number" id="in-dex" oninput="setBar('dex', this.value)"></div>
             </div>
             <div class="grid-flex">
-                <div><label>APP</label><input type="number" id="in-app" oninput="setBar('app', this.value)"></div>
-                <div><label>SIZ</label><input type="number" id="in-siz" oninput="setBar('siz', this.value)"></div>
-                <div><label>INT</label><input type="number" id="in-int" oninput="setBar('int', this.value)"></div>
-                <div><label>EDU</label><input type="number" id="in-edu" oninput="setBar('edu', this.value)"></div>
+                <div><label id="lbl-s4">APP</label><input type="number" id="in-app" oninput="setBar('app', this.value)"></div>
+                <div><label id="lbl-s5">SIZ</label><input type="number" id="in-siz" oninput="setBar('siz', this.value)"></div>
+                <div><label id="lbl-s6">INT</label><input type="number" id="in-int" oninput="setBar('int', this.value)"></div>
+                <div><label id="lbl-s7">EDU</label><input type="number" id="in-edu" oninput="setBar('edu', this.value)"></div>
             </div>
             <div class="grid-flex" style="margin-top:8px;">
-                <div><label>SAN</label><input type="number" id="in-san" oninput="updateVal('d-san', this.value, '0')"></div>
-                <div><label>LUK</label><input type="number" id="in-luk" oninput="updateVal('d-luk', this.value, '0')"></div>
+                <div id="input-sub0"><label id="lbl-sub0">SAN</label><input type="number" id="in-san" oninput="updateVal('d-san', this.value, '0')"></div>
+                <div id="input-sub1"><label id="lbl-sub1">LUK</label><input type="number" id="in-luk" oninput="updateVal('d-luk', this.value, '0')"></div>
                 <div><label>HP</label><input type="number" id="in-hp" oninput="updateVal('d-hp', this.value, '0')"></div>
                 <div><label>MP</label><input type="number" id="in-mp" oninput="updateVal('d-mp', this.value, '0')"></div>
             </div>
@@ -351,24 +362,29 @@
                 <div id="d-profile-line" class="profile-sub">- / - / -</div>
             </div>
             <div id="d-traits" class="traits-display"></div>
+            <div id="d-traits-emo" style="display:none; font-size:0.62rem; color:var(--sub-text-color); margin-bottom:8px; letter-spacing:0.02em; flex-direction:row; gap:16px; flex-wrap:wrap;">
+                <div id="d-emo-omote"></div>
+                <div id="d-emo-ura"></div>
+                <div id="d-emo-roots"></div>
+            </div>
             <div class="variants-row">
                 <div class="v-slot"><img id="v1-img"></div>
                 <div class="v-slot"><img id="v2-img"></div>
                 <div class="v-slot"><img id="v3-img"></div>
             </div>
             <div class="status-grid">
-                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">STR</span><span id="val-str">0</span></div><div class="stat-bar-bg"><div id="b-str" class="stat-bar-fill"></div></div></div>
-                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">CON</span><span id="val-con">0</span></div><div class="stat-bar-bg"><div id="b-con" class="stat-bar-fill"></div></div></div>
-                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">POW</span><span id="val-pow">0</span></div><div class="stat-bar-bg"><div id="b-pow" class="stat-bar-fill"></div></div></div>
-                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">DEX</span><span id="val-dex">0</span></div><div class="stat-bar-bg"><div id="b-dex" class="stat-bar-fill"></div></div></div>
-                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">APP</span><span id="val-app">0</span></div><div class="stat-bar-bg"><div id="b-app" class="stat-bar-fill"></div></div></div>
-                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">SIZ</span><span id="val-siz">0</span></div><div class="stat-bar-bg"><div id="b-siz" class="stat-bar-fill"></div></div></div>
-                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">INT</span><span id="val-int">0</span></div><div class="stat-bar-bg"><div id="b-int" class="stat-bar-fill"></div></div></div>
-                <div class="stat-item"><div class="stat-val-header"><span class="stat-label">EDU</span><span id="val-edu">0</span></div><div class="stat-bar-bg"><div id="b-edu" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label" id="cv-s0">STR</span><span id="val-str">0</span></div><div class="stat-bar-bg"><div id="b-str" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label" id="cv-s1">CON</span><span id="val-con">0</span></div><div class="stat-bar-bg"><div id="b-con" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label" id="cv-s2">POW</span><span id="val-pow">0</span></div><div class="stat-bar-bg"><div id="b-pow" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label" id="cv-s3">DEX</span><span id="val-dex">0</span></div><div class="stat-bar-bg"><div id="b-dex" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label" id="cv-s4">APP</span><span id="val-app">0</span></div><div class="stat-bar-bg"><div id="b-app" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label" id="cv-s5">SIZ</span><span id="val-siz">0</span></div><div class="stat-bar-bg"><div id="b-siz" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label" id="cv-s6">INT</span><span id="val-int">0</span></div><div class="stat-bar-bg"><div id="b-int" class="stat-bar-fill"></div></div></div>
+                <div class="stat-item"><div class="stat-val-header"><span class="stat-label" id="cv-s7">EDU</span><span id="val-edu">0</span></div><div class="stat-bar-bg"><div id="b-edu" class="stat-bar-fill"></div></div></div>
             </div>
             <div class="sub-stats">
-                <div class="sub-badge"><span class="sub-label">SAN</span><span id="d-san" class="sub-val">0</span></div>
-                <div class="sub-badge"><span class="sub-label">LUK</span><span id="d-luk" class="sub-val">0</span></div>
+                <div class="sub-badge" id="badge-sub0"><span class="sub-label" id="cv-sub0">SAN</span><span id="d-san" class="sub-val">0</span></div>
+                <div class="sub-badge" id="badge-sub1"><span class="sub-label" id="cv-sub1">LUK</span><span id="d-luk" class="sub-val">0</span></div>
                 <div class="sub-badge"><span class="sub-label">HP</span><span id="d-hp" class="sub-val">0</span></div>
                 <div class="sub-badge"><span class="sub-label">MP</span><span id="d-mp" class="sub-val">0</span></div>
             </div>
@@ -385,6 +401,83 @@
 <script>
     const root = document.documentElement;
     let allSkills = [];
+    let currentSystem = 'coc'; // 'coc' or 'emo'
+
+    // ---- システム定義 ----
+    const SYSTEMS = {
+        coc: {
+            statKeys:   ['str','con','pow','dex','app','siz','int','edu'],
+            statLabels: ['STR','CON','POW','DEX','APP','SIZ','INT','EDU'],
+            statMax: 100,
+            sub0Label: 'SAN', sub1Label: 'LUK',
+            skillsHeader: 'SKILLS',
+            scenarioPrefix: (ed) => `❚ CoC ${ed}th :`,
+            cmdRegex: /CCB?\(?.*?\)?<=?(\d+)\s+【(.+?)】/,
+            ignoreSkills: ['知識','アイデア','母国語'],
+            subMap: { 'san':'san', 'luk':'luk', 'luck':'luk', '幸運':'luk' },
+        },
+        emo: {
+            statKeys:   ['str','con','pow','dex','app','siz','int','edu'],
+            statLabels: ['身体','器用','精神','五感','知力','魅力','社会','運勢'],
+            statMax: 9,
+            sub0Label: '共鳴', sub1Label: null,  // エモクロアはsub1なし
+            skillsHeader: 'SKILLS',
+            scenarioPrefix: () => `❚ EmoCroa :`,
+            cmdRegex: /\d+DM<=(\d+)\s+〈(.+?)〉/,
+            ignoreSkills: [],
+            subMap: { 'hp':'hp', 'mp':'mp', '共鳴':'san' },
+        }
+    };
+
+    // ---- システム切替 ----
+    function setSystem(sys) {
+        currentSystem = sys;
+        const def = SYSTEMS[sys];
+        document.getElementById('btn-sys-coc').classList.toggle('active', sys === 'coc');
+        document.getElementById('btn-sys-emo').classList.toggle('active', sys === 'emo');
+        // 版トグルはCoCのみ表示
+        document.getElementById('coc-edition-toggle').style.display = sys === 'coc' ? 'flex' : 'none';
+        // バースケール更新
+        root.style.setProperty('--stat-max', def.statMax);
+        // サイドバーのラベル更新
+        def.statLabels.forEach((lbl, i) => {
+            const el = document.getElementById('lbl-s' + i);
+            if (el) el.textContent = lbl;
+        });
+        document.getElementById('lbl-sub0').textContent = def.sub0Label;
+        document.getElementById('lbl-sub1').textContent = def.sub1Label;
+        // キャンバスのラベル更新
+        def.statLabels.forEach((lbl, i) => {
+            const el = document.getElementById('cv-s' + i);
+            if (el) el.textContent = lbl;
+        });
+        document.getElementById('cv-sub0').textContent = def.sub0Label;
+        document.getElementById('lbl-sub0').textContent = def.sub0Label;
+        // sub1 は CoC のみ（SAN の入力欄と共鳴は SAN スロットを流用）
+        const showSub1 = def.sub1Label !== null;
+        document.getElementById('badge-sub1').style.display = showSub1 ? '' : 'none';
+        document.getElementById('input-sub1').style.display = showSub1 ? '' : 'none';
+        if (showSub1) {
+            document.getElementById('cv-sub1').textContent = def.sub1Label;
+            document.getElementById('lbl-sub1').textContent = def.sub1Label;
+        }
+        // スキルヘッダー
+        const sh = document.querySelector('.skills-header');
+        if (sh) sh.childNodes[0].textContent = def.skillsHeader;
+        // trait欄の切替
+        document.getElementById('trait-coc').style.display = sys === 'coc' ? '' : 'none';
+        document.getElementById('trait-emo').style.display = sys === 'emo' ? '' : 'none';
+        document.getElementById('d-traits').style.display      = sys === 'coc' ? '' : 'none';
+        document.getElementById('d-traits-emo').style.display  = sys === 'emo' ? 'flex' : 'none';
+        // シナリオ表示リフレッシュ
+        refreshScenarioDisplay();
+        // スケール変更後に既存の入力値でバーを再描画
+        const keys = def.statKeys;
+        keys.forEach(key => {
+            const inp = document.getElementById('in-' + key);
+            if (inp && inp.value) setBar(key, parseFloat(inp.value));
+        });
+    }
 
     function syncColor(val) {
         root.style.setProperty('--accent-color', val);
@@ -434,9 +527,18 @@ function setCanvasTheme(theme) {
     }
 
     function updateTrait() {
-        const t1 = document.getElementById('in-t1-name').value;
-        const t2 = document.getElementById('in-t2-name').value;
-        document.getElementById('d-traits').innerText = (t1 && t2) ? `${t1} / ${t2}` : (t1 || t2 || "");
+        if (currentSystem === 'emo') {
+            const omote = document.getElementById('in-emo-omote').value;
+            const ura   = document.getElementById('in-emo-ura').value;
+            const roots = document.getElementById('in-emo-roots').value;
+            document.getElementById('d-emo-omote').innerText = omote ? `表：${omote}` : '';
+            document.getElementById('d-emo-ura').innerText   = ura   ? `裏：${ura}`   : '';
+            document.getElementById('d-emo-roots').innerText = roots ? `ルーツ：${roots}` : '';
+        } else {
+            const t1 = document.getElementById('in-t1-name').value;
+            const t2 = document.getElementById('in-t2-name').value;
+            document.getElementById('d-traits').innerText = (t1 && t2) ? `${t1} / ${t2}` : (t1 || t2 || "");
+        }
     }
 
     function refreshProfileDisplay() {
@@ -461,7 +563,8 @@ function refreshScenarioDisplay() {
         const displayElem = document.getElementById('d-scenario');
         const hoElem = document.getElementById('d-ho');
         
-        displayElem.innerText = `❚ CoC ${ed}th : ${scn}`;
+        const sysDef = SYSTEMS[currentSystem];
+        displayElem.innerText = `${sysDef.scenarioPrefix(ed)} ${scn}`;
 
         if (ho) {
             hoElem.innerText = ho;
@@ -492,26 +595,49 @@ function refreshScenarioDisplay() {
                 const rubyInput = document.getElementById('in-ruby');
                 if (!rubyInput.value) {
                     const firstLine = d.memo.split('\n')[0];
-                    const match = firstLine.match(/[（(](.+?)[）)]/);
-                    if (match && match[1]) { rubyInput.value = match[1].trim(); updateRubyDisp(); }
+                    // ふりがな行（エモクロア：「ふりがな: xxx」形式）
+                    const furiganaMatch = firstLine.match(/ふりがな[：:]\s*(.+)/);
+                    if (furiganaMatch) {
+                        rubyInput.value = furiganaMatch[1].trim(); updateRubyDisp();
+                    } else {
+                        const match = firstLine.match(/[（(](.+?)[）)]/);
+                        if (match && match[1]) { rubyInput.value = match[1].trim(); updateRubyDisp(); }
+                    }
                 }
-                const profileLine = d.memo.split('\n')[2];
-                if (profileLine && profileLine.includes('/')) {
-                    const parts = profileLine.split('/').map(p => p.trim());
-                    if (parts[0]) document.getElementById('in-age').value = parts[0];
-                    if (parts[1]) document.getElementById('in-sex').value = parts[1];
-                    refreshProfileDisplay();
+                if (currentSystem === 'emo') {
+                    // エモクロア：共鳴感情を専用の欄に流し込む
+                    const omote = d.memo.match(/共鳴感情[・.]表[：:]\s*(.+)/);
+                    const ura   = d.memo.match(/共鳴感情[・.]裏[：:]\s*(.+)/);
+                    const roots = d.memo.match(/共鳴感情[・.]ルーツ[：:]\s*(.+)/);
+                    if (omote) document.getElementById('in-emo-omote').value = omote[1].trim();
+                    if (ura)   document.getElementById('in-emo-ura').value   = ura[1].trim();
+                    if (roots) document.getElementById('in-emo-roots').value = roots[1].trim();
+                    updateTrait();
+                } else {
+                    const profileLine = d.memo.split('\n')[2];
+                    if (profileLine && profileLine.includes('/')) {
+                        const parts = profileLine.split('/').map(p => p.trim());
+                        if (parts[0]) document.getElementById('in-age').value = parts[0];
+                        if (parts[1]) document.getElementById('in-sex').value = parts[1];
+                        refreshProfileDisplay();
+                    }
                 }
             }
             if (d.age) document.getElementById('in-age').value = d.age;
             if (d.sex) document.getElementById('in-sex').value = d.sex;
             if (d.job) document.getElementById('in-job').value = d.job;
-            const ps = ["str","con","pow","dex","app","siz","int","edu"];
+            const sysDef = SYSTEMS[currentSystem];
+            // params: システムの能力値ラベルをキーとしてマッピング
             if (d.params) d.params.forEach(p => {
-                const l = p.label.toLowerCase();
-                if(ps.includes(l)) { document.getElementById('in-'+l).value = p.value; setBar(l, p.value); }
+                const lbl = p.label;
+                const idx = sysDef.statLabels.findIndex(sl => sl === lbl || sl.toLowerCase() === lbl.toLowerCase());
+                if (idx >= 0) {
+                    const key = sysDef.statKeys[idx];
+                    document.getElementById('in-'+key).value = p.value;
+                    setBar(key, p.value);
+                }
             });
-            const sm = {'hp':'hp','mp':'mp','san':'san','luck':'luk','幸運':'luk'};
+            const sm = sysDef.subMap;
             if (d.status) d.status.forEach(s => {
                 const id = sm[s.label.toLowerCase()] || sm[s.label];
                 if(id) { document.getElementById('in-'+id).value = s.value; updateVal('d-'+id, s.value, '0'); }
@@ -519,13 +645,17 @@ function refreshScenarioDisplay() {
             allSkills = [];
             if (d.commands) {
                 d.commands.split('\n').forEach(line => {
-                    const m = line.match(/CCB?\(?.*?\)?<=?(\d+)\s+【(.+?)】/);
+                    const m = line.match(sysDef.cmdRegex);
                     if (m) {
+                        // CoCは m[1]=値 m[2]=ラベル、エモクロアも同順
                         const v = parseInt(m[1]), l = m[2].trim();
-                        if (["知識", "アイデア", "母国語"].includes(l)) return;
-                        if (l === "幸運") { document.getElementById('in-luk').value = v; updateVal('d-luk', v, '0'); }
-                        else if (!sm[l.toLowerCase()] && !sm[l]) {
-                            const isVisible = ["回避", "目星", "聞き耳", "図書館"].includes(l) || v > 40;
+                        if (sysDef.ignoreSkills.includes(l)) return;
+                        if (currentSystem === 'coc' && l === '幸運') { document.getElementById('in-luk').value = v; updateVal('d-luk', v, '0'); return; }
+                        const isSubStat = Object.values(sm).includes(sm[l.toLowerCase()] || sm[l]);
+                        if (!sm[l.toLowerCase()] && !sm[l]) {
+                            const isVisible = currentSystem === 'emo'
+                                ? !l.startsWith('＊')   // エモクロア：＊付きは汎用技能なので初期非表示
+                                : (["回避", "目星", "聞き耳", "図書館"].includes(l) || v > 40);
                             allSkills.push({ label: l, value: v, visible: isVisible });
                         }
                     }
@@ -577,8 +707,8 @@ function refreshScenarioDisplay() {
         });
     }
 
-	function setBar(id, val) {
-        const max = parseInt(getComputedStyle(root).getPropertyValue('--stat-max'));
+    function setBar(id, val) {
+        const max = SYSTEMS[currentSystem].statMax;
         const bar = document.getElementById('b-' + id);
         if(bar) bar.style.width = Math.min((val / max) * 100, 100) + '%';
         
