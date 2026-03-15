@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IKATOOLBOX | HOUSE RULE GENERATOR</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%%22 y=%2250%%22 style=%22dominant-baseline:central;text-anchor:middle;font-size:80px;%22>🦑</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&family=Noto+Sans+JP:wght@400;500;700&family=Montserrat:wght@700;900&display=block" rel="stylesheet">
+<style>
+  :root { --bg-dark:#1a1a1a; --card-bg:#222; --ui-input:#111; --ui-border:#444; --accent:#C5373C; --text-main:#dbdee1; --text-sub:#b5bac1; }
+  .material-symbols-outlined { display:inline-block; width:1em; height:1em; overflow:hidden; white-space:nowrap; direction:ltr; vertical-align:middle; }
+  *,*::before,*::after { box-sizing:border-box; }
+  body { font-family:'Noto Sans JP',sans-serif; line-height:1.6; max-width:1100px; margin:0 auto; padding:80px 20px 60px; background:var(--bg-dark); color:var(--text-main); min-height:100vh; position:relative; }
+  .back-link { position:absolute; top:30px; left:20px; display:flex; align-items:center; gap:8px; text-decoration:none; color:var(--text-sub); font-family:'Montserrat',sans-serif; font-size:0.8rem; font-weight:700; letter-spacing:0.1em; transition:0.3s; z-index:1000; }
+  .back-link:hover { color:var(--accent); transform:translateX(-5px); }
+  .card { background:var(--card-bg); padding:24px 28px; border-radius:12px; border:1px solid var(--ui-border); margin-bottom:12px; }
+  .ui-header { margin-bottom:16px; border-bottom:3px solid var(--accent); padding-bottom:12px; display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:10px; }
+  .ui-brand { font-family:'Montserrat',sans-serif; font-size:0.7rem; font-weight:900; color:var(--accent); letter-spacing:0.4em; display:block; margin-bottom:2px; }
+  .ui-title { font-family:'Montserrat','Noto Sans JP',sans-serif; font-size:1.3rem; font-weight:900; color:#fff; letter-spacing:0.05em; }
+  .toggle-group { display:flex; gap:2px; background:#111; padding:3px; border-radius:4px; }
+  .toggle-btn { background:transparent; color:var(--text-sub); border:none; padding:4px 14px; border-radius:3px; font-weight:900; cursor:pointer; transition:0.2s; font-family:'Montserrat',sans-serif; font-size:0.7rem; }
+  .toggle-btn.active { background:var(--accent); color:#fff; }
+  .note { font-size:0.75em; color:var(--text-sub); margin-bottom:16px; }
+
+  .main-layout { display:grid; grid-template-columns:1fr 320px; gap:16px; align-items:start; }
+  .preview-panel { position:sticky; top:20px; }
+
+  .sec-head { font-family:'Montserrat',sans-serif; font-size:0.65rem; font-weight:900; color:var(--accent); letter-spacing:0.25em; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+  .sec-head::after { content:""; flex:1; height:1px; background:var(--accent); opacity:0.2; }
+  .sec { margin-bottom:22px; padding-bottom:18px; border-bottom:1px solid #2a2a2a; }
+  .sec:last-child { border-bottom:none; margin-bottom:0; }
+
+  .q { margin-bottom:11px; }
+  .ql { font-size:0.72em; color:var(--text-sub); margin-bottom:5px; font-weight:700; display:flex; align-items:center; gap:6px; }
+  .ql .dot { width:5px; height:5px; border-radius:50%; background:var(--ui-border); flex-shrink:0; transition:background 0.2s; }
+  .ql.on .dot { background:var(--accent); }
+  .ql.on { color:#fff; }
+
+  .cg { display:flex; flex-wrap:wrap; gap:5px; }
+  .cc { background:#181818; border:1px solid #2e2e2e; border-radius:6px; padding:6px 11px; cursor:pointer; font-size:0.71em; color:#555; transition:border-color 0.12s, color 0.12s, background 0.12s; user-select:none; line-height:1.4; }
+  .cc:hover { border-color:#555; color:#aaa; background:#1e1e1e; }
+  .cc.sel { border-color:var(--accent); color:#fff; background:rgba(197,55,60,0.11); }
+  .cc .cn { font-weight:700; display:block; }
+  .cc .cd { font-size:0.87em; color:#444; display:block; margin-top:1px; }
+  .cc.sel .cd { color:#777; }
+
+  .sub { display:none; padding:10px 12px; background:#161616; border-radius:6px; border:1px solid #2a2a2a; margin-top:-5px; margin-bottom:10px; }
+  .sub .q { margin-bottom:8px; }
+  .sub .q:last-child { margin-bottom:0; }
+
+  .xn { width:100%; background:var(--ui-input); border:1px solid #2a2a2a; color:var(--text-main); padding:7px 10px; border-radius:4px; font-family:inherit; font-size:0.75em; min-height:46px; resize:vertical; outline:none; transition:border-color 0.15s; margin-top:6px; }
+  .xn:focus { border-color:var(--accent); }
+  .xn::placeholder { color:#2e2e2e; }
+
+  .pv-card { background:#181818; border-radius:8px; border:1px solid var(--ui-border); overflow:hidden; }
+  .pv-head { padding:10px 14px; border-bottom:1px solid #2a2a2a; display:flex; justify-content:space-between; align-items:center; }
+  .pv-title { font-family:'Montserrat',sans-serif; font-size:0.6rem; font-weight:900; color:var(--accent); letter-spacing:0.25em; }
+  .pv-ed { font-family:'Montserrat',sans-serif; font-size:0.58rem; color:var(--text-sub); }
+  .pv-body { padding:12px 14px; font-size:0.72em; line-height:1.9; white-space:pre-wrap; word-break:break-all; max-height:calc(100vh - 220px); overflow-y:auto; min-height:100px; scrollbar-width:thin; scrollbar-color:#444 transparent; }
+  .pv-body .ph { color:#2a2a2a; font-style:italic; }
+  .pv-body .ph2 { color:var(--accent); font-family:'Montserrat',sans-serif; font-size:0.8em; font-weight:900; letter-spacing:0.06em; }
+  .pv-body .ph3 { color:#888; font-size:0.85em; font-style:italic; }
+  .pv-body .pl { color:var(--text-main); }
+  .pv-acts { padding:10px 14px; border-top:1px solid #2a2a2a; display:flex; flex-direction:column; gap:6px; }
+
+  .btn { padding:10px; font-size:13px; cursor:pointer; background:var(--accent); color:#fff; border:none; border-radius:4px; font-weight:900; transition:0.2s; font-family:'Montserrat',sans-serif; letter-spacing:0.08em; display:flex; align-items:center; justify-content:center; gap:6px; width:100%; }
+  .btn:hover:not(:disabled) { filter:brightness(1.12); transform:translateY(-1px); }
+  .btn:disabled { background:#2a2a2a; color:#444; cursor:default; transform:none; }
+  .btn .material-symbols-outlined { font-size:1rem; width:1rem; height:1rem; }
+  .btn-g { padding:8px; font-size:12px; cursor:pointer; background:transparent; color:var(--text-sub); border:1px solid #2a2a2a; border-radius:4px; font-weight:700; transition:0.2s; font-family:'Montserrat',sans-serif; display:flex; align-items:center; justify-content:center; gap:5px; width:100%; }
+  .btn-g:hover { border-color:#444; color:#888; }
+  .btn-g .material-symbols-outlined { font-size:0.9rem; width:0.9rem; height:0.9rem; }
+  #status { text-align:center; font-size:0.78em; color:var(--accent); font-weight:bold; min-height:1.2em; margin-top:2px; }
+
+  .v6 { display:none; } .v7 { display:none; }
+  @media (max-width:900px) { .main-layout { grid-template-columns:1fr; } .preview-panel { position:static; } .pv-body { max-height:260px; } }
+  @media (max-width:640px) { body { padding:60px 14px 60px; } .back-link { top:10px; left:10px; } .card { padding:18px 14px; } }
+</style>
+</head>
+<body>
+<a href="index.html" class="back-link"><span class="material-symbols-outlined" style="font-size:0.9rem;">arrow_back_ios</span>BACK TO TOOLBOX</a>
+<div class="card">
+  <div class="ui-header">
+    <div><span class="ui-brand">IKATOOLBOX</span><div class="ui-title">HOUSE RULE GENERATOR</div></div>
+    <div class="toggle-group">
+      <button id="btnV6" class="toggle-btn active" onclick="setEd('v6')">6th</button>
+      <button id="btnV7" class="toggle-btn" onclick="setEd('v7')">7th</button>
+    </div>
+  </div>
+  <p class="note">選択肢をクリックして組み合わせるだけでハウスルールが完成します。</p>
+
+  <div class="main-layout">
+  <div><!-- フォーム -->
+
+  <!-- ▼ キャラクター作成 -->
+  <div class="sec">
+    <div class="sec-head">キャラクター作成</div>
+
+    <div class="q"><div class="ql" id="l_振り直し"><span class="dot"></span>能力値 振り直し</div>
+    <div class="cg" data-k="振り直し" data-s="1">
+      <div class="cc" data-t="なし（RB準拠）"><span class="cn">なし（RB準拠）</span></div>
+      <div class="cc" data-t="一括振り直し：2回まで"><span class="cn">一括2回まで</span></div>
+      <div class="cc" data-t="一括振り直し：3回まで"><span class="cn">一括3回まで</span></div>
+      <div class="cc" data-t="一括振り直し：無制限。個別振り直しは合計3回まで"><span class="cn">一括無制限・個別3回</span></div>
+      <div class="cc" data-t="振り直し：無制限（合計値が92以下または15超えがない場合は回数消費なし）"><span class="cn">低値条件付き無制限</span><span class="cd">合計92以下 or 15超えなしは回数消費なし</span></div>
+      <div class="cc" data-t="振り直し：KP許可制で何回でも可"><span class="cn">KP許可制・何回でも</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_振り直しOpt"><span class="dot"></span>振り直し 補足オプション</div>
+    <div class="cg" data-k="振り直しOpt" data-s="0">
+      <div class="cc" data-t="振り直し後に出目が下がった場合、前の値を選択可"><span class="cn">下がった場合は前の値を選択可</span></div>
+      <div class="cc" data-t="任意の1能力値に限り±3の範囲で微調整可"><span class="cn">1能力値だけ±3微調整可</span></div>
+      <div class="cc v7" data-t="7版：幸運の振り直しはPOWとは別に個別3回まで"><span class="cn">7版：幸運のみ個別3回</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_入れ替え"><span class="dot"></span>能力値 入れ替え</div>
+    <div class="cg" data-k="入れ替え" data-s="1">
+      <div class="cc" data-t="なし"><span class="cn">なし</span></div>
+      <div class="cc" data-t="同じダイス数で振った値同士を1回だけ交換可（EDU除く）"><span class="cn">同ダイス数同士・1回（EDU除く）</span></div>
+      <div class="cc" data-t="任意の2能力値を1回だけ交換可"><span class="cn">任意の2値・1回</span></div>
+      <div class="cc" data-t="自由に何度でも（良心の範囲で）"><span class="cn">自由に何度でも</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_技能上限"><span class="dot"></span>技能上限</div>
+    <div class="cg" data-k="技能上限" data-s="1">
+      <div class="cc" data-t="なし（シナリオ指定優先）"><span class="cn">上限なし</span></div>
+      <div class="cc" data-t="80まで（シナリオ指定優先）"><span class="cn">上限80</span></div>
+      <div class="cc" data-t="85まで（シナリオ指定優先）"><span class="cn">上限85</span></div>
+      <div class="cc" data-t="85まで（職業技能1つのみ90可）"><span class="cn">上限85 / 職業技能1つのみ90可</span></div>
+      <div class="cc" data-t="初期85・継続95まで"><span class="cn">初期85 / 継続95</span></div>
+      <div class="cc" data-t="任意の1技能のみ90・他は80まで"><span class="cn">1技能のみ90 / 他は80</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_回避初期値"><span class="dot"></span>〈回避〉初期値・上限</div>
+    <div class="cg" data-k="回避初期値" data-s="1">
+      <div class="cc" data-t="RB準拠（DEX×2を初期値として振り分け可）"><span class="cn">RB準拠</span></div>
+      <div class="cc" data-t="DEX×3固定（振り分け不可）"><span class="cn">DEX×3固定</span></div>
+      <div class="cc" data-t="最大DEX×5まで自由割り振り（技能上限の例外）"><span class="cn">最大DEX×5まで自由割り振り</span></div>
+      <div class="cc" data-t="上限60（技能上限と独立）"><span class="cn">上限60（技能上限と独立）</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_英語"><span class="dot"></span>〈英語〉初期値</div>
+    <div class="cg" data-k="英語" data-s="1">
+      <div class="cc v6" data-t="RB準拠（EDU×1）"><span class="cn">RB準拠（EDU×1）</span></div>
+      <div class="cc v6" data-t="0として扱う"><span class="cn">0扱い</span></div>
+      <div class="cc v6" data-t="EDU16以上はEDU×2"><span class="cn">EDU16以上はEDU×2</span></div>
+      <div class="cc v6" data-t="現代設定はEDU×2可"><span class="cn">現代設定はEDU×2可</span></div>
+      <div class="cc v7" data-t="RB準拠（EDU 1/5）"><span class="cn">RB準拠（EDU 1/5）</span></div>
+      <div class="cc v7" data-t="現代設定はEDU 1/2可"><span class="cn">現代設定はEDU 1/2可</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_高技能背景"><span class="dot"></span>高技能の背景設定</div>
+    <div class="cg" data-k="高技能背景" data-s="1">
+      <div class="cc" data-t="不要"><span class="cn">不要</span></div>
+      <div class="cc" data-t="技能値60以上はキャラクター背景にその技能の習得理由を記載すること"><span class="cn">60以上は習得理由の記載必須</span></div>
+      <div class="cc" data-t="技能値80以上はキャラクター背景にその技能の習得理由を記載すること"><span class="cn">80以上は習得理由の記載必須</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_サプリ"><span class="dot"></span>サプリ・特殊ルール</div>
+    <div class="cg" data-k="サプリ" data-s="0">
+      <div class="cc v6" data-t="特徴表：採用しない"><span class="cn">特徴表なし</span></div>
+      <div class="cc v6" data-t="特徴表：全員採用時のみ最大2つまで（振り直しは2回まで）"><span class="cn">特徴表 最大2つ</span></div>
+      <div class="cc v7" data-t="経験値パック：全員採用時のみ最大2つまで"><span class="cn">経験値パック 最大2つ</span></div>
+      <div class="cc" data-t="学生探索者：指定がない場合サプリ参照（2010準拠）"><span class="cn">学生探索者ルール</span></div>
+      <div class="cc" data-t="持ち物：背景から説明できないものや背景上所持不可のものは持ち込み不可"><span class="cn">持ち物制限</span></div>
+      <div class="cc" data-t="現代日本舞台では銃火器・刀剣類の持ち込みは原則不可（職業・設定上必要な場合はKP相談）"><span class="cn">現代日本：武器持ち込み原則不可</span></div>
+      <div class="cc" data-t="武道・ほかの言語・芸術・製作・操縦などは種類制限なく取得可（2010準拠）"><span class="cn">複数取得技能の種類制限なし</span></div>
+    </div></div>
+
+    <textarea class="xn" data-k="キャラ追記" placeholder="追記…" oninput="onXn(this)"></textarea>
+  </div>
+
+  <!-- ▼ ダイス・判定 -->
+  <div class="sec">
+    <div class="sec-head">ダイス・判定</div>
+
+    <div class="q"><div class="ql" id="l_クリ範囲"><span class="dot"></span>クリティカル 範囲</div>
+    <div class="cg" data-k="クリ範囲" data-s="1">
+      <div class="cc" data-t="1のみ"><span class="cn">1のみ</span></div>
+      <div class="cc" data-t="1〜5"><span class="cn">1〜5</span></div>
+      <div class="cc" data-t="技能値の1/5以下"><span class="cn">技能値の1/5以下</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_クリ効果"><span class="dot"></span>クリティカル 効果（通常判定）</div>
+    <div class="cg" data-k="クリ効果" data-s="1">
+      <div class="cc" data-t="RB準拠"><span class="cn">RB準拠</span></div>
+      <div class="cc" data-t="追加情報の入手（KP裁量）"><span class="cn">追加情報の入手</span></div>
+      <div class="cc" data-t="追加情報 or C券1枚（KP判断）"><span class="cn">追加情報 or C券1枚</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_ファン範囲"><span class="dot"></span>ファンブル 範囲</div>
+    <div class="cg" data-k="ファン範囲" data-s="1">
+      <div class="cc" data-t="100のみ"><span class="cn">100のみ</span></div>
+      <div class="cc" data-t="96〜100"><span class="cn">96〜100</span></div>
+      <div class="cc" data-t="96〜100（技能値問わず常時）"><span class="cn">常時96〜100</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_ファン効果"><span class="dot"></span>ファンブル 処理（通常判定）</div>
+    <div class="cg" data-k="ファン効果" data-s="0">
+      <div class="cc" data-t="KP裁量で決定"><span class="cn">KP裁量</span></div>
+      <div class="cc" data-t="技能値にマイナス補正"><span class="cn">技能にマイナス補正</span></div>
+      <div class="cc" data-t="1d3のHP減少（戦闘外）"><span class="cn">1d3 HP減少（戦闘外）</span></div>
+      <div class="cc" data-t="100ファンブルのみ特殊処理の可能性あり"><span class="cn">100Fのみ特殊処理あり</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_スペシャル"><span class="dot"></span>スペシャル</div>
+    <div class="cg" data-k="スペシャル" data-s="1">
+      <div class="cc" data-t="採用しない"><span class="cn">採用しない</span></div>
+      <div class="cc" data-t="場合により採用（KP判断）"><span class="cn">場合により採用</span></div>
+      <div class="cc" data-t="常時採用"><span class="cn">常時採用</span></div>
+    </div></div>
+
+    <div class="q v7"><div class="ql" id="l_プッシュ"><span class="dot"></span>プッシュロール（7版）</div>
+    <div class="cg" data-k="プッシュ" data-s="1">
+      <div class="cc" data-t="RB準拠"><span class="cn">RB準拠</span></div>
+      <div class="cc" data-t="採用しない"><span class="cn">採用しない</span></div>
+      <div class="cc" data-t="採用（幸運・SANロール・戦闘ロールは不可）"><span class="cn">採用（幸運・SAN・戦闘は不可）</span></div>
+      <div class="cc" data-t="採用（2回目失敗でファンブル扱い）"><span class="cn">採用（2回目失敗でファンブル）</span></div>
+    </div></div>
+
+    <!-- C券 -->
+    <div class="q"><div class="ql" id="l_C券"><span class="dot"></span>C券（クリティカルチケット）</div>
+    <div class="cg" data-k="C券" data-s="1">
+      <div class="cc" data-t="採用しない" data-hide="cken"><span class="cn">採用しない</span></div>
+      <div class="cc" data-t="採用する" data-show="cken"><span class="cn">採用する</span></div>
+    </div></div>
+    <div class="sub" id="cken">
+      <div class="q"><div class="ql" id="l_C券獲得"><span class="dot"></span>獲得条件</div>
+      <div class="cg" data-k="C券獲得" data-s="0">
+        <div class="cc" data-t="クリティカル時（追加情報が発生しない場合）"><span class="cn">クリ時（追加情報なし）</span></div>
+        <div class="cc" data-t="クリティカル時（無条件）"><span class="cn">クリ時（無条件）</span></div>
+        <div class="cc" data-t="KP判断で随時贈呈"><span class="cn">KP随時贈呈</span></div>
+        <div class="cc" data-t="スペシャルを3回貯めると1枚に変換可"><span class="cn">スペシャル3回→1枚に変換可</span></div>
+      </div></div>
+      <div class="q"><div class="ql" id="l_C券上限"><span class="dot"></span>所持上限</div>
+      <div class="cg" data-k="C券上限" data-s="1">
+        <div class="cc" data-t="上限なし"><span class="cn">無制限</span></div>
+        <div class="cc" data-t="最大3枚"><span class="cn">最大3枚</span></div>
+        <div class="cc" data-t="最大5枚"><span class="cn">最大5枚</span></div>
+        <div class="cc" data-t="セッション終了時にリセット（持ち越し不可）"><span class="cn">セッション持ち越し不可</span></div>
+      </div></div>
+      <div class="q"><div class="ql" id="l_C券用途"><span class="dot"></span>用途（複数選択可）</div>
+      <div class="cg" data-k="C券用途" data-s="0">
+        <div class="cc" data-t="振り直し（1枚）"><span class="cn">振り直し</span></div>
+        <div class="cc" data-t="ファンブル打消し（1枚）"><span class="cn">ファンブル打消し</span></div>
+        <div class="cc" data-t="ロール前に技能補正（補正値はKP裁量・1枚）"><span class="cn">ロール前 技能補正</span><span class="cd">補正値はKP裁量</span></div>
+        <div class="cc" data-t="次のロールに+10補正（1枚）"><span class="cn">次ロール +10</span></div>
+        <div class="cc" data-t="次のロールに+30補正（1枚）"><span class="cn">次ロール +30</span></div>
+        <div class="cc" data-t="KPへの交渉・CCB&lt;=30（1枚）"><span class="cn">KP交渉（CCB&lt;=30）</span></div>
+        <div class="cc" data-t="成長チェックを1つ付与（1枚）"><span class="cn">成長チェック付与</span></div>
+        <div class="cc" data-t="SAN値を1d3回復（1枚）"><span class="cn">SAN 1d3回復</span></div>
+        <div class="cc" data-t="他のPCへ譲渡可（双方合意が必要）"><span class="cn">他PCへ譲渡可</span></div>
+        <div class="cc" data-t="セッション後の成長判定に使用可（判定1回追加・1枚）"><span class="cn">セッション後 成長判定に使用可</span></div>
+      </div></div>
+      <div class="q"><div class="ql" id="l_C券F"><span class="dot"></span>ファンブル時のC券</div>
+      <div class="cg" data-k="C券F" data-s="1">
+        <div class="cc" data-t="ファンブル時：C券に影響なし"><span class="cn">影響なし</span></div>
+        <div class="cc" data-t="ファンブル時：C券1枚を没収"><span class="cn">1枚没収</span></div>
+        <div class="cc" data-t="ファンブル時：所持C券を全て没収"><span class="cn">全没収</span></div>
+      </div></div>
+    </div>
+
+    <textarea class="xn" data-k="ダイス追記" placeholder="追記…" oninput="onXn(this)"></textarea>
+  </div>
+
+  <!-- ▼ 正気度・発狂 -->
+  <div class="sec">
+    <div class="sec-head">正気度・発狂</div>
+
+    <div class="q"><div class="ql" id="l_SANc補正"><span class="dot"></span>SANチェック 出目補正</div>
+    <div class="cg" data-k="SANc補正" data-s="1">
+      <div class="cc" data-t="補正なし（ダイス結果そのまま）"><span class="cn">補正なし</span></div>
+      <div class="cc" data-t="クリ→最低値 / ファン→最高値"><span class="cn">クリ→最低値 / ファン→最高値</span></div>
+      <div class="cc" data-t="クリ→0 / ファン→最高値"><span class="cn">クリ→0 / ファン→最高値</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_一時的狂気"><span class="dot"></span>一時的狂気</div>
+    <div class="cg" data-k="一時的狂気" data-s="1">
+      <div class="cc" data-t="RB準拠"><span class="cn">RB準拠</span></div>
+      <div class="cc" data-t="〈精神分析〉や肉体ショックで即座に回復可（期間はRBと異なる場合あり）"><span class="cn">精神分析で即時回復可</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_不定の狂気"><span class="dot"></span>不定の狂気</div>
+    <div class="cg" data-k="不定の狂気" data-s="1">
+      <div class="cc" data-t="RB準拠"><span class="cn">RB準拠</span></div>
+      <div class="cc" data-t="1日以内に現在SAN値の20%が減少した場合に発症。一時回復可。1日経過でリセット"><span class="cn">1日20%減で発症・1日でリセット</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_狂気内容"><span class="dot"></span>狂気内容の決定</div>
+    <div class="cg" data-k="狂気内容" data-s="1">
+      <div class="cc" data-t="RB準拠（ダイスで決定）"><span class="cn">RB準拠（ダイス）</span></div>
+      <div class="cc" data-t="KP・PL相談優先（決まらない場合のみダイス）"><span class="cn">KP・PL相談優先</span></div>
+      <div class="cc" data-t="シナリオ指定またはKP裁量"><span class="cn">シナリオ・KP裁量</span></div>
+    </div></div>
+
+    <textarea class="xn" data-k="SAN追記" placeholder="追記…" oninput="onXn(this)"></textarea>
+  </div>
+
+  <!-- ▼ 戦闘ルール -->
+  <div class="sec">
+    <div class="sec-head">戦闘ルール</div>
+
+    <div class="q"><div class="ql" id="l_行動順"><span class="dot"></span>行動順</div>
+    <div class="cg" data-k="行動順" data-s="1">
+      <div class="cc" data-t="DEX順（同値はKP裁量）"><span class="cn">DEX順（同値はKP裁量）</span></div>
+      <div class="cc" data-t="DEX順（同値は1d100低い方が先）"><span class="cn">DEX順（同値は1d100低い方が先）</span></div>
+      <div class="cc" data-t="DEX順（同値はPC優先・PC同士は1d100低い方が先）"><span class="cn">DEX順（同値はPC優先）</span></div>
+      <div class="cc" data-t="DEX順（cocofolia左側優先）"><span class="cn">DEX順（cocofolia左側優先）</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_特殊行動"><span class="dot"></span>特殊行動オプション</div>
+    <div class="cg" data-k="特殊行動" data-s="0">
+      <div class="cc" data-t="ディレイ：行動を任意のタイミングまで遅らせることができる"><span class="cn">ディレイ</span><span class="cd">行動を任意タイミングに遅らせる</span></div>
+      <div class="cc" data-t="パス：そのラウンドの行動権を放棄できる"><span class="cn">パス</span><span class="cd">行動権の放棄</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_回避回数"><span class="dot"></span>回避 回数・難易度</div>
+    <div class="cg" data-k="回避回数" data-s="1">
+      <div class="cc" data-t="RB準拠（1R1回）"><span class="cn">RB準拠（1R1回）</span></div>
+      <div class="cc" data-t="1R3回まで可（2回目は技能値2/3・3回目は技能値1/3）"><span class="cn">3回まで（毎回2/3ずつ減少）</span></div>
+      <div class="cc" data-t="1R1回。2回目は幸運・3回目は幸運/2で判定"><span class="cn">2回目から幸運判定</span></div>
+      <div class="cc" data-t="回数制限なし"><span class="cn">制限なし</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_受け流し"><span class="dot"></span>受け流し</div>
+    <div class="cg" data-k="受け流し" data-s="1">
+      <div class="cc" data-t="RB準拠"><span class="cn">RB準拠</span></div>
+      <div class="cc" data-t="何度でも使用可・他の行動と併用可"><span class="cn">何度でも・他行動と併用可</span></div>
+      <div class="cc" data-t="1R1回・回避と同一ターンは使用不可"><span class="cn">1R1回・回避とは排他</span></div>
+      <div class="cc" data-t="採用しない"><span class="cn">採用しない</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_専念"><span class="dot"></span>専念行動（複数選択可）</div>
+    <div class="cg" data-k="専念" data-s="0">
+      <div class="cc" data-t="回避に専念：R開始時に宣言。そのラウンドの回避判定に+20ボーナス"><span class="cn">回避に専念</span><span class="cd">R開始宣言で+20</span></div>
+      <div class="cc" data-t="治療に専念：R開始時に宣言。そのラウンドの回復技能に+20ボーナス"><span class="cn">治療に専念</span><span class="cd">R開始宣言で+20</span></div>
+      <div class="cc" data-t="サポートに専念：R開始時に宣言。任意のPCの技能判定にボーナスを付与（DEX対抗あり）"><span class="cn">サポートに専念</span></div>
+      <div class="cc" data-t="庇う：DEX対抗。ダメージを肩代わり。1R1回（関連技能持ちは対抗なし）"><span class="cn">庇う</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_意識不明"><span class="dot"></span>意識不明 条件</div>
+    <div class="cg" data-k="意識不明" data-s="0">
+      <div class="cc" data-t="RB準拠のみ"><span class="cn">RB準拠のみ</span></div>
+      <div class="cc" data-t="1回の攻撃で最大HPの1/2以上のダメージを受けた場合、CON×5に失敗すると意識不明"><span class="cn">最大HP1/2以上 + CON失敗</span></div>
+      <div class="cc" data-t="HPが1〜2になった場合、自動的に意識不明（HP3以上に回復で復帰）"><span class="cn">HP1〜2で自動意識不明</span></div>
+      <div class="cc" data-t="MPが0になった場合も意識不明（MP1以上回復で復帰）"><span class="cn">MP0でも意識不明</span></div>
+    </div></div>
+
+    <!-- 戦闘クリティカル・ファンブルを個別に選択できるサブ詳細形式 -->
+    <div class="q"><div class="ql" id="l_戦闘クリファン"><span class="dot"></span>戦闘時 クリティカル / ファンブル</div>
+    <div class="cg" data-k="戦闘クリファン" data-s="1">
+      <div class="cc" data-t="RB準拠" data-hide="bat-cf"><span class="cn">RB準拠</span></div>
+      <div class="cc" data-t="独自ルールを設定する" data-show="bat-cf"><span class="cn">独自ルールを設定する</span></div>
+    </div></div>
+    <div class="sub" id="bat-cf">
+      <div class="q"><div class="ql" id="l_戦闘クリ"><span class="dot"></span>クリティカル 効果（戦闘）</div>
+      <div class="cg" data-k="戦闘クリ" data-s="0">
+        <div class="cc" data-t="[クリ]回避不可"><span class="cn">回避不可</span></div>
+        <div class="cc" data-t="[クリ]ダメージ2倍（または最大値）"><span class="cn">ダメージ2倍 / 最大値</span></div>
+        <div class="cc" data-t="[クリ]即座に反撃可"><span class="cn">即座に反撃可</span></div>
+        <div class="cc" data-t="[クリ]部位狙い自動成功"><span class="cn">部位狙い自動成功</span></div>
+        <div class="cc" data-t="[クリ]ノックバック（DEX対抗）"><span class="cn">ノックバック（DEX対抗）</span></div>
+      </div></div>
+      <div class="q"><div class="ql" id="l_戦闘ファン"><span class="dot"></span>ファンブル 効果（戦闘）</div>
+      <div class="cg" data-k="戦闘ファン" data-s="0">
+        <div class="cc" data-t="[ファン]反撃を受ける"><span class="cn">反撃を受ける</span></div>
+        <div class="cc" data-t="[ファン]そのターン回避・受け流し不可"><span class="cn">そのターン回避不可</span></div>
+        <div class="cc" data-t="[ファン]武器を落とす（拾い直しに1行動）"><span class="cn">武器を落とす</span></div>
+        <div class="cc" data-t="[ファン]転倒（起き上がりに1行動）"><span class="cn">転倒（起き上がりに1行動）</span></div>
+        <div class="cc" data-t="[ファン]1d3 HP自傷"><span class="cn">1d3 HP自傷</span></div>
+        <div class="cc" data-t="[ファン]味方誤射の可能性（KP裁量）"><span class="cn">味方誤射の可能性</span></div>
+      </div></div>
+    </div>
+
+    <textarea class="xn" data-k="戦闘追記" placeholder="追記…" oninput="onXn(this)"></textarea>
+  </div>
+
+  <!-- ▼ 成長・その他 -->
+  <div class="sec">
+    <div class="sec-head">成長・その他</div>
+
+    <div class="q"><div class="ql" id="l_成長条件"><span class="dot"></span>成長チェック 獲得条件</div>
+    <div class="cg" data-k="成長条件" data-s="1">
+      <div class="cc" data-t="RB準拠"><span class="cn">RB準拠</span></div>
+      <div class="cc" data-t="1度でも成功した技能 + ファンブルした技能"><span class="cn">成功技能 + ファンブル技能</span></div>
+      <div class="cc" data-t="クリティカル / 同一技能での複数ファンブル / 初期値成功"><span class="cn">クリ / 複数ファン / 初期値成功</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_成長タイミング"><span class="dot"></span>成長 タイミング</div>
+    <div class="cg" data-k="成長タイミング" data-s="1">
+      <div class="cc" data-t="RB準拠（シナリオ終了後）"><span class="cn">RB準拠（終了後）</span></div>
+      <div class="cc" data-t="クリ発生時に即時判定（難しい場合は終了後）"><span class="cn">クリ発生時に即時成長</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_成長判定"><span class="dot"></span>成長判定 方式</div>
+    <div class="cg" data-k="成長判定" data-s="1">
+      <div class="cc" data-t="RB準拠"><span class="cn">RB準拠</span></div>
+      <div class="cc" data-t="失敗で1d10上昇（96以上でも成長）"><span class="cn">失敗で1d10・96以上でも成長</span></div>
+      <div class="cc" data-t="失敗を成功扱い（成功1d10・失敗1d3）"><span class="cn">失敗=成功扱い / 成功1d10・失敗1d3</span></div>
+      <div class="cc" data-t="判定なし・固定5%上昇"><span class="cn">固定5%上昇</span></div>
+    </div></div>
+
+    <div class="q"><div class="ql" id="l_高技能成長"><span class="dot"></span>高技能（90超）の扱い</div>
+    <div class="cg" data-k="高技能成長" data-s="1">
+      <div class="cc" data-t="通常通り成長"><span class="cn">通常通り成長</span></div>
+      <div class="cc" data-t="成長なし → SAN回復判定（成功1d5・失敗1d3）"><span class="cn">成長なし → SAN回復</span><span class="cd">成功1d5 / 失敗1d3</span></div>
+    </div></div>
+
+    <textarea class="xn" data-k="成長追記" placeholder="追記…" oninput="onXn(this)"></textarea>
+  </div>
+
+  </div><!-- /フォーム -->
+
+  <!-- ▼ プレビュー -->
+  <div class="preview-panel">
+    <div class="pv-card">
+      <div class="pv-head">
+        <span class="pv-title">PREVIEW</span>
+        <span class="pv-ed" id="pvEd">CoC 6版</span>
+      </div>
+      <div class="pv-body" id="pvBody"><span class="ph">項目を選択すると
+ここに反映されます</span></div>
+      <div class="pv-acts">
+        <button class="btn" id="copyBtn" onclick="doCopy()" disabled>
+          <span class="material-symbols-outlined">content_copy</span>テキストをコピー
+        </button>
+        <button class="btn-g" onclick="doReset()">
+          <span class="material-symbols-outlined">refresh</span>リセット
+        </button>
+        <div id="status"></div>
+      </div>
+    </div>
+  </div>
+  </div><!-- /main-layout -->
+</div>
+
+<script>
+// ---- データ ----
+// SECTIONSのkeysは { k: データキー, label: プレビューに出す見出し語 } の形式
+// labelがnullのものはセクション見出しの下にflatに並ぶ（サブ項目など）
+const SECS = [
+  { head:'キャラクター作成', items:[
+    {k:'振り直し',     lbl:'振り直し'},
+    {k:'振り直しOpt',  lbl:null},
+    {k:'入れ替え',     lbl:'数値入れ替え'},
+    {k:'技能上限',     lbl:'技能上限'},
+    {k:'回避初期値',   lbl:'〈回避〉初期値・上限'},
+    {k:'英語',         lbl:'〈英語〉初期値'},
+    {k:'高技能背景',   lbl:'高技能の背景設定'},
+    {k:'サプリ',       lbl:null},
+    {k:'キャラ追記',   lbl:null},
+  ]},
+  { head:'ダイス・判定', items:[
+    {k:'クリ範囲',  lbl:'クリティカル範囲'},
+    {k:'クリ効果',  lbl:'クリティカル効果'},
+    {k:'ファン範囲',lbl:'ファンブル範囲'},
+    {k:'ファン効果',lbl:'ファンブル処理'},
+    {k:'スペシャル',lbl:'スペシャル'},
+    {k:'プッシュ',  lbl:'プッシュロール'},
+    {k:'C券',       lbl:'C券（クリティカルチケット）'},
+    {k:'C券獲得',   lbl:null},
+    {k:'C券上限',   lbl:null},
+    {k:'C券用途',   lbl:null},
+    {k:'C券F',      lbl:null},
+    {k:'ダイス追記',lbl:null},
+  ]},
+  { head:'正気度・発狂', items:[
+    {k:'SANc補正',  lbl:'SANチェック出目補正'},
+    {k:'一時的狂気',lbl:'一時的狂気'},
+    {k:'不定の狂気',lbl:'不定の狂気'},
+    {k:'狂気内容',  lbl:'狂気内容の決定'},
+    {k:'SAN追記',   lbl:null},
+  ]},
+  { head:'戦闘ルール', items:[
+    {k:'行動順',      lbl:'行動順'},
+    {k:'特殊行動',    lbl:'特殊行動'},
+    {k:'回避回数',    lbl:'回避'},
+    {k:'受け流し',    lbl:'受け流し'},
+    {k:'専念',        lbl:'専念行動'},
+    {k:'意識不明',    lbl:'意識不明条件'},
+    {k:'戦闘クリファン', lbl:null},
+    {k:'戦闘クリ',    lbl:'クリティカル効果'},
+    {k:'戦闘ファン',  lbl:'ファンブル効果'},
+    {k:'戦闘追記',    lbl:null},
+  ]},
+  { head:'成長・その他', items:[
+    {k:'成長条件',    lbl:'成長チェック獲得条件'},
+    {k:'成長タイミング',lbl:'成長タイミング'},
+    {k:'成長判定',    lbl:'成長判定方式'},
+    {k:'高技能成長',  lbl:'技能90超の扱い'},
+    {k:'成長追記',    lbl:null},
+  ]},
+];
+
+const sel = {};
+let ed = 'v6';
+
+// ---- 版切替 ----
+function setEd(e) {
+  ed = e;
+  document.getElementById('btnV6').classList.toggle('active', e==='v6');
+  document.getElementById('btnV7').classList.toggle('active', e==='v7');
+  document.querySelectorAll('.v6').forEach(el => el.style.display = e==='v6' ? 'inline-flex' : 'none');
+  document.querySelectorAll('.v7').forEach(el => el.style.display = e==='v7' ? 'inline-flex' : 'none');
+  // q-unit.v7 （プッシュロール行全体）
+  document.querySelectorAll('.q.v7').forEach(el => el.style.display = e==='v7' ? 'block' : 'none');
+  document.getElementById('pvEd').textContent = e==='v6' ? 'CoC 6版' : 'CoC 7版';
+  updatePv();
+}
+
+// ---- 選択肢クリック ----
+document.querySelectorAll('.cg').forEach(g => {
+  const k = g.dataset.k;
+  const single = g.dataset.s === '1';
+  g.querySelectorAll('.cc').forEach(c => {
+    c.addEventListener('click', () => {
+      const wasOn = c.classList.contains('sel');
+      if (single) {
+        g.querySelectorAll('.cc').forEach(x => x.classList.remove('sel'));
+        if (!wasOn) { c.classList.add('sel'); sel[k] = [c.dataset.t]; }
+        else { delete sel[k]; }
+      } else {
+        c.classList.toggle('sel');
+        sel[k] = [...g.querySelectorAll('.cc.sel')].map(x => x.dataset.t);
+        if (!sel[k].length) delete sel[k];
+      }
+      // サブ詳細の展開
+      if (c.dataset.show) {
+        const el = document.getElementById(c.dataset.show);
+        if (el) el.style.display = !wasOn ? 'block' : 'none';
+        if (wasOn) clearSub(c.dataset.show);
+      }
+      if (c.dataset.hide) {
+        const el = document.getElementById(c.dataset.hide);
+        if (el) el.style.display = 'none';
+        clearSub(c.dataset.hide);
+      }
+      updLbl(k); updatePv();
+    });
+  });
+});
+
+function clearSub(subId) {
+  const sub = document.getElementById(subId);
+  if (!sub) return;
+  sub.querySelectorAll('.cc').forEach(c => c.classList.remove('sel'));
+  sub.querySelectorAll('.cg').forEach(g => { delete sel[g.dataset.k]; });
+}
+
+function onXn(ta) {
+  const k = ta.dataset.k;
+  const v = ta.value.trim();
+  if (v) sel[k] = [v]; else delete sel[k];
+  updatePv();
+}
+
+function updLbl(k) {
+  const el = document.getElementById('l_'+k);
+  if (!el) return;
+  el.classList.toggle('on', !!(sel[k]?.length));
+}
+
+// ---- テキスト行を構築する共通関数 ----
+// [クリ]xxx / [ファン]xxx のプレフィックスをグループ化して小見出し付きに整形
+function buildLines(items, forCopy) {
+  const out = []; // { type:'sec'|'sub'|'item', text }
+  items.forEach(item => {
+    const vals = sel[item.k];
+    if (!vals?.length) return;
+
+    if (item.lbl) {
+      // 値が1つで単純な場合は「小見出し  値」、複数・[プレフィックス]付きは小見出し＋インデント行
+      const hasPrefix = vals.some(v => /^\[.+?\]/.test(v));
+      const isMulti = vals.length > 1 || hasPrefix;
+
+      if (isMulti) {
+        out.push({ type:'sub', text: item.lbl });
+        vals.forEach(v => {
+          const stripped = v.replace(/^\[.+?\]/, '').trim();
+          out.push({ type:'item', text: stripped });
+        });
+      } else {
+        // 単値：小見出し  値 を1行で
+        out.push({ type:'inline', lbl: item.lbl, text: vals[0] });
+      }
+    } else {
+      // lbl なし：値をそのまま（追記や「採用する/しない」など）
+      vals.forEach(v => {
+        if (v === '採用しない' || v === '採用する') return; // C券の採用有無はサブ詳細で完結
+        out.push({ type:'item', text: v });
+      });
+    }
+  });
+  return out;
+}
+
+// ---- プレビュー生成 ----
+function updatePv() {
+  const body = document.getElementById('pvBody');
+  const edLbl = ed==='v6' ? '6版' : '7版';
+  let hasAny = false;
+  let html = `<span style="font-family:'Montserrat',sans-serif;font-size:0.88em;font-weight:900;color:#fff;letter-spacing:0.04em;">【CoC ${edLbl} ハウスルール】</span>\n\n`;
+
+  SECS.forEach(sec => {
+    const rows = buildLines(sec.items, false);
+    if (!rows.length) return;
+    hasAny = true;
+    html += `<span class="ph2">━━ ${sec.head} ━━</span>\n`;
+    rows.forEach(r => {
+      if (r.type === 'sub')    html += `<span class="ph3">  ▸ ${r.text}</span>\n`;
+      else if (r.type === 'inline') html += `<span class="pl">  ${r.lbl.padEnd(12,'　')}${r.text}</span>\n`;
+      else                     html += `<span class="pl">    ・${r.text}</span>\n`;
+    });
+    html += '\n';
+  });
+
+  if (!hasAny) {
+    body.innerHTML = '<span class="ph">項目を選択すると\nここに反映されます</span>';
+    document.getElementById('copyBtn').disabled = true;
+  } else {
+    body.innerHTML = html;
+    document.getElementById('copyBtn').disabled = false;
+  }
+  SECS.forEach(sec => sec.items.forEach(item => updLbl(item.k)));
+}
+
+// ---- コピー ----
+function doCopy() {
+  const edLbl = ed==='v6' ? '6版' : '7版';
+  let out = `【CoC ${edLbl} ハウスルール】\n\n`;
+  let hasAny = false;
+  SECS.forEach(sec => {
+    const rows = buildLines(sec.items, true);
+    if (!rows.length) return;
+    hasAny = true;
+    out += `━━ ${sec.head} ━━\n`;
+    rows.forEach(r => {
+      if (r.type === 'sub')         out += `  ▸ ${r.text}\n`;
+      else if (r.type === 'inline') out += `  ${r.lbl.padEnd(12,'　')}${r.text}\n`;
+      else                          out += `    ・${r.text}\n`;
+    });
+    out += '\n';
+  });
+  if (!hasAny) return;
+  navigator.clipboard.writeText(out.trim()).then(() => {
+    const st = document.getElementById('status');
+    st.textContent = 'コピーしました！';
+    setTimeout(() => { st.textContent = ''; }, 2500);
+  });
+}
+
+// ---- リセット ----
+function doReset() {
+  Object.keys(sel).forEach(k => delete sel[k]);
+  document.querySelectorAll('.cc').forEach(c => c.classList.remove('sel'));
+  document.querySelectorAll('.xn').forEach(ta => { ta.value = ''; });
+  document.querySelectorAll('.ql').forEach(l => l.classList.remove('on'));
+  document.querySelectorAll('.sub').forEach(s => { s.style.display = 'none'; });
+  updatePv();
+}
+
+window.onload = () => setEd('v6');
+</script>
+<div style="position:fixed;bottom:10px;right:15px;font-family:sans-serif;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:0.1em;font-weight:bold;pointer-events:none;z-index:9999;">✦ IKATOOLBOX</div>
+</body>
+</html>
