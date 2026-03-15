@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IKATOOLBOX | RECAP BUILDER</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%%22 y=%2250%%22 style=%22dominant-baseline:central;text-anchor:middle;font-size:80px;%22>🦑</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&family=Noto+Sans+JP:wght@400;500;700&family=Montserrat:wght@700;900&display=block" rel="stylesheet">
+<style>
+  :root {
+    --bg-dark:#1a1a1a; --card-bg:#222; --ui-input:#111; --ui-border:#444;
+    --accent:#C5373C; --text-main:#dbdee1; --text-sub:#b5bac1;
+  }
+  .material-symbols-outlined { display:inline-block; width:1em; height:1em; overflow:hidden; white-space:nowrap; direction:ltr; vertical-align:middle; }
+  *,*::before,*::after { box-sizing:border-box; }
+  body { font-family:'Noto Sans JP',sans-serif; line-height:1.6; max-width:1100px; margin:0 auto; padding:80px 20px 60px; background:var(--bg-dark); color:var(--text-main); min-height:100vh; position:relative; }
+
+  .back-link { position:absolute; top:30px; left:20px; display:flex; align-items:center; gap:8px; text-decoration:none; color:var(--text-sub); font-family:'Montserrat',sans-serif; font-size:0.8rem; font-weight:700; letter-spacing:0.1em; transition:0.3s; }
+  .back-link:hover { color:var(--accent); transform:translateX(-5px); }
+  .card { background:var(--card-bg); padding:24px 28px; border-radius:12px; border:1px solid var(--ui-border); margin-bottom:12px; }
+  .ui-header { margin-bottom:16px; border-bottom:3px solid var(--accent); padding-bottom:12px; display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:10px; }
+  .ui-brand { font-family:'Montserrat',sans-serif; font-size:0.7rem; font-weight:900; color:var(--accent); letter-spacing:0.4em; display:block; margin-bottom:2px; }
+  .ui-title { font-family:'Montserrat','Noto Sans JP',sans-serif; font-size:1.3rem; font-weight:900; color:#fff; letter-spacing:0.05em; }
+  .note { font-size:0.75em; color:var(--text-sub); margin-bottom:16px; }
+
+  .main-layout { display:grid; grid-template-columns:1fr 320px; gap:16px; align-items:start; }
+  .preview-panel { position:sticky; top:20px; }
+
+  /* セクション */
+  .sec-head { font-family:'Montserrat',sans-serif; font-size:0.65rem; font-weight:900; color:var(--accent); letter-spacing:0.25em; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+  .sec-head::after { content:""; flex:1; height:1px; background:var(--accent); opacity:0.2; }
+  .sec { margin-bottom:20px; padding-bottom:18px; border-bottom:1px solid #2a2a2a; }
+  .sec:last-child { border-bottom:none; margin-bottom:0; }
+
+  .q { margin-bottom:10px; }
+  .ql { font-size:0.72em; color:var(--text-sub); margin-bottom:4px; font-weight:700; display:flex; align-items:center; gap:6px; }
+  .ql .dot { width:5px; height:5px; border-radius:50%; background:var(--ui-border); flex-shrink:0; transition:background 0.2s; }
+  .ql.on .dot { background:var(--accent); }
+  .ql.on { color:#fff; }
+
+  input[type="text"], input[type="date"] {
+    width:100%; background:var(--ui-input); border:1px solid var(--ui-border); color:var(--text-main);
+    padding:7px 10px; border-radius:4px; font-family:inherit; font-size:0.82rem; outline:none; transition:border-color 0.15s;
+  }
+  input[type="text"]:focus, input[type="date"]:focus { border-color:var(--accent); }
+  input[type="date"] { color-scheme:dark; }
+
+  textarea {
+    width:100%; background:var(--ui-input); border:1px solid var(--ui-border); color:var(--text-main);
+    padding:7px 10px; border-radius:4px; font-family:inherit; font-size:0.8rem; min-height:60px; resize:vertical; outline:none; transition:border-color 0.15s;
+  }
+  textarea:focus { border-color:var(--accent); }
+  textarea::placeholder, input::placeholder { color:#333; }
+
+  /* タグ入力 */
+  .tag-input-wrap { display:flex; flex-direction:column; gap:6px; }
+  .tag-row { display:flex; gap:6px; align-items:center; }
+  .tag-row input { flex:1; }
+  .tag-add-btn { background:transparent; border:1px dashed #444; color:#555; border-radius:4px; padding:6px 10px; cursor:pointer; font-size:0.72rem; font-family:'Montserrat',sans-serif; transition:0.15s; white-space:nowrap; }
+  .tag-add-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .tag-remove-btn { background:transparent; border:none; color:#444; cursor:pointer; padding:4px; display:flex; align-items:center; transition:0.15s; flex-shrink:0; }
+  .tag-remove-btn:hover { color:#ff5252; }
+  .tag-remove-btn .material-symbols-outlined { font-size:1rem; width:1rem; height:1rem; }
+
+  /* 被害テーブル */
+  .damage-table { width:100%; border-collapse:collapse; }
+  .damage-table th { font-size:0.6rem; font-family:'Montserrat',sans-serif; font-weight:900; color:#555; letter-spacing:0.1em; padding:4px 8px; border-bottom:1px solid #2a2a2a; text-align:left; }
+  .damage-table td { padding:4px 6px; }
+  .damage-table input { min-height:auto; padding:5px 8px; font-size:0.78rem; }
+  .damage-table .del-cell { width:32px; text-align:center; }
+  .add-row-btn { margin-top:6px; background:transparent; border:1px dashed #333; color:#555; border-radius:4px; padding:5px 12px; cursor:pointer; font-size:0.7rem; font-family:'Montserrat',sans-serif; transition:0.15s; width:100%; }
+  .add-row-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+  /* プレビュー */
+  .pv-card { background:#181818; border-radius:8px; border:1px solid var(--ui-border); overflow:hidden; }
+  .pv-head { padding:10px 14px; border-bottom:1px solid #2a2a2a; display:flex; justify-content:space-between; align-items:center; }
+  .pv-title { font-family:'Montserrat',sans-serif; font-size:0.6rem; font-weight:900; color:var(--accent); letter-spacing:0.25em; }
+  .pv-body { padding:12px 14px; font-size:0.72em; line-height:1.9; white-space:pre-wrap; word-break:break-all; max-height:calc(100vh - 220px); overflow-y:auto; min-height:100px; scrollbar-width:thin; scrollbar-color:#444 transparent; color:var(--text-sub); }
+  .pv-body .ph { color:#2a2a2a; font-style:italic; }
+  .pv-body .ph2 { color:var(--accent); font-family:'Montserrat',sans-serif; font-size:0.8em; font-weight:900; letter-spacing:0.06em; }
+  .pv-body .pl { color:var(--text-main); }
+  .pv-body .pm { color:var(--text-sub); }
+  .pv-acts { padding:10px 14px; border-top:1px solid #2a2a2a; display:flex; flex-direction:column; gap:6px; }
+
+  .btn { padding:10px; font-size:13px; cursor:pointer; background:var(--accent); color:#fff; border:none; border-radius:4px; font-weight:900; transition:0.2s; font-family:'Montserrat',sans-serif; letter-spacing:0.08em; display:flex; align-items:center; justify-content:center; gap:6px; width:100%; }
+  .btn:hover:not(:disabled) { filter:brightness(1.12); transform:translateY(-1px); }
+  .btn:disabled { background:#2a2a2a; color:#444; cursor:default; transform:none; }
+  .btn .material-symbols-outlined { font-size:1rem; width:1rem; height:1rem; }
+  .btn-g { padding:8px; font-size:12px; cursor:pointer; background:transparent; color:var(--text-sub); border:1px solid #2a2a2a; border-radius:4px; font-weight:700; transition:0.2s; font-family:'Montserrat',sans-serif; display:flex; align-items:center; justify-content:center; gap:5px; width:100%; }
+  .btn-g:hover { border-color:#444; color:#888; }
+  .btn-g .material-symbols-outlined { font-size:0.9rem; width:0.9rem; height:0.9rem; }
+  #status { text-align:center; font-size:0.78em; color:var(--accent); font-weight:bold; min-height:1.2em; margin-top:2px; }
+
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+
+  @media (max-width:900px) { .main-layout { grid-template-columns:1fr; } .preview-panel { position:static; } .pv-body { max-height:260px; } }
+  @media (max-width:640px) { body { padding:60px 14px 60px; } .back-link { top:10px; left:10px; } .card { padding:18px 14px; } }
+</style>
+</head>
+<body>
+<a href="index.html" class="back-link"><span class="material-symbols-outlined" style="font-size:0.9rem;">arrow_back_ios</span>BACK TO TOOLBOX</a>
+
+<div class="card">
+  <div class="ui-header">
+    <div><span class="ui-brand">IKATOOLBOX</span><div class="ui-title">RECAP BUILDER</div></div>
+  </div>
+  <p class="note">セッションの記録をまとめてDiscordやcocolfoliaにコピーできます。</p>
+
+  <div class="main-layout">
+  <div>
+
+    <!-- ▼ セッション基本情報 -->
+    <div class="sec">
+      <div class="sec-head">セッション情報</div>
+      <div class="grid-2" style="margin-bottom:8px;">
+        <div class="q">
+          <div class="ql" id="l_scenario"><span class="dot"></span>シナリオ名</div>
+          <input type="text" id="in-scenario" placeholder="シナリオ名" oninput="upd('scenario',this.value)">
+        </div>
+        <div class="q">
+          <div class="ql" id="l_date"><span class="dot"></span>プレイ日</div>
+          <input type="date" id="in-date" oninput="upd('date',this.value)">
+        </div>
+      </div>
+      <div class="q">
+        <div class="ql" id="l_players"><span class="dot"></span>参加者</div>
+        <input type="text" id="in-players" placeholder="PL名をカンマ区切りで（例：Alice、Bob、KP: Carol）" oninput="upd('players',this.value)">
+      </div>
+      <div class="q">
+        <div class="ql" id="l_summary"><span class="dot"></span>一言あらすじ</div>
+        <textarea id="in-summary" placeholder="今回のセッションをひとことで…" rows="2" oninput="upd('summary',this.value)"></textarea>
+      </div>
+    </div>
+
+    <!-- ▼ 訪れた場所・発見した情報 -->
+    <div class="sec">
+      <div class="sec-head">訪れた場所・発見した情報</div>
+      <div class="q">
+        <div class="ql" id="l_places"><span class="dot"></span>訪れた場所</div>
+        <div class="tag-input-wrap" id="places-wrap"></div>
+        <button class="tag-add-btn" onclick="addTag('places-wrap','place')">+ 場所を追加</button>
+      </div>
+      <div class="q" style="margin-top:10px;">
+        <div class="ql" id="l_clues"><span class="dot"></span>発見した情報・手がかり</div>
+        <div class="tag-input-wrap" id="clues-wrap"></div>
+        <button class="tag-add-btn" onclick="addTag('clues-wrap','clue')">+ 情報を追加</button>
+      </div>
+    </div>
+
+    <!-- ▼ 被害記録 -->
+    <div class="sec">
+      <div class="sec-head">被害記録</div>
+      <table class="damage-table">
+        <thead><tr><th>探索者</th><th>SAN損失</th><th>HP損失</th><th>備考</th><th class="del-cell"></th></tr></thead>
+        <tbody id="damage-tbody"></tbody>
+      </table>
+      <button class="add-row-btn" onclick="addDamageRow()">+ 探索者を追加</button>
+    </div>
+
+    <!-- ▼ 印象的なシーン・ロール -->
+    <div class="sec">
+      <div class="sec-head">印象的なシーン・ロール</div>
+      <div class="tag-input-wrap" id="scenes-wrap"></div>
+      <button class="tag-add-btn" onclick="addTag('scenes-wrap','scene')">+ シーンを追加</button>
+    </div>
+
+    <!-- ▼ 次回への引き継ぎ -->
+    <div class="sec">
+      <div class="sec-head">次回への引き継ぎ・TODO</div>
+      <div class="tag-input-wrap" id="todos-wrap"></div>
+      <button class="tag-add-btn" onclick="addTag('todos-wrap','todo')">+ TODOを追加</button>
+      <div class="q" style="margin-top:10px;">
+        <div class="ql" id="l_nextnote"><span class="dot"></span>次回への一言メモ</div>
+        <textarea id="in-nextnote" placeholder="次回セッションに向けた補足など…" rows="2" oninput="updatePreview()"></textarea>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ▼ プレビュー -->
+  <div class="preview-panel">
+    <div class="pv-card">
+      <div class="pv-head"><span class="pv-title">PREVIEW</span></div>
+      <div class="pv-body" id="pvBody"><span class="ph">入力するとここに反映されます</span></div>
+      <div class="pv-acts">
+        <button class="btn" id="copyDiscord" onclick="doCopy('discord')" disabled>
+          <span class="material-symbols-outlined">content_copy</span>Discord形式でコピー
+        </button>
+        <button class="btn-g" id="copyPlain" onclick="doCopy('plain')" disabled>
+          <span class="material-symbols-outlined">content_copy</span>プレーンテキストでコピー
+        </button>
+        <button class="btn-g" onclick="doReset()">
+          <span class="material-symbols-outlined">refresh</span>リセット
+        </button>
+        <div id="status"></div>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<script>
+// ---- データストア ----
+const D = {
+  scenario:'', date:'', players:'', summary:'',
+  places:[], clues:[], damage:[], scenes:[], todos:[], nextnote:''
+};
+
+function upd(key, val) { D[key] = val; updLbl(key); updatePreview(); }
+function updLbl(key) {
+  const el = document.getElementById('l_'+key);
+  if (!el) return;
+  const has = typeof D[key] === 'string' ? D[key].trim() !== '' : D[key].length > 0;
+  el.classList.toggle('on', has);
+}
+
+// ---- タグ行（場所・手がかり・シーン・TODO） ----
+const tagData = { place:[], clue:[], scene:[], todo:[] };
+const tagWrapMap = { place:'places-wrap', clue:'clues-wrap', scene:'scenes-wrap', todo:'todos-wrap' };
+const tagDKey   = { place:'places', clue:'clues', scene:'scenes', todo:'todos' };
+
+function addTag(wrapId, type, val='') {
+  const wrap = document.getElementById(wrapId);
+  const idx = tagData[type].length;
+  tagData[type].push(val);
+
+  const row = document.createElement('div');
+  row.className = 'tag-row';
+  row.dataset.idx = idx;
+
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.value = val;
+  inp.placeholder = type === 'place' ? '場所名' : type === 'clue' ? '情報・手がかり' : type === 'scene' ? '印象的なシーンやロール' : 'TODO内容';
+  inp.addEventListener('input', () => {
+    tagData[type][idx] = inp.value;
+    D[tagDKey[type]] = tagData[type].filter(v => v.trim());
+    updLbl(tagDKey[type]);
+    updatePreview();
+  });
+
+  const del = document.createElement('button');
+  del.className = 'tag-remove-btn';
+  del.innerHTML = '<span class="material-symbols-outlined">close</span>';
+  del.addEventListener('click', () => {
+    tagData[type].splice(idx, 1);
+    row.remove();
+    D[tagDKey[type]] = tagData[type].filter(v => v.trim());
+    updLbl(tagDKey[type]);
+    updatePreview();
+    // idx 再採番
+    document.querySelectorAll(`#${wrapId} .tag-row`).forEach((r, i) => r.dataset.idx = i);
+  });
+
+  row.appendChild(inp); row.appendChild(del);
+  wrap.appendChild(row);
+  inp.focus();
+}
+
+// ---- 被害テーブル ----
+function addDamageRow(data={}) {
+  const tbody = document.getElementById('damage-tbody');
+  const tr = document.createElement('tr');
+  const fields = ['name','san','hp','note'];
+  const ph = ['探索者名','例: -5','例: -2','備考'];
+  fields.forEach((f, i) => {
+    const td = document.createElement('td');
+    const inp = document.createElement('input');
+    inp.type = 'text'; inp.value = data[f]||''; inp.placeholder = ph[i];
+    inp.addEventListener('input', () => { syncDamage(); });
+    td.appendChild(inp); tr.appendChild(td);
+  });
+  const delTd = document.createElement('td');
+  delTd.className = 'del-cell';
+  const delBtn = document.createElement('button');
+  delBtn.className = 'tag-remove-btn';
+  delBtn.innerHTML = '<span class="material-symbols-outlined">close</span>';
+  delBtn.addEventListener('click', () => { tr.remove(); syncDamage(); });
+  delTd.appendChild(delBtn); tr.appendChild(delTd);
+  tbody.appendChild(tr);
+}
+function syncDamage() {
+  D.damage = [...document.querySelectorAll('#damage-tbody tr')].map(tr => {
+    const inps = tr.querySelectorAll('input');
+    return { name: inps[0].value, san: inps[1].value, hp: inps[2].value, note: inps[3].value };
+  }).filter(r => r.name.trim());
+  updLbl('damage');
+  updatePreview();
+}
+
+// ---- プレビュー ----
+function buildText(mode) {
+  const isDiscord = mode === 'discord';
+  const lines = [];
+  const h1 = (t) => isDiscord ? `# ${t}` : `━━ ${t} ━━`;
+  const h2 = (t) => isDiscord ? `## ${t}` : `▸ ${t}`;
+  const li = (t) => `・${t}`;
+  const sep = () => isDiscord ? '---' : '──────────────';
+
+  // タイトル
+  const title = D.scenario ? `SESSION RECAP — ${D.scenario}` : 'SESSION RECAP';
+  lines.push(isDiscord ? `# ${title}` : `【${title}】`);
+
+  // 基本情報
+  const meta = [];
+  if (D.date) meta.push(isDiscord ? `**日付：** ${D.date}` : `日付：${D.date}`);
+  if (D.players) meta.push(isDiscord ? `**参加者：** ${D.players}` : `参加者：${D.players}`);
+  if (meta.length) { lines.push(''); meta.forEach(m => lines.push(m)); }
+
+  // あらすじ
+  if (D.summary) {
+    lines.push('');
+    lines.push(isDiscord ? `> ${D.summary}` : `「${D.summary}」`);
+  }
+
+  // 場所・情報
+  if (D.places.length || D.clues.length) {
+    lines.push(''); lines.push(sep());
+    lines.push(h2('訪れた場所・発見した情報'));
+    if (D.places.length) { lines.push(''); D.places.forEach(p => lines.push(li(p))); }
+    if (D.clues.length)  { lines.push(''); D.clues.forEach(c => lines.push(li(c))); }
+  }
+
+  // 被害記録
+  if (D.damage.length) {
+    lines.push(''); lines.push(sep());
+    lines.push(h2('被害記録'));
+    lines.push('');
+    D.damage.forEach(r => {
+      let row = `${r.name}`;
+      const dmg = [];
+      if (r.san) dmg.push(`SAN ${r.san}`);
+      if (r.hp)  dmg.push(`HP ${r.hp}`);
+      if (dmg.length) row += `　${dmg.join(' / ')}`;
+      if (r.note) row += `　（${r.note}）`;
+      lines.push(li(row));
+    });
+  }
+
+  // 印象的なシーン
+  if (D.scenes.length) {
+    lines.push(''); lines.push(sep());
+    lines.push(h2('印象的なシーン・ロール'));
+    lines.push('');
+    D.scenes.forEach(s => lines.push(li(s)));
+  }
+
+  // 次回引き継ぎ
+  if (D.todos.length || D.nextnote) {
+    lines.push(''); lines.push(sep());
+    lines.push(h2('次回への引き継ぎ'));
+    if (D.todos.length) { lines.push(''); D.todos.forEach(t => lines.push(li(t))); }
+    if (D.nextnote) { lines.push(''); lines.push(isDiscord ? `> ${D.nextnote}` : D.nextnote); }
+  }
+
+  lines.push(''); lines.push(isDiscord ? '*✦ IKATOOLBOX*' : '✦ IKATOOLBOX');
+  return lines.join('\n');
+}
+
+function updatePreview() {
+  const body = document.getElementById('pvBody');
+  const hasAny = D.scenario || D.date || D.players || D.summary ||
+    D.places.length || D.clues.length || D.damage.length ||
+    D.scenes.length || D.todos.length || D.nextnote;
+
+  if (!hasAny) {
+    body.innerHTML = '<span class="ph">入力するとここに反映されます</span>';
+    document.getElementById('copyDiscord').disabled = true;
+    document.getElementById('copyPlain').disabled = true;
+    return;
+  }
+
+  // プレビューはDiscord形式でそのまま表示
+  const text = buildText('discord');
+  let html = '';
+  text.split('\n').forEach(line => {
+    if (line.startsWith('# '))       html += `<span class="ph2">${esc(line)}</span>\n`;
+    else if (line.startsWith('## ')) html += `<span class="ph2" style="font-size:0.75em;">${esc(line)}</span>\n`;
+    else if (line.startsWith('---')) html += `<span class="pm">──────────────</span>\n`;
+    else if (line.startsWith('> '))  html += `<span class="pm" style="border-left:2px solid var(--accent);padding-left:6px;display:block;">${esc(line.slice(2))}</span>\n`;
+    else                             html += `<span class="pl">${esc(line)}</span>\n`;
+  });
+  body.innerHTML = html;
+  document.getElementById('copyDiscord').disabled = false;
+  document.getElementById('copyPlain').disabled = false;
+}
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ---- コピー ----
+function doCopy(mode) {
+  const text = buildText(mode);
+  navigator.clipboard.writeText(text).then(() => {
+    const st = document.getElementById('status');
+    st.textContent = 'コピーしました！';
+    setTimeout(() => { st.textContent = ''; }, 2500);
+  });
+}
+
+// ---- リセット ----
+function doReset() {
+  Object.keys(D).forEach(k => { D[k] = Array.isArray(D[k]) ? [] : ''; });
+  Object.keys(tagData).forEach(k => { tagData[k] = []; });
+  document.querySelectorAll('input[type="text"],input[type="date"],textarea').forEach(el => el.value = '');
+  document.querySelectorAll('.tag-input-wrap').forEach(el => el.innerHTML = '');
+  document.getElementById('damage-tbody').innerHTML = '';
+  document.querySelectorAll('.ql').forEach(l => l.classList.remove('on'));
+  updatePreview();
+}
+
+// 初期行追加
+window.onload = () => {
+  addTag('places-wrap','place');
+  addTag('clues-wrap','clue');
+  addTag('scenes-wrap','scene');
+  addTag('todos-wrap','todo');
+  addDamageRow();
+};
+</script>
+
+<div style="position:fixed;bottom:10px;right:15px;font-family:sans-serif;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:0.1em;font-weight:bold;pointer-events:none;z-index:9999;">✦ IKATOOLBOX</div>
+</body>
+</html>
