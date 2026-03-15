@@ -296,8 +296,8 @@ function buildText(mode) {
   const lines = [];
   const h1 = (t) => isDiscord ? `# ${t}` : `━━ ${t} ━━`;
   const h2 = (t) => isDiscord ? `## ${t}` : `▸ ${t}`;
-  const li = (t) => `・${t}`;
-  const sep = () => isDiscord ? '---' : '──────────────';
+  const li = (t) => isDiscord ? `- ${t}` : `・${t}`;
+  const sep = () => isDiscord ? '' : '──────────────';
 
   // タイトル
   const title = D.scenario ? `SESSION RECAP — ${D.scenario}` : 'SESSION RECAP';
@@ -317,7 +317,8 @@ function buildText(mode) {
 
   // 場所・情報
   if (D.places.length || D.clues.length) {
-    lines.push(''); lines.push(sep());
+    lines.push('');
+    if (sep()) lines.push(sep());
     lines.push(h2('訪れた場所・発見した情報'));
     if (D.places.length) { lines.push(''); D.places.forEach(p => lines.push(li(p))); }
     if (D.clues.length)  { lines.push(''); D.clues.forEach(c => lines.push(li(c))); }
@@ -325,7 +326,8 @@ function buildText(mode) {
 
   // 被害記録
   if (D.damage.length) {
-    lines.push(''); lines.push(sep());
+    lines.push('');
+    if (sep()) lines.push(sep());
     lines.push(h2('被害記録'));
     lines.push('');
     D.damage.forEach(r => {
@@ -341,7 +343,8 @@ function buildText(mode) {
 
   // 印象的なシーン
   if (D.scenes.length) {
-    lines.push(''); lines.push(sep());
+    lines.push('');
+    if (sep()) lines.push(sep());
     lines.push(h2('印象的なシーン・ロール'));
     lines.push('');
     D.scenes.forEach(s => lines.push(li(s)));
@@ -349,13 +352,13 @@ function buildText(mode) {
 
   // 次回引き継ぎ
   if (D.todos.length || D.nextnote) {
-    lines.push(''); lines.push(sep());
+    lines.push('');
+    if (sep()) lines.push(sep());
     lines.push(h2('次回への引き継ぎ'));
     if (D.todos.length) { lines.push(''); D.todos.forEach(t => lines.push(li(t))); }
     if (D.nextnote) { lines.push(''); lines.push(isDiscord ? `> ${D.nextnote}` : D.nextnote); }
   }
 
-  lines.push(''); lines.push(isDiscord ? '*✦ IKATOOLBOX*' : '✦ IKATOOLBOX');
   return lines.join('\n');
 }
 
@@ -372,16 +375,43 @@ function updatePreview() {
     return;
   }
 
-  // プレビューはDiscord形式でそのまま表示
+  // プレビュー：MDをHTMLとしてレンダリング
   const text = buildText('discord');
+  // 行ごとに変換
+  const lines = text.split('\n');
   let html = '';
-  text.split('\n').forEach(line => {
-    if (line.startsWith('# '))       html += `<span class="ph2">${esc(line)}</span>\n`;
-    else if (line.startsWith('## ')) html += `<span class="ph2" style="font-size:0.75em;">${esc(line)}</span>\n`;
-    else if (line.startsWith('---')) html += `<span class="pm">──────────────</span>\n`;
-    else if (line.startsWith('> '))  html += `<span class="pm" style="border-left:2px solid var(--accent);padding-left:6px;display:block;">${esc(line.slice(2))}</span>\n`;
-    else                             html += `<span class="pl">${esc(line)}</span>\n`;
+  let inList = false;
+  const renderInline = (s) => {
+    return esc(s)
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/__(.+?)__/g, '<u>$1</u>');
+  };
+  lines.forEach(line => {
+    if (line.startsWith('# ')) {
+      if (inList) { html += '</ul>'; inList = false; }
+      html += `<div class="pv-h1">${renderInline(line.slice(2))}</div>`;
+    } else if (line.startsWith('## ')) {
+      if (inList) { html += '</ul>'; inList = false; }
+      html += `<div class="pv-h2">${renderInline(line.slice(3))}</div>`;
+    } else if (line.startsWith('### ')) {
+      if (inList) { html += '</ul>'; inList = false; }
+      html += `<div class="pv-h3">${renderInline(line.slice(4))}</div>`;
+    } else if (line.startsWith('> ')) {
+      if (inList) { html += '</ul>'; inList = false; }
+      html += `<div class="pv-quote">${renderInline(line.slice(2))}</div>`;
+    } else if (line.startsWith('- ')) {
+      if (!inList) { html += '<ul class="pv-list">'; inList = true; }
+      html += `<li>${renderInline(line.slice(2))}</li>`;
+    } else if (line === '') {
+      if (inList) { html += '</ul>'; inList = false; }
+      html += '<div class="pv-br"></div>';
+    } else {
+      if (inList) { html += '</ul>'; inList = false; }
+      html += `<div class="pv-line">${renderInline(line)}</div>`;
+    }
   });
+  if (inList) html += '</ul>';
   body.innerHTML = html;
   document.getElementById('copyDiscord').disabled = false;
   document.getElementById('copyPlain').disabled = false;
