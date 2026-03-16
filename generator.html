@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
@@ -504,6 +504,38 @@
         });
     }
 
+    // タブカラー変更：全行再描画せずDOMを直接更新
+    function updateTabColor(tab, color) {
+        const config = tabStyleMap[tab];
+        const isInfo = tab.toLowerCase() === 'info';
+        const isChat = config.style === 'style-chat' || config.style === 'style-default';
+        const isSecret = config.style === 'style-secret';
+
+        document.querySelectorAll('.log-row').forEach((row, i) => {
+            const item = logData[i];
+            if (!item || item.tab !== tab) return;
+            const char = charSettings[item.charKey] || { color: '#888' };
+
+            // row-name の border-left と文字色
+            const nameEl = row.querySelector('.row-name');
+            if (nameEl) {
+                if (isInfo) {
+                    nameEl.style.borderLeftColor = color;
+                } else {
+                    nameEl.style.borderLeftColor = char.color;
+                }
+            }
+            // secret タブの背景
+            if (isSecret) {
+                row.style.setProperty('background-color', color + '44', 'important');
+            }
+            // info タブの行 border-left
+            if (isInfo) {
+                row.style.borderLeft = `4px solid ${color}`;
+            }
+        });
+    }
+
 function renderTabSettings() {
         const container = document.getElementById('tabStyleSettings');
         container.innerHTML = '';
@@ -515,7 +547,7 @@ function renderTabSettings() {
                     <span class="tab-config-name">${tab}</span>
                     <div class="tab-config-controls">
                         <input type="color" class="in-color-picker" value="${tabStyleMap[tab].color}" 
-                            oninput="tabStyleMap['${tab}'].color=this.value.toUpperCase(); this.nextElementSibling.nextElementSibling.value=this.value.toUpperCase(); renderEditor(true)">
+                            oninput="tabStyleMap['${tab}'].color=this.value.toUpperCase(); this.nextElementSibling.nextElementSibling.value=this.value.toUpperCase(); updateTabColor('${tab}', this.value.toUpperCase())">
                         
                         <button class="btn-toggle-input" onclick="this.nextElementSibling.classList.toggle('hidden-input')" title="カラーコード入力を表示">
                             <span class="material-symbols-outlined" style="font-size: 18px;">settings</span>
@@ -523,7 +555,7 @@ function renderTabSettings() {
 
                         <input type="text" class="in-color hidden-input" value="${tabStyleMap[tab].color}" 
                             style="width: 75px; background: #222; border: 1px solid #444; color: #888; font-size: 0.7rem; padding: 4px; margin: 0; text-align: center; border-radius: 2px;"
-                            oninput="if(/^#[0-9A-F]{6}$/i.test(this.value)){tabStyleMap['${tab}'].color=this.value.toUpperCase(); this.previousElementSibling.previousElementSibling.value=this.value.toUpperCase(); renderEditor(true)}">
+                            oninput="if(/^#[0-9A-F]{6}$/i.test(this.value)){const v=this.value.toUpperCase(); tabStyleMap['${tab}'].color=v; this.previousElementSibling.previousElementSibling.value=v; updateTabColor('${tab}', v)}">
                         
                         <select class="style-select" 
                             onchange="tabStyleMap['${tab}'].style=this.value; renderEditor(true)">
@@ -662,7 +694,7 @@ function renderRowContent(row, index) {
 
         if (isSelected) row.classList.add('selected');
 
-        row.style.borderLeft = `4px solid ${accentColor}`;
+        // border-left は非表示
 
         if (currentTabConfig.style === 'style-secret') {
             const translucentColor = currentTabConfig.color + '44';
@@ -1029,6 +1061,11 @@ function exportLog() {
             <div class="hero-title">${h1Title}</div>
         </div>`;
 
+    // #888系カラーをメインタブカラーで代替
+    const mainTabEntry = Object.values(tabStyleMap).find(t => t.style === 'style-default');
+    const mainTabColor = mainTabEntry ? mainTabEntry.color : '#C5373C';
+    const isGray = (col) => /^#(888|888888|aaaaaa|999|999999|666|666666)$/i.test(col);
+
     logData.forEach((item, i) => {
         const char = charSettings[item.charKey];
         const config = tabStyleMap[item.tab];
@@ -1038,9 +1075,12 @@ function exportLog() {
         
         const isSystem = (char.displayName && char.displayName.toLowerCase() === 'system');
         if (isSystem) styleClass += ' row-system';
+
+        // #888系カラーはメインタブカラーで代替
+        const charColor = isGray(char.color) ? mainTabColor : char.color;
         
-        let nameStyle = config.style === 'style-chat' ? `style="color:${char.color}"` : "";
-        let lineStyle = (config.style === 'style-chat' || isSystem) ? `style="display:none;"` : `style="background:${char.color}"`;
+        let nameStyle = config.style === 'style-chat' ? `style="color:${charColor}"` : "";
+        let lineStyle = (config.style === 'style-chat' || isSystem) ? `style="display:none;"` : `style="background:${charColor}"`;
         if (item.tab.toLowerCase() === 'info') lineStyle = `style="background:${config.color}"`;
         const tabNameDisplay = isSystem ? '' : item.tab;
         const nameDisplay = isSystem ? '' : char.displayName;
