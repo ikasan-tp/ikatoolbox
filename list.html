@@ -402,11 +402,25 @@
 
     function saveImage() {
         const canvas = document.getElementById('capture-canvas');
-        html2canvas(canvas, { backgroundColor: null, scale: 2 }).then(c => {
+        // 背景色をCSSから取得して明示的に渡す（null だと環境によって失敗する）
+        const bgColor = getComputedStyle(canvas).backgroundColor || '#050505';
+        html2canvas(canvas, {
+            backgroundColor: bgColor,
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            logging: false
+        }).then(c => {
+            const dataUrl = c.toDataURL('image/png');
             const a = document.createElement('a');
-            a.href = c.toDataURL();
+            a.href = dataUrl;
             a.download = 'scenario_list.png';
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
+        }).catch(err => {
+            console.error('画像生成エラー:', err);
+            alert('画像の保存に失敗しました。');
         });
     }
 </script>
