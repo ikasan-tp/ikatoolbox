@@ -174,7 +174,9 @@
         .item-scenario-author { font-size: 0.85rem; opacity: 0.5; font-weight: 700; white-space: nowrap; }
         .item-date { font-family: 'Montserrat'; font-size: 0.8rem; opacity: 0.4; font-weight: 700; white-space: nowrap; margin-left: 10px; }
         .pc-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px 0; }
-        .pc-tag { font-size: 0.65rem; padding: 3px 12px; border-radius: 2px; border: 1px solid var(--accent-color); font-weight: bold; background: color-mix(in srgb, var(--accent-color), transparent 85%); color: var(--accent-color); }
+        .pc-tag { font-size: 0.65rem; padding: 3px 12px; border-radius: 2px; border: 1px solid var(--accent-color); font-weight: bold; background: transparent; color: var(--accent-color); }
+        .item-delete-btn { display: block; background: none; border: none; color: #444; font-size: 0.8rem; cursor: pointer; padding: 2px 6px; border-radius: 3px; transition: 0.15s; line-height: 1; }
+        .item-delete-btn:hover { color: #C5373C; background: rgba(197,55,60,0.1); }
         .item-members { font-size: 0.7rem; font-weight: 900; margin: 0 0 10px 0; letter-spacing: 0.05em; color: var(--accent-color); opacity: 0.8; word-break: break-all; }
         .item-memo { font-size: 0.85rem; opacity: 0.8; line-height: 1.7; white-space: pre-wrap; word-break: break-all; overflow-wrap: break-word; }
         .canvas-footer { margin-top: 15px; font-size: 0.55rem; opacity: 0.2; text-align: center; font-family: 'Montserrat'; letter-spacing: 0.3em; font-weight: 700; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 20px; flex-shrink: 0; }
@@ -188,6 +190,7 @@
             align-items: center; justify-content: center;
         }
         .mobile-menu-btn span { transition: transform 0.3s ease; display: inline-block; }
+        .mobile-menu-btn.is-active span { transform: rotate(180deg); }
 
         @media screen and (max-width: 1024px) {
             body { overflow: hidden; }
@@ -389,25 +392,38 @@
                     </div>
                     ${author ? `<div class="item-scenario-author">${author}</div>` : ''}
                 </div>
-                <div class="item-date">${dateInput}</div>
+                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                    <div class="item-date">${dateInput}</div>
+                    <button class="item-delete-btn" title="削除">✕</button>
+                </div>
             </div>
             <div class="pc-list">${pcTags}</div>
             ${memberInfo}
             <div class="item-memo">${memo}</div>
         `;
+        item.querySelector('.item-delete-btn').addEventListener('click', () => {
+            item.remove();
+            if (container.children.length === 0) {
+                const msg = document.createElement('div');
+                msg.id = 'placeholder-msg';
+                msg.style.cssText = 'color:#444; text-align:center; margin-top:40px; font-weight:900; letter-spacing:0.2em;';
+                msg.textContent = 'NO RECORDS';
+                container.appendChild(msg);
+            }
+        });
         container.appendChild(item);
         
         if (window.innerWidth <= 1024 && sidebar.classList.contains('active')) toggleMenu();
     }
 
-    function saveImage() {
+    async function saveImage() {
+        await document.fonts.ready;
         const canvas = document.getElementById('capture-canvas');
-        // 背景色をCSSから取得して明示的に渡す（null だと環境によって失敗する）
         const bgColor = getComputedStyle(canvas).backgroundColor || '#050505';
         html2canvas(canvas, {
             backgroundColor: bgColor,
             scale: 2,
-            useCORS: true,
+            useCORS: false,
             allowTaint: true,
             logging: false
         }).then(c => {
@@ -420,7 +436,7 @@
             document.body.removeChild(a);
         }).catch(err => {
             console.error('画像生成エラー:', err);
-            alert('画像の保存に失敗しました。');
+            alert('画像の保存に失敗しました: ' + err.message);
         });
     }
 </script>
