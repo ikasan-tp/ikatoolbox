@@ -259,13 +259,13 @@
             <h2>3. ステータス & 技能</h2>
             <div class="grid-flex">
                 <div><label id="lbl-s0">STR</label><input type="number" id="in-str" oninput="setBar('str', this.value)"></div>
-                <div><label id="lbl-s1">CON</label><input type="number" id="in-con" oninput="setBar('con', this.value)"></div>
-                <div><label id="lbl-s2">POW</label><input type="number" id="in-pow" oninput="setBar('pow', this.value)"></div>
+                <div><label id="lbl-s1">CON</label><input type="number" id="in-con" oninput="setBar('con', this.value); autoCalcHpMp()"></div>
+                <div><label id="lbl-s2">POW</label><input type="number" id="in-pow" oninput="setBar('pow', this.value); autoCalcHpMp()"></div>
                 <div><label id="lbl-s3">DEX</label><input type="number" id="in-dex" oninput="setBar('dex', this.value)"></div>
             </div>
             <div class="grid-flex">
                 <div><label id="lbl-s4">APP</label><input type="number" id="in-app" oninput="setBar('app', this.value)"></div>
-                <div><label id="lbl-s5">SIZ</label><input type="number" id="in-siz" oninput="setBar('siz', this.value)"></div>
+                <div><label id="lbl-s5">SIZ</label><input type="number" id="in-siz" oninput="setBar('siz', this.value); autoCalcHpMp()"></div>
                 <div><label id="lbl-s6">INT</label><input type="number" id="in-int" oninput="setBar('int', this.value)"></div>
                 <div><label id="lbl-s7">EDU</label><input type="number" id="in-edu" oninput="setBar('edu', this.value)"></div>
             </div>
@@ -402,6 +402,7 @@
     const root = document.documentElement;
     let allSkills = [];
     let currentSystem = 'coc'; // 'coc' or 'emo'
+    let currentEdition = 7;
 
     // ---- システム定義 ----
     const SYSTEMS = {
@@ -414,7 +415,7 @@
             scenarioPrefix: (ed) => `❚ CoC ${ed}th :`,
             cmdRegex: /CCB?\(?.*?\)?<=?(\d+)\s+【(.+?)】/,
             ignoreSkills: ['知識','アイデア','母国語'],
-            subMap: { 'san':'san', 'luk':'luk', 'luck':'luk', '幸運':'luk' },
+            subMap: { 'san':'san', 'luk':'luk', 'luck':'luk', '幸運':'luk', 'hp':'hp', 'mp':'mp', 'ヒットポイント':'hp', 'マジックポイント':'mp' },
         },
         emo: {
             statKeys:   ['str','con','pow','dex','app','siz','int','edu'],
@@ -663,6 +664,7 @@ function refreshScenarioDisplay() {
             }
             allSkills = allSkills.filter((v, i, a) => a.findIndex(t => t.label === v.label) === i);
             buildSkillManager(); refreshSkills(); refreshScenarioDisplay(); refreshProfileDisplay();
+            autoCalcHpMp();
         } catch (e) { console.error(e); alert("データ形式エラー"); }
     }
 
@@ -707,8 +709,27 @@ function refreshScenarioDisplay() {
         });
     }
 
+    function autoCalcHpMp() {
+        if (currentSystem !== 'coc') return;
+        const con = parseFloat(document.getElementById('in-con').value) || 0;
+        const siz = parseFloat(document.getElementById('in-siz').value) || 0;
+        const pow = parseFloat(document.getElementById('in-pow').value) || 0;
+        if (con > 0 || siz > 0) {
+            const hp = currentEdition === 7 ? Math.ceil((con + siz) / 10) : Math.floor((con + siz) / 2);
+            document.getElementById('in-hp').value = hp;
+            document.getElementById('d-hp').innerText = hp;
+        }
+        if (pow > 0) {
+            const mp = Math.floor(pow / 5);
+            document.getElementById('in-mp').value = mp;
+            document.getElementById('d-mp').innerText = mp;
+        }
+    }
+
     function setBar(id, val) {
-        const max = SYSTEMS[currentSystem].statMax;
+        const sysDef = SYSTEMS[currentSystem];
+        const baseMax = sysDef.statMax;
+        const max = (currentSystem === 'coc') ? (currentEdition === 7 ? 100 : 25) : baseMax;
         const bar = document.getElementById('b-' + id);
         if(bar) bar.style.width = Math.min((val / max) * 100, 100) + '%';
         
@@ -754,11 +775,13 @@ function refreshScenarioDisplay() {
     }
 
     function setEdition(ed) {
+        currentEdition = ed;
         root.style.setProperty('--stat-max', ed === 7 ? 100 : 25);
         document.getElementById('btn-7th').classList.toggle('active', ed === 7);
         document.getElementById('btn-6th').classList.toggle('active', ed === 6);
         refreshScenarioDisplay();
         ["str","con","pow","dex","app","siz","int","edu"].forEach(id => { const v = document.getElementById('in-' + id).value; if(v) setBar(id, v); });
+        autoCalcHpMp();
     }
 window.setSecretMode = function(isOn) {
     const bOn = document.getElementById('btn-secret-on');
