@@ -420,6 +420,9 @@
         await document.fonts.ready;
         const canvas = document.getElementById('capture-canvas');
         const bgColor = getComputedStyle(canvas).backgroundColor || '#050505';
+        // 削除ボタンを一時非表示
+        const deleteBtns = canvas.querySelectorAll('.item-delete-btn');
+        deleteBtns.forEach(btn => btn.style.visibility = 'hidden');
         html2canvas(canvas, {
             backgroundColor: bgColor,
             scale: 2,
@@ -437,6 +440,9 @@
         }).catch(err => {
             console.error('画像生成エラー:', err);
             alert('画像の保存に失敗しました: ' + err.message);
+        }).finally(() => {
+            // 削除ボタンを再表示
+            deleteBtns.forEach(btn => btn.style.visibility = '');
         });
     }
 </script>
