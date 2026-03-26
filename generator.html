@@ -989,7 +989,27 @@ function exportLog() {
     .nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); opacity: 0; visibility: hidden; transition: 0.3s; z-index: 1500; } 
     .nav-uncheck:checked ~ .nav-overlay { opacity: 1; visibility: visible; } 
 
-    .nav-content { position: fixed; top: 0; right: -320px; width: 280px; height: 100%; background: #0a0a0a; transition: 0.4s; z-index: 2000; border-left: 1px solid #222; overflow-y: auto; visibility: hidden; padding-top: env(safe-area-inset-top); } 
+.nav-content {
+    position: fixed;
+    top: 0;
+    right: -320px;
+    width: 280px;
+    height: 100vh;
+
+    background: #0a0a0a;
+    overflow-y: auto;
+
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+
+    transition: 0.4s;
+    z-index: 2000;
+}
+
+html:has(#nav-input:checked),
+body:has(#nav-input:checked) {
+    overflow: hidden;
+}
     .nav-uncheck:checked ~ .nav-content { right: 0; visibility: visible; } 
 
     .nav-section { padding: 30px 20px 10px; border-bottom: 1px solid #222; } 
