@@ -178,8 +178,9 @@
         // セッションタイトル
         const heroTitle = heroArea ? heroArea.outerHTML : '';
         // 目次セクションの見出しに使うタイトルテキスト
-        const heroTitleText = heroArea ? (heroArea.querySelector('.hero-title')?.textContent.trim() || f.name.replace('.html','')) : f.name.replace('.html','');
-
+const heroTitleText = heroArea
+  ? (heroArea.querySelector('.hero-title')?.textContent.trim() || file.name.replace('.html',''))
+  : file.name.replace('.html','');
         // コンテンツ本体（.containerの中身）
         const contentHTML = container ? container.innerHTML : doc.body.innerHTML;
 
