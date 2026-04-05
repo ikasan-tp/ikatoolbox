@@ -153,8 +153,11 @@
         .guide-text p { font-size: 0.72rem; color: #666; margin: 0; line-height: 1.5; }
 
         .mobile-menu-btn { position: fixed; bottom: 20px; right: 20px; width: 52px; height: 52px; border-radius: 50%; background: var(--accent); color: white; border: none; z-index: 10001; cursor: pointer; display: none; align-items: center; justify-content: center; }
-        .mobile-menu-btn span { transition: transform 0.3s ease; display: inline-block; }
-        .mobile-menu-btn.is-active span { transform: rotate(90deg); }
+        .three-dots { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+        .three-dots span { width: 4px; height: 4px; background: white; border-radius: 50%; transition: transform 0.3s ease, opacity 0.3s ease, border-radius 0.3s ease; transform-origin: center; }
+        .mobile-menu-btn.is-active .three-dots span:nth-child(1) { transform: translateY(8px) rotate(45deg) scaleX(3.5); border-radius: 2px; }
+        .mobile-menu-btn.is-active .three-dots span:nth-child(2) { opacity: 0; transform: scale(0); }
+        .mobile-menu-btn.is-active .three-dots span:nth-child(3) { transform: translateY(-8px) rotate(-45deg) scaleX(3.5); border-radius: 2px; }
 
         @media screen and (max-width: 1024px) {
             .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); height: 100%; width: 85%; max-width: 380px; }
@@ -171,7 +174,7 @@
 <body>
 
     <button id="menu-toggle" class="mobile-menu-btn">
-        <span class="material-symbols-outlined">settings</span>
+        <div class="three-dots"><span></span><span></span><span></span></div>
     </button>
 
     <aside class="sidebar">
@@ -383,8 +386,6 @@
         e.stopPropagation();
         sidebar.classList.toggle('active');
         menuBtn.classList.toggle('is-active');
-        const icon = menuBtn.querySelector('.material-symbols-outlined');
-        icon.textContent = sidebar.classList.contains('active') ? 'close' : 'settings';
     });
 
     function toggleCustomSystem(val) {
@@ -974,7 +975,7 @@ function exportLog() {
 
     let html = `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><title>${h1Title}</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet"><style>
     :root { --outer-bg: #0f0f0f; --inner-bg: #050505; --block-bg: #111111; --text: #dbdee1; --accent: ${dynamicAccent}; --sub-line: #444; --border: #222; --tab-text: #666; --chat-text: #8a8a8a; --container-width: 680px; } 
-    html, body { min-height: 100vh; } body { background: var(--outer-bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; margin: 0; padding: 0; line-height: 1.7; display: flex; flex-direction: column; align-items: center; } 
+    html, body { height: 100%; } body { background: var(--outer-bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; margin: 0; padding: 0; line-height: 1.7; display: flex; flex-direction: column; align-items: center; } 
     
     header { position: fixed; top: 0; left: 0; width: 100%; background: rgba(5, 5, 5, 0.98); backdrop-filter: blur(12px); z-index: 1000; border-bottom: 1px solid var(--border); display: flex; justify-content: center; padding: 0; } 
     .header-inner { width: 90%; max-width: var(--container-width); height: calc(60px + env(safe-area-inset-top)); display: flex; justify-content: space-between; align-items: center; padding-top: env(safe-area-inset-top); box-sizing: border-box; } 
@@ -989,27 +990,7 @@ function exportLog() {
     .nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); opacity: 0; visibility: hidden; transition: 0.3s; z-index: 1500; } 
     .nav-uncheck:checked ~ .nav-overlay { opacity: 1; visibility: visible; } 
 
-.nav-content {
-    position: fixed;
-    top: 0;
-    right: -320px;
-    width: 280px;
-    height: 100vh;
-
-    background: #0a0a0a;
-    overflow-y: auto;
-
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-
-    transition: 0.4s;
-    z-index: 2000;
-}
-
-html:has(#nav-input:checked),
-body:has(#nav-input:checked) {
-    overflow: hidden;
-}
+    .nav-content { position: fixed; top: 0; right: -320px; width: 280px; height: 100%; background: #0a0a0a; transition: 0.4s; z-index: 2000; border-left: 1px solid #222; overflow-y: auto; visibility: hidden; padding-top: env(safe-area-inset-top); } 
     .nav-uncheck:checked ~ .nav-content { right: 0; visibility: visible; } 
 
     .nav-section { padding: 30px 20px 10px; border-bottom: 1px solid #222; } 
@@ -1111,10 +1092,10 @@ body:has(#nav-input:checked) {
             .replace(/([^ \n\t｜|《》]+)《([^《》]+)》/g, '<ruby>$1<rt>$2</rt></ruby>');
 
 
-        html += `\n<div class="log-row ${styleClass}" id="log-${i}"><div class="row-header"><div class="row-name" ${nameStyle}><span class="name-line" ${lineStyle}></span>${nameDisplay}</div><div class="row-tab">${tabNameDisplay}</div></div><hr class="info-separator"><div class="row-content">${safeContent}</div></div>`;
+        html += `<div class="log-row ${styleClass}" id="log-${i}"><div class="row-header"><div class="row-name" ${nameStyle}><span class="name-line" ${lineStyle}></span>${nameDisplay}</div><div class="row-tab">${tabNameDisplay}</div></div><hr class="info-separator"><div class="row-content">${safeContent}</div></div>`;
     });
 
-    html += `</div><footer>✦ IKATOOLBOX</footer></div>
+    html += `</div></div><footer>✦ IKATOOLBOX</footer>
     <script>
     function closeMenu() {
         document.getElementById('nav-input').checked = false;
@@ -1129,7 +1110,7 @@ body:has(#nav-input:checked) {
             else container.classList.add('hide-' + styleClass);
         }
     }
- <\/script></body></html>`;
+<\\\/script></body></html>`;
 
     const blob = new Blob([html], { type: 'text/html' });
     const a = document.createElement('a'); 
