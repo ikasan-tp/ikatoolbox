@@ -16,6 +16,7 @@
             --img-x: 0px; --img-y: 0px; --img-scale: 1;
             --v-x: 0px; --v-y: 0px; --v-scale: 1; --stat-max: 100;
             --ui-accent: #C5373C; --ui-bg: #222222; --ui-input: #111111; --ui-border: #444444;
+            --bg-opacity: 1;
         }
 
         body { background: #1a1a1a; color: #eee; margin: 0; display: flex; font-family: 'Montserrat', 'Noto Sans JP', sans-serif; height: 100vh; overflow: hidden; }
@@ -134,10 +135,10 @@
 
         /* ---- プレビューエリア ---- */
         .preview-area { flex: 1; display: flex; justify-content: center; align-items: center; background: #151515; padding: 20px; overflow: auto; position: relative; }
-        #display-canvas { width: 800px; height: 800px; background: var(--bg-color); color: var(--text-color); display: flex; position: relative; overflow: hidden; flex-shrink: 0; }
+        #display-canvas { width: 800px; height: 800px; background: rgba(var(--bg-rgb), var(--bg-opacity)); color: var(--text-color); display: flex; position: relative; overflow: hidden; flex-shrink: 0; }
         #display-canvas::before { content: "✦"; position: absolute; top: 25%; left: 75%; transform: translate(-50%, -50%); font-size: 850px; color: var(--accent-color); opacity: 0.05; z-index: 0; pointer-events: none; }
 
-        .info-side { flex: 0 0 75%; padding: 45px 50px; display: flex; flex-direction: column; z-index: 10; background: linear-gradient(to right, rgba(var(--bg-rgb), 1) 0%, rgba(var(--bg-rgb), 1) 50%, rgba(var(--bg-rgb), 0.8) 65%, rgba(var(--bg-rgb), 0) 85%); box-sizing: border-box; position: relative; }
+        .info-side { flex: 0 0 75%; padding: 45px 50px; display: flex; flex-direction: column; z-index: 10; background: linear-gradient(to right, rgba(var(--bg-rgb), var(--bg-opacity)) 0%, rgba(var(--bg-rgb), var(--bg-opacity)) 50%, rgba(var(--bg-rgb), calc(var(--bg-opacity) * 0.8)) 65%, rgba(var(--bg-rgb), 0) 85%); box-sizing: border-box; position: relative; }
         .scenario-tag { align-self: flex-start; background: var(--accent-color); color: #fff; font-size: 0.7rem; font-weight: 900; padding: 4px 12px; margin-bottom: 10px; height: 1.2rem; display: flex; align-items: center; }
         .name-area { border-left: 10px solid var(--accent-color); padding-left: 20px; display: flex; flex-direction: column; justify-content: center; width: 100%; min-height: 100px; margin-bottom: 5px; }
 
@@ -177,6 +178,16 @@
             opacity: 0.7; z-index: 1; pointer-events: none;
         }
         #main-img { height: 98%; z-index: 2; transform: translate(var(--img-x), var(--img-y)) scale(var(--img-scale)); display: none; pointer-events: none; }
+
+        /* 背景画像レイヤー */
+        #bg-img-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none; overflow: hidden;
+        }
+        #bg-img-layer img {
+            width: 100%; height: 100%; object-fit: cover; display: none;
+            transform-origin: center center;
+        }
 
         /* モバイルメニューボタン */
         .mobile-menu-btn {
@@ -334,6 +345,25 @@
                 <button id="btn-dark" class="toggle-btn active" onclick="setCanvasTheme('dark')">DARK</button>
                 <button id="btn-light" class="toggle-btn" onclick="setCanvasTheme('light')">LIGHT</button>
             </div>
+            <label>背景の不透明度</label>
+            <input type="range" min="0" max="1" step="0.01" value="1" style="margin-bottom:12px;" oninput="root.style.setProperty('--bg-opacity', this.value)">
+            <label>背景画像</label>
+            <div class="file-input-wrapper">
+                <label for="bg-file" class="custom-file-btn">
+                    <span class="material-symbols-outlined">wallpaper</span> 背景画像を選択
+                </label>
+                <input type="file" id="bg-file" accept="image/*" onchange="loadBgImg(this)">
+            </div>
+            <div id="bg-img-controls" style="display:none;">
+                <div class="grid-3">
+                    <div><label>左右</label><input type="range" min="-400" max="400" value="0" oninput="setBgPos('--bg-x', this.value)"></div>
+                    <div><label>上下</label><input type="range" min="-400" max="400" value="0" oninput="setBgPos('--bg-y', this.value)"></div>
+                    <div><label>拡大</label><input type="range" min="0.5" max="3" step="0.01" value="1" oninput="setBgPos('--bg-scale', this.value)"></div>
+                </div>
+                <label>不透明度</label>
+                <input type="range" min="0" max="1" step="0.01" value="1" oninput="document.getElementById('bg-img').style.opacity = this.value" style="margin-bottom:4px;">
+                <button class="clear-btn" style="margin-top:4px;" onclick="removeBgImg()">背景画像を削除</button>
+            </div>
             <label>アクセントカラー</label>
             <div class="color-picker-wrap">
                 <input type="color" id="color-picker" value="#C5373C" oninput="syncColor(this.value)">
@@ -397,6 +427,7 @@
             </div>
             <div class="skills-container"><div class="skills-header">SKILLS</div><div id="skills-list"></div></div>
         </div>
+        <div id="bg-img-layer"><img id="bg-img"></div>
         <div class="image-side"><div class="accent-bg"></div><img id="main-img"></div>
     </div>
 </div>
@@ -727,6 +758,34 @@ function refreshScenarioDisplay() {
     }
 
     function setPos(p, v) { root.style.setProperty(p, p.includes('scale') ? v : v + 'px'); }
+
+    function setBgPos(p, v) {
+        if (p === '--bg-scale') bgScale = parseFloat(v);
+        else if (p === '--bg-x') bgX = parseFloat(v);
+        else if (p === '--bg-y') bgY = parseFloat(v);
+        const img = document.getElementById('bg-img');
+        img.style.transform = `translate(${bgX}px, ${bgY}px) scale(${bgScale})`;
+    }
+
+    let bgX = 0, bgY = 0, bgScale = 1;
+
+    function loadBgImg(input) {
+        const f = input.files[0];
+        if (!f) return;
+        const img = document.getElementById('bg-img');
+        img.src = URL.createObjectURL(f);
+        img.style.display = 'block';
+        document.getElementById('bg-img-controls').style.display = 'block';
+    }
+
+    function removeBgImg() {
+        const img = document.getElementById('bg-img');
+        img.src = '';
+        img.style.display = 'none';
+        document.getElementById('bg-img-controls').style.display = 'none';
+        document.getElementById('bg-file').value = '';
+        bgX = 0; bgY = 0; bgScale = 1;
+    }
     function loadImg(i, id) { const f = i.files[0]; if(f) { const el = document.getElementById(id); el.src = URL.createObjectURL(f); el.style.display = 'block'; } }
     
     function saveImage() { 
