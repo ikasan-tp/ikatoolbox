@@ -567,7 +567,6 @@ function renderTabSettings() {
             `;
             container.appendChild(div);
         });
-        renderEditor(true);
     }
 
     function updatePreviewStyles() {
@@ -880,6 +879,14 @@ function handleReplace() {
                 }
             }
         });
+
+        if (changedCount > 0) {
+            alert(`置換完了！ ${changedCount}件を置換しました。`);
+            document.getElementById('searchInput').value = '';
+            handleSearch();
+        } else {
+            alert('置換対象が見つかりませんでした。');
+        }
     }
 
 function cleanUpLogData() {
@@ -990,10 +997,11 @@ function exportLog() {
     .nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); opacity: 0; visibility: hidden; transition: 0.3s; z-index: 1500; } 
     .nav-uncheck:checked ~ .nav-overlay { opacity: 1; visibility: visible; } 
 
-    .nav-content { position: fixed; top: 0; right: -320px; width: 280px; height: 100%; background: #0a0a0a; transition: 0.4s; z-index: 2000; border-left: 1px solid #222; overflow-y: auto; visibility: hidden; padding-top: env(safe-area-inset-top); } 
+    .nav-content { position: fixed; top: 0; right: -320px; width: 280px; height: 100vh; height: 100dvh; background: #0a0a0a; transition: 0.4s; z-index: 2000; border-left: 1px solid #222; overflow: hidden; visibility: hidden; padding-top: env(safe-area-inset-top); box-sizing: border-box; display: flex; flex-direction: column; } 
     .nav-uncheck:checked ~ .nav-content { right: 0; visibility: visible; } 
 
-    .nav-section { padding: 30px 20px 10px; border-bottom: 1px solid #222; } 
+    .nav-section { padding: 30px 20px 10px; border-bottom: 1px solid #222; flex-shrink: 0; } 
+    .nav-section:last-child { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; border-bottom: none; padding-bottom: calc(20px + env(safe-area-inset-bottom)); } 
     .nav-label { font-family: 'Montserrat'; font-weight: 900; font-size: 0.6rem; color: var(--accent); margin-bottom: 15px; display: block; } 
     
     .filter-btn { appearance: none; -webkit-appearance: none; display: inline-block; padding: 8px 14px; margin: 4px; font-size: 0.7rem; font-weight: bold; background: #1a1a1a; border: 1px solid #333; border-radius: 20px; color: #888; cursor: pointer; border: 1px solid transparent; } 
@@ -1099,7 +1107,15 @@ function exportLog() {
     <script>
     function closeMenu() {
         document.getElementById('nav-input').checked = false;
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
     }
+
+    document.getElementById('nav-input').addEventListener('change', function() {
+        const lock = this.checked ? 'hidden' : '';
+        document.body.style.overflow = lock;
+        document.documentElement.style.overflow = lock;
+    });
 
     function toggleTab(styleClass, btn) {
         btn.classList.toggle('active');
