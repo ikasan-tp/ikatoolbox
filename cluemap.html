@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IKATOOLBOX | CLUE MAP</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%%22 y=%2250%%22 style=%22dominant-baseline:central;text-anchor:middle;font-size:80px;%22>🦑</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&family=Noto+Sans+JP:wght@400;500;700;900&family=Montserrat:wght@700;900&display=block" rel="stylesheet">
+<style>
+:root {
+  --bg-dark:     #1a1a1a;
+  --ui-bg:       #222222;
+  --ui-input:    #111111;
+  --ui-border:   #444444;
+  --ui-accent:   #C5373C;
+  --text-main:   #dbdee1;
+  --text-sub:    #b5bac1;
+  --clue-color:  #C5373C;
+  --place-color: #3C82C5;
+  --npc-color:   #4BAF6A;
+  --event-color: #C5A03C;
+  --flag-color:  #9B59C5;
+}
+
+.material-symbols-outlined {
+  display:inline-block;width:1em;height:1em;
+  overflow:hidden;white-space:nowrap;direction:ltr;vertical-align:middle;
+}
+*,*::before,*::after { box-sizing:border-box;margin:0;padding:0; }
+html,body { height:100%;overflow:hidden;background:var(--bg-dark);color:var(--text-main);font-family:'Noto Sans JP',sans-serif; }
+body { display:flex;flex-direction:column; }
+
+.workspace { flex:1;display:flex;overflow:hidden; }
+
+/* ─────────────────────────────────────────
+   SIDEBAR  （list.html 準拠）
+───────────────────────────────────────── */
+.sidebar {
+  width: 300px; flex-shrink: 0;
+  background: var(--ui-bg);
+  border-right: 1px solid var(--ui-border);
+  display: flex; flex-direction: column;
+  z-index: 100;
+}
+.sidebar-scroll {
+  flex: 1; overflow-y: auto;
+  padding: 14px 18px 60px;
+  scrollbar-width: thin; scrollbar-color: #444 transparent;
+}
+.sidebar-scroll::-webkit-scrollbar { width: 4px; }
+.sidebar-scroll::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
+
+.back-link {
+  display: flex; align-items: center; gap: 8px;
+  text-decoration: none; color: #666;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em;
+  transition: 0.2s; margin-bottom: 16px;
+}
+.back-link:hover { color: var(--ui-accent); transform: translateX(-3px); }
+.back-link .material-symbols-outlined { font-size: 0.9rem; width: 0.9rem; height: 0.9rem; }
+
+/* header（list.html 完全準拠） */
+.ui-header { margin-bottom: 20px; border-bottom: 3px solid var(--ui-accent); padding-bottom: 12px; }
+.ui-brand { font-family: 'Montserrat', sans-serif; font-size: 0.68rem; font-weight: 900; color: var(--ui-accent); letter-spacing: 0.4em; display: block; margin-bottom: 2px; }
+.ui-title { font-family: 'Montserrat', sans-serif; font-size: 1.3rem; font-weight: 900; color: #fff; letter-spacing: 0.05em; }
+.ui-title-sub { font-size: 0.68rem; font-weight: 400; color: #666; letter-spacing: 0.08em; margin-left: 6px; }
+
+/* sections（list.html の control-group 準拠） */
+.control-group { margin-bottom: 0; padding: 14px 0; border-bottom: 1px solid #2a2a2a; }
+.control-group:last-child { border-bottom: none; }
+
+/* section label（list.html の h2 準拠） */
+.sec-h {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.62rem; color: var(--ui-accent); margin: 0 0 12px;
+  letter-spacing: 0.2em; font-weight: 900; text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+}
+.sec-h::after { content: ""; flex: 1; height: 1px; background: var(--ui-accent); opacity: 0.2; }
+
+/* form label */
+.f-lbl { display: block; font-family: 'Montserrat', sans-serif; font-size: 0.6rem; margin-bottom: 4px; color: #666; font-weight: 700; letter-spacing: 0.04em; }
+.form-grp { margin-bottom: 8px; }
+.form-row { display: flex; gap: 6px; }
+
+/* inputs */
+.f-input, .f-area {
+  width: 100%; background: var(--ui-input); border: 1px solid var(--ui-border);
+  color: var(--text-main); padding: 6px 9px; border-radius: 4px; font-size: 0.76rem;
+  box-sizing: border-box; font-family: 'Noto Sans JP', sans-serif; margin-bottom: 6px;
+  outline: none; transition: border-color 0.15s;
+}
+.f-input:focus, .f-area:focus { border-color: var(--ui-accent); }
+.f-input::placeholder, .f-area::placeholder { color: #555; }
+.f-area { resize: vertical; min-height: 54px; }
+
+/* type buttons */
+.type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 10px; }
+.type-btn {
+  background: #1a1a1a; border: 1px solid var(--ui-border); border-radius: 4px;
+  padding: 8px 10px; cursor: pointer; display: flex; align-items: center; gap: 6px;
+  transition: 0.15s; font-family: 'Noto Sans JP', sans-serif; color: #888; font-size: 0.68rem; font-weight: 700;
+}
+.type-btn:hover { border-color: var(--ui-accent); color: #fff; }
+.type-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+/* add form */
+.add-form { display: none; margin-top: 10px; }
+.add-form.show { display: block; }
+
+/* ── BUTTONS（list.html 準拠） ── */
+/* primary: list.html の add-btn — アウトライン → ホバーで塗り */
+.btn-primary {
+  width: 100%; padding: 10px; background: transparent;
+  color: var(--ui-accent); border: 1px solid var(--ui-accent);
+  border-radius: 4px; font-weight: 900; font-size: 0.78rem;
+  cursor: pointer; transition: 0.2s;
+  font-family: 'Montserrat', sans-serif; letter-spacing: 0.08em;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-primary:hover { background: var(--ui-accent); color: #fff; }
+.btn-primary .material-symbols-outlined { font-size: 0.88rem; }
+
+/* ghost: list.html の clear-btn */
+.btn-ghost {
+  width: 100%; background: none; border: 1px solid #333; color: #555;
+  font-size: 0.68rem; font-weight: 700; cursor: pointer;
+  padding: 8px; border-radius: 4px;
+  font-family: 'Montserrat', sans-serif; letter-spacing: 0.06em;
+  transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-ghost:hover { border-color: #666; color: #999; }
+.btn-ghost.danger:hover { border-color: #ff6b6b; color: #ff6b6b; }
+.btn-ghost .material-symbols-outlined { font-size: 0.84rem; width: 0.84rem; height: 0.84rem; }
+
+/* inline cancel */
+.btn-cancel {
+  background: transparent; color: #555; border: 1px solid #333;
+  padding: 8px 14px; border-radius: 4px;
+  font-size: 0.68rem; font-weight: 700; cursor: pointer;
+  font-family: 'Montserrat', sans-serif; transition: 0.2s; white-space: nowrap;
+}
+.btn-cancel:hover { color: #888; border-color: #555; }
+
+.act-col { display: flex; flex-direction: column; gap: 6px; }
+
+/* node detail */
+.node-detail { display: none; }
+.node-detail.show { display: block; }
+.type-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: 'Montserrat', sans-serif; font-size: 0.52rem; font-weight: 900;
+  letter-spacing: 0.22em; padding: 3px 10px; border-radius: 3px;
+  margin-bottom: 11px; border: 1px solid currentColor;
+}
+
+/* toggle */
+.disc-row {
+  display: flex; align-items: center; gap: 9px; padding: 8px 10px;
+  cursor: pointer; user-select: none;
+  background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 4px;
+  transition: border-color 0.15s; margin-bottom: 8px;
+}
+.disc-row:hover { border-color: var(--ui-accent); }
+.tog-track { width: 34px; height: 18px; border-radius: 9px; border: 1px solid #555; position: relative; transition: 0.2s; flex-shrink: 0; }
+.tog-track.on { background: rgba(197,55,60,0.22); border-color: var(--ui-accent); }
+.tog-knob { position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: #555; transition: 0.2s; }
+.tog-track.on .tog-knob { transform: translateX(16px); background: var(--ui-accent); }
+.tog-lbl { font-size: 0.67rem; color: #666; }
+.tog-track.on + .tog-lbl { color: var(--ui-accent); }
+
+/* connections */
+.conn-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 7px; }
+.conn-item { display: flex; align-items: center; gap: 6px; padding: 5px 9px; background: var(--ui-input); border: 1px solid var(--ui-border); border-radius: 4px; font-size: 0.63rem; }
+.conn-name { flex: 1; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.conn-del { cursor: pointer; color: #444; transition: color 0.15s; font-size: 0.82rem; width: 0.82rem; display: inline-block; line-height: 1; }
+.conn-del:hover { color: var(--ui-accent); }
+.conn-empty { font-size: 0.6rem; color: #555; }
+
+/* stats */
+.stats-row { display: flex; gap: 6px; }
+.stat-pill { flex: 1; background: var(--ui-input); border: 1px solid var(--ui-border); border-radius: 4px; padding: 8px 4px; text-align: center; }
+.stat-n { font-family: 'Montserrat', sans-serif; font-size: 1.3rem; font-weight: 900; color: var(--ui-accent); line-height: 1; display: block; }
+.stat-l { font-family: 'Montserrat', sans-serif; font-size: 0.48rem; font-weight: 900; color: #555; letter-spacing: 0.1em; display: block; margin-top: 2px; }
+
+/* legend */
+.legend { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.leg-item { display: flex; align-items: center; gap: 8px; font-size: 0.62rem; color: #777; }
+
+/* ─────────────────────────────────────────
+   CANVAS
+───────────────────────────────────────── */
+.canvas-wrap { flex: 1; position: relative; overflow: hidden; background: var(--bg-dark); }
+
+/* ── キャンバスグリッド（ライン格子） ── */
+.canvas-wrap::before {
+  content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+/* 大グリッド（5マスごと） */
+.canvas-wrap::after {
+  content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px);
+  background-size: 200px 200px;
+}
+
+.canvas-inner { position: absolute; inset: 0; z-index: 1; transform-origin: 0 0; }
+.svg-layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+
+/* nodes */
+.node {
+  position: absolute; width: 150px;
+  background: var(--ui-bg); border: 1px solid var(--ui-border);
+  border-radius: 8px; padding: 11px 12px 9px;
+  cursor: pointer; user-select: none; transform: translate(-50%,-50%);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+}
+.node:hover { border-color: #666; }
+.node.selected { border-color: var(--ui-accent); box-shadow: 0 0 0 1px var(--ui-accent), 0 4px 20px rgba(197,55,60,0.2); }
+.node.src { border-color: #C5A03C; box-shadow: 0 0 0 1px #C5A03C; }
+.node.discovered { opacity: 0.4; }
+.node.discovered .n-title { text-decoration: line-through; color: #555; }
+.n-bar { height: 2px; border-radius: 1px; margin-bottom: 8px; }
+.n-meta { display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+.n-dot { width: 6px; height: 6px; border-radius: 50%; }
+.n-type { font-family: 'Montserrat', sans-serif; font-size: 0.42rem; font-weight: 900; letter-spacing: 0.18em; color: #666; }
+.n-title { font-size: 0.7rem; font-weight: 700; color: var(--text-main); line-height: 1.3; margin-bottom: 3px; }
+.n-desc { font-size: 0.58rem; color: #777; line-height: 1.5; }
+.n-found { display: none; margin-top: 5px; font-family: 'Montserrat', sans-serif; font-size: 0.4rem; font-weight: 900; letter-spacing: 0.15em; color: #444; }
+.node.discovered .n-found { display: block; }
+
+/* empty state */
+.empty-state { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px; pointer-events: none; z-index: 2; }
+.empty-icon { font-family: 'Montserrat', sans-serif; font-size: 0.7rem; font-weight: 900; letter-spacing: 0.35em; color: #303030; }
+.empty-sub { font-size: 0.6rem; color: #383838; letter-spacing: 0.08em; }
+
+/* mode banner */
+.mode-banner { position: absolute; top: 14px; right: 18px; background: rgba(197,160,60,0.12); border: 1px solid rgba(197,160,60,0.4); border-radius: 20px; padding: 6px 16px; font-family: 'Montserrat', sans-serif; font-size: 0.56rem; font-weight: 900; letter-spacing: 0.14em; color: #C5A03C; display: none; z-index: 50; }
+.mode-banner.show { display: block; }
+
+/* ctx menu */
+.ctx-menu { position: fixed; background: #1e1e1e; border: 1px solid var(--ui-border); border-radius: 6px; padding: 4px 0; z-index: 400; min-width: 148px; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.7); }
+.ctx-menu.show { display: block; }
+.ctx-item { padding: 7px 14px; font-size: 0.67rem; color: #888; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.1s; }
+.ctx-item .material-symbols-outlined { font-size: 0.88rem; width: 0.88rem; height: 0.88rem; }
+.ctx-item:hover { background: #2a2a2a; color: var(--text-main); }
+.ctx-item.danger:hover { color: #ff6b6b; }
+.ctx-sep { height: 1px; background: var(--ui-border); margin: 4px 0; }
+
+/* toast */
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(60px); background: #222; border: 1px solid var(--ui-border); border-radius: 20px; padding: 8px 20px; font-size: 0.67rem; color: #888; transition: transform 0.25s ease; z-index: 999; white-space: nowrap; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+.wm { position: fixed; bottom: 10px; right: 14px; font-family: 'Montserrat', sans-serif; font-size: 0.6rem; font-weight: 900; color: rgba(255,255,255,0.07); letter-spacing: 0.18em; pointer-events: none; z-index: 999; }
+
+/* ── ALL CLEAR 確認ダイアログ ── */
+.confirm-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.72);
+  display: flex; align-items: center; justify-content: center; z-index: 2000;
+  opacity: 0; pointer-events: none; transition: opacity 0.18s;
+  backdrop-filter: blur(3px);
+}
+.confirm-overlay.open { opacity: 1; pointer-events: all; }
+.confirm-box {
+  background: var(--ui-bg); border: 1px solid var(--ui-border);
+  border-radius: 8px; padding: 28px 28px 22px; width: 290px; max-width: 90vw;
+  transform: translateY(8px); transition: transform 0.18s;
+}
+.confirm-overlay.open .confirm-box { transform: translateY(0); }
+.confirm-title {
+  font-family: 'Montserrat', sans-serif; font-size: 0.62rem; font-weight: 900;
+  letter-spacing: 0.2em; color: #ff6b6b; margin-bottom: 10px;
+}
+.confirm-msg { font-size: 0.76rem; color: #888; margin-bottom: 20px; line-height: 1.65; }
+.confirm-btns { display: flex; gap: 7px; }
+.confirm-btns .btn-cancel-dlg {
+  flex: 1; padding: 9px; background: none; border: 1px solid #333; color: #666;
+  border-radius: 4px; font-weight: 700; font-size: 0.68rem; cursor: pointer;
+  font-family: 'Montserrat', sans-serif; letter-spacing: 0.06em; transition: 0.2s;
+}
+.confirm-btns .btn-cancel-dlg:hover { border-color: #555; color: #888; }
+.confirm-btns .btn-clear-ok {
+  flex: 1; padding: 9px; background: transparent; color: #ff6b6b; border: 1px solid #ff6b6b;
+  border-radius: 4px; font-weight: 900; font-size: 0.72rem; cursor: pointer;
+  font-family: 'Montserrat', sans-serif; letter-spacing: 0.08em; transition: 0.2s;
+}
+.confirm-btns .btn-clear-ok:hover { background: #ff6b6b; color: #fff; }
+
+input[type=file] { display: none; }
+</style>
+</head>
+<body>
+
+<div class="workspace">
+
+  <!-- ───── SIDEBAR ───── -->
+  <aside class="sidebar">
+    <div class="sidebar-scroll">
+
+      <a href="index.html" class="back-link">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        BACK TO TOOLBOX
+      </a>
+
+      <div class="ui-header">
+        <span class="ui-brand">IKATOOLBOX</span>
+        <div class="ui-title">CLUE MAP<span class="ui-title-sub">for CoC</span></div>
+      </div>
+
+      <!-- SCENARIO -->
+      <div class="control-group">
+        <div class="sec-h">SCENARIO</div>
+        <input type="text" class="f-input" id="scenarioName" placeholder="シナリオ名を入力…" maxlength="60" style="margin-bottom:0;">
+      </div>
+
+      <!-- ADD NODE -->
+      <div class="control-group">
+        <div class="sec-h">ADD NODE</div>
+        <div class="type-grid">
+          <button class="type-btn" onclick="startAdd('clue')"><span class="type-dot" style="background:var(--clue-color)"></span>手がかり</button>
+          <button class="type-btn" onclick="startAdd('place')"><span class="type-dot" style="background:var(--place-color)"></span>場所</button>
+          <button class="type-btn" onclick="startAdd('npc')"><span class="type-dot" style="background:var(--npc-color)"></span>NPC</button>
+          <button class="type-btn" onclick="startAdd('event')"><span class="type-dot" style="background:var(--event-color)"></span>イベント</button>
+          <button class="type-btn" onclick="startAdd('flag')" style="grid-column:span 2;"><span class="type-dot" style="background:var(--flag-color)"></span>フラグ / 条件分岐</button>
+        </div>
+        <div class="add-form" id="addForm">
+          <div class="form-grp">
+            <label class="f-lbl">タイトル</label>
+            <input class="f-input" id="newTitle" type="text" placeholder="例：古い日記" maxlength="40">
+          </div>
+          <div class="form-grp">
+            <label class="f-lbl">メモ</label>
+            <textarea class="f-area" id="newDesc" placeholder="内容・条件・備考など…" rows="3"></textarea>
+          </div>
+          <div class="form-row">
+            <button class="btn-primary" onclick="confirmAdd()" style="flex:1;">
+              <span class="material-symbols-outlined">add</span>追加
+            </button>
+            <button class="btn-cancel" onclick="cancelAdd()">取消</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- NODE DETAIL -->
+      <div class="control-group node-detail" id="nodeDetail">
+        <div class="sec-h">NODE DETAIL</div>
+        <div id="detailBadge" class="type-badge"></div>
+        <div class="form-grp">
+          <label class="f-lbl">タイトル</label>
+          <input class="f-input" id="detailTitle" type="text" maxlength="40" oninput="updateNode()">
+        </div>
+        <div class="form-grp">
+          <label class="f-lbl">メモ</label>
+          <textarea class="f-area" id="detailDesc" rows="3" oninput="updateNode()"></textarea>
+        </div>
+        <div class="disc-row" onclick="toggleDisc()">
+          <div class="tog-track" id="togTrack"><div class="tog-knob"></div></div>
+          <span class="tog-lbl" id="togLbl">発見済みにする</span>
+        </div>
+        <div class="form-grp">
+          <label class="f-lbl">接続ノード</label>
+          <div class="conn-list" id="connList"></div>
+          <button class="btn-ghost" onclick="enterConnect()">
+            <span class="material-symbols-outlined">add_link</span>接続を追加
+          </button>
+        </div>
+        <button class="btn-ghost danger" onclick="deleteSelected()">
+          <span class="material-symbols-outlined">delete</span>このノードを削除
+        </button>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="control-group">
+        <div class="sec-h">ACTIONS</div>
+        <div class="act-col">
+          <button class="btn-ghost" onclick="autoLayout()"><span class="material-symbols-outlined">auto_awesome_mosaic</span>AUTO LAYOUT</button>
+          <button class="btn-ghost" id="connectBtn" onclick="toggleConnect()"><span class="material-symbols-outlined">share</span>CONNECT MODE</button>
+          <button class="btn-ghost" onclick="doExport()"><span class="material-symbols-outlined">download</span>EXPORT JSON</button>
+          <label class="btn-ghost" style="cursor:pointer;"><span class="material-symbols-outlined">upload</span>IMPORT JSON<input type="file" id="importFile" accept=".json"></label>
+          <!-- ▼ ALL CLEAR -->
+          <button class="btn-ghost danger" onclick="openConfirmClear()">
+            <span class="material-symbols-outlined">delete_sweep</span>ALL CLEAR
+          </button>
+        </div>
+      </div>
+
+      <!-- LEGEND & STATS -->
+      <div class="control-group">
+        <div class="sec-h">LEGEND</div>
+        <div class="legend">
+          <div class="leg-item"><span class="type-dot" style="background:var(--clue-color);width:7px;height:7px;border-radius:50%;flex-shrink:0;"></span>手がかり</div>
+          <div class="leg-item"><span class="type-dot" style="background:var(--place-color);width:7px;height:7px;border-radius:50%;flex-shrink:0;"></span>場所</div>
+          <div class="leg-item"><span class="type-dot" style="background:var(--npc-color);width:7px;height:7px;border-radius:50%;flex-shrink:0;"></span>NPC</div>
+          <div class="leg-item"><span class="type-dot" style="background:var(--event-color);width:7px;height:7px;border-radius:50%;flex-shrink:0;"></span>イベント</div>
+          <div class="leg-item"><span class="type-dot" style="background:var(--flag-color);width:7px;height:7px;border-radius:50%;flex-shrink:0;"></span>フラグ</div>
+        </div>
+        <div class="sec-h">STATS</div>
+        <div class="stats-row">
+          <div class="stat-pill"><span class="stat-n" id="stNodes">0</span><span class="stat-l">NODES</span></div>
+          <div class="stat-pill"><span class="stat-n" id="stFound">0</span><span class="stat-l">FOUND</span></div>
+          <div class="stat-pill"><span class="stat-n" id="stEdges">0</span><span class="stat-l">EDGES</span></div>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- ───── CANVAS ───── -->
+  <div class="canvas-wrap" id="canvasWrap">
+    <div class="canvas-inner" id="canvasInner">
+      <svg class="svg-layer" id="svgLayer">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="rgba(255,255,255,0.18)"/>
+          </marker>
+          <marker id="arrS" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="var(--ui-accent)"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">✦ CLUE MAP</div>
+      <div class="empty-sub">左パネルからノードを追加してください</div>
+    </div>
+    <div class="mode-banner" id="modeBanner">接続先ノードをクリック — ESC でキャンセル</div>
+  </div>
+
+</div>
+
+<!-- ctx menu -->
+<div class="ctx-menu" id="ctxMenu">
+  <div class="ctx-item" onclick="ctxConnect()"><span class="material-symbols-outlined">add_link</span>接続を追加</div>
+  <div class="ctx-item" onclick="ctxToggle()"><span class="material-symbols-outlined">check_circle</span>発見済み切替</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item danger" onclick="deleteSelected()"><span class="material-symbols-outlined">delete</span>削除</div>
+</div>
+
+<!-- ALL CLEAR 確認ダイアログ -->
+<div id="confirmOverlay" class="confirm-overlay" onclick="if(event.target===this)closeConfirmClear()">
+  <div class="confirm-box">
+    <div class="confirm-title">ALL CLEAR</div>
+    <div class="confirm-msg">すべてのノードとエッジを削除します。<br>この操作は元に戻せません。</div>
+    <div class="confirm-btns">
+      <button class="btn-cancel-dlg" onclick="closeConfirmClear()">キャンセル</button>
+      <button class="btn-clear-ok" onclick="executeClearAll()">すべて削除</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="wm">✦ IKATOOLBOX</div>
+
+<script>
+let nodes=[],edges=[],selectedId=null;
+let connectMode=false,connectSrc=null,pendingType=null;
+let dragNode=null,dragOff={x:0,y:0};
+let scale=1,pan={x:0,y:0},isPanning=false,panStart={x:0,y:0};
+let idCnt=1;
+
+const TYPE={
+  clue: {label:'手がかり',color:'#C5373C'},
+  place:{label:'場所',    color:'#3C82C5'},
+  npc:  {label:'NPC',     color:'#4BAF6A'},
+  event:{label:'イベント',color:'#C5A03C'},
+  flag: {label:'フラグ',  color:'#9B59C5'},
+};
+
+const $=id=>document.getElementById(id);
+const canvasInner=$('canvasInner'),svgLayer=$('svgLayer'),canvasWrap=$('canvasWrap');
+
+/* --- ADD --- */
+function startAdd(type){
+  pendingType=type;
+  $('addForm').classList.add('show');
+  $('newTitle').value='';$('newDesc').value='';
+  $('newTitle').focus();
+  deselectAll();
+}
+function cancelAdd(){$('addForm').classList.remove('show');pendingType=null;}
+function confirmAdd(){
+  const t=$('newTitle').value.trim();
+  if(!t){toast('タイトルを入力してください');return;}
+  const d=$('newDesc').value.trim();
+  const id='n'+(idCnt++);
+  const wr=canvasWrap.getBoundingClientRect();
+  const x=(wr.width/2-pan.x)/scale+(Math.random()-.5)*60;
+  const y=(wr.height/2-pan.y)/scale+(Math.random()-.5)*60;
+  nodes.push({id,type:pendingType,title:t,desc:d,discovered:false,x,y});
+  cancelAdd();renderAll();selectNode(id);updateStats();
+}
+
+/* --- DELETE --- */
+function deleteSelected(){
+  if(!selectedId)return;
+  nodes=nodes.filter(n=>n.id!==selectedId);
+  edges=edges.filter(e=>e.from!==selectedId&&e.to!==selectedId);
+  selectedId=null;hideDetail();renderAll();updateStats();hideCtx();
+}
+
+/* --- ALL CLEAR --- */
+function openConfirmClear(){ $('confirmOverlay').classList.add('open'); }
+function closeConfirmClear(){ $('confirmOverlay').classList.remove('open'); }
+function executeClearAll(){
+  nodes=[];edges=[];selectedId=null;idCnt=1;
+  hideDetail();renderAll();updateStats();
+  closeConfirmClear();
+  toast('すべてのノードを削除しました');
+}
+
+/* --- UPDATE --- */
+function updateNode(){
+  if(!selectedId)return;
+  const n=nodes.find(n=>n.id===selectedId);if(!n)return;
+  n.title=$('detailTitle').value;n.desc=$('detailDesc').value;
+  const el=$('nd-'+selectedId);
+  if(el){el.querySelector('.n-title').textContent=n.title;el.querySelector('.n-desc').textContent=n.desc;}
+}
+function toggleDisc(){
+  if(!selectedId)return;
+  const n=nodes.find(n=>n.id===selectedId);if(!n)return;
+  n.discovered=!n.discovered;
+  $('nd-'+selectedId)?.classList.toggle('discovered',n.discovered);
+  $('togTrack').classList.toggle('on',n.discovered);
+  $('togLbl').textContent=n.discovered?'発見済み':'発見済みにする';
+  updateStats();
+}
+
+/* --- SELECT --- */
+function selectNode(id){
+  deselectAll();selectedId=id;
+  $('nd-'+id)?.classList.add('selected');
+  showDetail(id);renderEdges();
+}
+function deselectAll(){
+  selectedId=null;
+  document.querySelectorAll('.node.selected').forEach(e=>e.classList.remove('selected'));
+  hideDetail();renderEdges();
+}
+function showDetail(id){
+  const n=nodes.find(n=>n.id===id);if(!n)return;
+  $('nodeDetail').classList.add('show');
+  const meta=TYPE[n.type];
+  const badge=$('detailBadge');
+  badge.textContent=meta.label;badge.style.color=meta.color;badge.style.borderColor=meta.color;
+  $('detailTitle').value=n.title;$('detailDesc').value=n.desc;
+  $('togTrack').classList.toggle('on',n.discovered);
+  $('togLbl').textContent=n.discovered?'発見済み':'発見済みにする';
+  renderConnList(id);
+}
+function hideDetail(){$('nodeDetail').classList.remove('show');}
+function renderConnList(id){
+  const list=$('connList');list.innerHTML='';
+  const rel=edges.filter(e=>e.from===id||e.to===id);
+  if(!rel.length){list.innerHTML='<div class="conn-empty">接続なし</div>';return;}
+  rel.forEach(e=>{
+    const oid=e.from===id?e.to:e.from;
+    const other=nodes.find(n=>n.id===oid);if(!other)return;
+    const meta=TYPE[other.type];
+    const item=document.createElement('div');item.className='conn-item';
+    item.innerHTML=`<span class="type-dot" style="background:${meta.color};width:6px;height:6px;border-radius:50%;flex-shrink:0;"></span><span class="conn-name">${esc(other.title)}</span><span class="conn-del material-symbols-outlined" onclick="removeEdge('${e.from}','${e.to}')">close</span>`;
+    list.appendChild(item);
+  });
+}
+
+/* --- EDGES --- */
+function removeEdge(from,to){
+  edges=edges.filter(e=>!(e.from===from&&e.to===to));
+  renderEdges();if(selectedId)renderConnList(selectedId);updateStats();
+}
+function addEdge(from,to){
+  if(from===to)return;
+  if(edges.find(e=>(e.from===from&&e.to===to)||(e.from===to&&e.to===from))){toast('すでに接続されています');return;}
+  edges.push({from,to});renderEdges();if(selectedId)renderConnList(selectedId);updateStats();
+}
+
+/* --- CONNECT --- */
+function enterConnect(){
+  if(!selectedId)return;
+  connectSrc=selectedId;connectMode=true;
+  $('modeBanner').classList.add('show');
+  $('connectBtn').style.borderColor='var(--ui-accent)';
+  $('connectBtn').style.color='var(--ui-accent)';
+  $('nd-'+connectSrc)?.classList.add('src');
+}
+function exitConnect(){
+  $('nd-'+connectSrc)?.classList.remove('src');
+  connectMode=false;connectSrc=null;
+  $('modeBanner').classList.remove('show');
+  $('connectBtn').style.borderColor='';
+  $('connectBtn').style.color='';
+}
+function toggleConnect(){if(connectMode)exitConnect();else if(selectedId)enterConnect();else toast('先にノードを選択してください');}
+function ctxConnect(){hideCtx();enterConnect();}
+function ctxToggle(){hideCtx();toggleDisc();}
+
+/* --- RENDER --- */
+function renderAll(){
+  document.querySelectorAll('.node').forEach(e=>e.remove());
+  $('emptyState').style.display=nodes.length?'none':'flex';
+  nodes.forEach(renderNodeEl);renderEdges();
+}
+function renderNodeEl(n){
+  const meta=TYPE[n.type];
+  const el=document.createElement('div');
+  el.className='node'+(n.discovered?' discovered':'')+(n.id===selectedId?' selected':'');
+  el.id='nd-'+n.id;el.style.left=n.x+'px';el.style.top=n.y+'px';
+  el.innerHTML=`<div class="n-bar" style="background:${meta.color}"></div><div class="n-meta"><div class="n-dot" style="background:${meta.color}"></div><div class="n-type">${meta.label}</div></div><div class="n-title">${esc(n.title)}</div><div class="n-desc">${esc(n.desc)}</div><div class="n-found">DISCOVERED</div>`;
+  el.addEventListener('mousedown',e=>{
+    e.stopPropagation();if(e.button===2)return;
+    if(connectMode){
+      if(n.id!==connectSrc){addEdge(connectSrc,n.id);toast('接続しました');}
+      exitConnect();selectNode(n.id!==connectSrc?n.id:connectSrc);return;
+    }
+    dragNode=n;
+    const wr=canvasWrap.getBoundingClientRect();
+    dragOff.x=(e.clientX-wr.left-pan.x)/scale-n.x;
+    dragOff.y=(e.clientY-wr.top-pan.y)/scale-n.y;
+    selectNode(n.id);
+  });
+  el.addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();selectNode(n.id);showCtx(e.clientX,e.clientY);});
+  canvasInner.appendChild(el);
+}
+function renderEdges(){
+  svgLayer.querySelectorAll('.edge').forEach(e=>e.remove());
+  edges.forEach(e=>{
+    const fn=nodes.find(n=>n.id===e.from),tn=nodes.find(n=>n.id===e.to);
+    if(!fn||!tn)return;
+    const sel=selectedId&&(e.from===selectedId||e.to===selectedId);
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.classList.add('edge');
+    line.setAttribute('x1',fn.x);line.setAttribute('y1',fn.y);
+    line.setAttribute('x2',tn.x);line.setAttribute('y2',tn.y);
+    line.setAttribute('stroke',sel?'rgba(197,55,60,0.65)':'rgba(255,255,255,0.12)');
+    line.setAttribute('stroke-width',sel?'1.5':'1');
+    line.setAttribute('marker-end',sel?'url(#arrS)':'url(#arr)');
+    svgLayer.appendChild(line);
+  });
+}
+
+/* --- AUTO LAYOUT --- */
+function autoLayout(){
+  if(!nodes.length)return;
+  if(nodes.length===1){nodes[0].x=0;nodes[0].y=0;renderAll();fitView();return;}
+  const r=Math.max(130,nodes.length*28);
+  nodes.forEach((n,i)=>{const a=(i/nodes.length)*Math.PI*2;n.x=Math.cos(a)*r;n.y=Math.sin(a)*r;});
+  const ITER=220,REP=9000,ATT=0.055,DAMP=0.84,CG=0.012;
+  let vx=nodes.map(()=>0),vy=nodes.map(()=>0);
+  for(let it=0;it<ITER;it++){
+    const fx=nodes.map(()=>0),fy=nodes.map(()=>0);
+    for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
+      const dx=nodes[i].x-nodes[j].x,dy=nodes[i].y-nodes[j].y;
+      const d=Math.sqrt(dx*dx+dy*dy)+.01,f=REP/(d*d);
+      fx[i]+=(dx/d)*f;fy[i]+=(dy/d)*f;fx[j]-=(dx/d)*f;fy[j]-=(dy/d)*f;
+    }
+    edges.forEach(e=>{
+      const fi=nodes.findIndex(n=>n.id===e.from),ti=nodes.findIndex(n=>n.id===e.to);
+      if(fi<0||ti<0)return;
+      const dx=nodes[ti].x-nodes[fi].x,dy=nodes[ti].y-nodes[fi].y;
+      const d=Math.sqrt(dx*dx+dy*dy)+.01,f=d*ATT;
+      fx[fi]+=(dx/d)*f;fy[fi]+=(dy/d)*f;fx[ti]-=(dx/d)*f;fy[ti]-=(dy/d)*f;
+    });
+    nodes.forEach((n,i)=>{fx[i]-=n.x*CG;fy[i]-=n.y*CG;});
+    nodes.forEach((n,i)=>{vx[i]=(vx[i]+fx[i])*DAMP;vy[i]=(vy[i]+fy[i])*DAMP;n.x+=vx[i];n.y+=vy[i];});
+  }
+  const cx=(Math.min(...nodes.map(n=>n.x))+Math.max(...nodes.map(n=>n.x)))/2;
+  const cy=(Math.min(...nodes.map(n=>n.y))+Math.max(...nodes.map(n=>n.y)))/2;
+  nodes.forEach(n=>{n.x-=cx;n.y-=cy;});
+  renderAll();fitView();toast('レイアウトを自動整列しました');
+}
+function fitView(){
+  if(!nodes.length)return;
+  const wr=canvasWrap.getBoundingClientRect(),pad=80,NW=150,NH=100;
+  const minX=Math.min(...nodes.map(n=>n.x))-NW/2,minY=Math.min(...nodes.map(n=>n.y))-NH/2;
+  const maxX=Math.max(...nodes.map(n=>n.x))+NW/2,maxY=Math.max(...nodes.map(n=>n.y))+NH/2;
+  const cw=maxX-minX+pad*2,ch=maxY-minY+pad*2;
+  scale=Math.min(1.5,Math.min(wr.width/cw,wr.height/ch));
+  pan.x=(wr.width-(minX+maxX)*scale)/2;pan.y=(wr.height-(minY+maxY)*scale)/2;
+  applyTransform();
+}
+function applyTransform(){canvasInner.style.transform=`translate(${pan.x}px,${pan.y}px) scale(${scale})`;}
+
+/* --- DRAG --- */
+document.addEventListener('mousemove',e=>{
+  if(dragNode){
+    const wr=canvasWrap.getBoundingClientRect();
+    dragNode.x=(e.clientX-wr.left-pan.x)/scale-dragOff.x;
+    dragNode.y=(e.clientY-wr.top-pan.y)/scale-dragOff.y;
+    const el=$('nd-'+dragNode.id);
+    if(el){el.style.left=dragNode.x+'px';el.style.top=dragNode.y+'px';}
+    renderEdges();
+  }
+  if(isPanning){pan.x=e.clientX-panStart.x;pan.y=e.clientY-panStart.y;applyTransform();}
+});
+document.addEventListener('mouseup',()=>{dragNode=null;isPanning=false;});
+canvasWrap.addEventListener('mousedown',e=>{
+  if(e.target.closest('.node'))return;
+  if(connectMode){exitConnect();return;}
+  deselectAll();hideCtx();
+  isPanning=true;panStart.x=e.clientX-pan.x;panStart.y=e.clientY-pan.y;
+});
+
+/* --- ZOOM --- */
+canvasWrap.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const r=canvasWrap.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+  const ns=Math.min(3,Math.max(0.15,scale*(e.deltaY>0?.9:1.1)));
+  pan.x=mx-(mx-pan.x)*(ns/scale);pan.y=my-(my-pan.y)*(ns/scale);
+  scale=ns;applyTransform();
+},{passive:false});
+
+/* --- CTX --- */
+function showCtx(x,y){$('ctxMenu').style.left=x+'px';$('ctxMenu').style.top=y+'px';$('ctxMenu').classList.add('show');}
+function hideCtx(){$('ctxMenu').classList.remove('show');}
+document.addEventListener('click',hideCtx);
+document.addEventListener('contextmenu',e=>{if(!e.target.closest('.node')){e.preventDefault();hideCtx();}});
+
+/* --- KEYBOARD --- */
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if(connectMode)exitConnect();
+    else if($('confirmOverlay').classList.contains('open'))closeConfirmClear();
+    else deselectAll();
+  }
+  if((e.key==='Delete'||e.key==='Backspace')&&selectedId){
+    if(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='TEXTAREA')return;
+    deleteSelected();
+  }
+});
+
+/* --- STATS --- */
+function updateStats(){
+  $('stNodes').textContent=nodes.length;
+  $('stFound').textContent=nodes.filter(n=>n.discovered).length;
+  $('stEdges').textContent=edges.length;
+}
+
+/* --- EXPORT/IMPORT --- */
+function doExport(){
+  const name=$('scenarioName').value||'cluemap';
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify({version:1,scenario:name,nodes,edges,idCnt},null,2)],{type:'application/json'}));
+  a.download=name.replace(/\s+/g,'_')+'.json';a.click();toast('エクスポートしました');
+}
+$('importFile').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      nodes=d.nodes||[];edges=d.edges||[];idCnt=d.idCnt||nodes.length+1;
+      if(d.scenario)$('scenarioName').value=d.scenario;
+      selectedId=null;hideDetail();renderAll();fitView();updateStats();toast('インポートしました');
+    }catch{toast('インポートに失敗しました');}
+  };
+  r.readAsText(f);e.target.value='';
+});
+
+/* --- UTIL --- */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+let toastTimer;
+function toast(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2000);}
+
+/* --- SAMPLE --- */
+(function(){
+  nodes=[
+    {id:'n1',type:'place', title:'廃屋',        desc:'事件の発端となった場所',discovered:false,x:-180,y:0},
+    {id:'n2',type:'clue',  title:'古い日記',     desc:'ページが数枚破られている',discovered:false,x:-60, y:-130},
+    {id:'n3',type:'npc',   title:'エドワード',   desc:'地元の老人。秘密を知る',discovered:false,x:80,  y:-80},
+    {id:'n4',type:'clue',  title:'血痕',         desc:'台所の床に残っている',discovered:false,x:-60, y:130},
+    {id:'n5',type:'event', title:'深夜の叫び声', desc:'複数の目撃証言あり',discovered:false,x:80,  y:80},
+    {id:'n6',type:'flag',  title:'儀式の完成',   desc:'ここに至ると真相が判明',discovered:false,x:220, y:0},
+  ];
+  edges=[{from:'n1',to:'n2'},{from:'n1',to:'n4'},{from:'n2',to:'n3'},{from:'n4',to:'n5'},{from:'n3',to:'n6'},{from:'n5',to:'n6'}];
+  idCnt=10;
+  $('scenarioName').value='サンプルシナリオ';
+  renderAll();fitView();updateStats();
+})();
+</script>
+</body>
+</html>
