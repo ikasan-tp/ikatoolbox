@@ -221,11 +221,7 @@ select:focus { border-color:var(--ui-accent); }
           <input class="f-input" id="newHoName" placeholder="例：探偵" maxlength="30">
         </div>
         <div class="form-grp">
-          <label class="f-lbl">説明（プレイヤー向け）</label>
-          <textarea class="f-area" id="newHoDesc" placeholder="プレイヤーに見せるHOの概要" rows="2"></textarea>
-        </div>
-        <div class="form-grp">
-          <label class="f-lbl">秘匿情報（GMのみ）</label>
+          <label class="f-lbl">秘匿情報（GMのみ・URLに含まれません）</label>
           <textarea class="f-area" id="newHoSecret" placeholder="プレイヤーには非表示" rows="2"></textarea>
         </div>
         <div class="form-row" style="margin-bottom:10px;">
@@ -423,7 +419,7 @@ function decodeB64(str) {
 function buildSessionData() {
   return {
     name: $('scenarioName').value.trim() || '無題シナリオ',
-    hos: hos.map(h => ({ id: h.id, name: h.name, desc: h.desc, color: h.color, capacity: h.capacity }))
+    hos: hos.map(h => ({ id: h.id, name: h.name, color: h.color, capacity: h.capacity }))
     // secret は含めない
   };
 }
@@ -442,7 +438,6 @@ function addHO() {
   const ho = {
     id: 'ho' + (hoIdCnt++),
     name,
-    desc: $('newHoDesc').value.trim(),
     secret: $('newHoSecret').value.trim(),
     capacity: Math.max(1, parseInt($('newHoCap').value) || 1),
     color: HO_COLORS[(hos.length) % HO_COLORS.length]
@@ -450,7 +445,6 @@ function addHO() {
   hos.push(ho);
   assignments[ho.id] = [];
   $('newHoName').value = '';
-  $('newHoDesc').value = '';
   $('newHoSecret').value = '';
   $('newHoCap').value = '1';
   renderSidebarHOs();
@@ -639,7 +633,6 @@ function renderBoard() {
         </div>
         ${hasConflict ? `<div class="conflict-warn"><span class="material-symbols-outlined">warning</span>第1希望が競合しています</div>` : ''}
         <div class="ho-card-name">${esc(ho.name)}</div>
-        <div class="ho-card-desc">${esc(ho.desc)}</div>
         ${ho.secret ? `<div class="ho-card-secret-info">🔒 ${esc(ho.secret)}</div>` : ''}
         <div class="ho-slots">${slots}</div>
         ${prefSummary ? `<div class="ho-card-prefs" style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.05);">${prefSummary}</div>` : ''}
@@ -723,7 +716,7 @@ function initPlayerView(code) {
       <div class="player-ho-card-bar" style="background:${h.color || '#555'}"></div>
       <div class="player-ho-card-body">
         <div class="player-ho-card-name">${esc(h.name)}</div>
-        <div class="player-ho-card-desc">${esc(h.desc || '')}</div>
+        <div class="player-ho-card-desc" style="color:#555;font-size:0.58rem;">詳細はGMにご確認ください</div>
       </div>
     </div>`).join('');
 
