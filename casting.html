@@ -69,7 +69,7 @@ select:focus { border-color:var(--ui-accent); }
 .main-area::-webkit-scrollbar-thumb { background:#333;border-radius:2px; }
 
 /* ── HO LIST in sidebar ── */
-.ho-sidebar-item { display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--ui-input);border:1px solid var(--ui-border);border-radius:4px;margin-bottom:5px;cursor:default; }
+.ho-sidebar-item { display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--ui-input);border:1px solid var(--ui-border);border-radius:4px;margin-bottom:5px; }
 .ho-color-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0; }
 .ho-sidebar-name { font-size:0.72rem;font-weight:700;flex:1;color:var(--text-main);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
 .ho-sidebar-cap { font-family:'Montserrat',sans-serif;font-size:0.55rem;font-weight:900;color:#555;white-space:nowrap; }
@@ -78,8 +78,8 @@ select:focus { border-color:var(--ui-accent); }
 .ho-del-btn:hover { color:#ff6b6b; }
 .ho-del-btn .material-symbols-outlined { font-size:0.9rem;width:0.9rem;height:0.9rem; }
 
-/* ── RESPONSE items in sidebar ── */
-.resp-item { padding:8px 10px;background:var(--ui-input);border:1px solid var(--ui-border);border-radius:4px;margin-bottom:5px;position:relative; }
+/* ── RESPONSE items ── */
+.resp-item { padding:8px 10px;background:var(--ui-input);border:1px solid var(--ui-border);border-radius:4px;margin-bottom:5px; }
 .resp-item-head { display:flex;align-items:center;justify-content:space-between;margin-bottom:4px; }
 .resp-player { font-size:0.72rem;font-weight:700;color:var(--text-main); }
 .resp-del { background:none;border:none;cursor:pointer;color:#444;font-size:0.75rem;display:flex;align-items:center;transition:color 0.15s; }
@@ -91,40 +91,69 @@ select:focus { border-color:var(--ui-accent); }
 .pref-1 { background:rgba(197,160,60,0.2);color:#C5A03C;border:1px solid rgba(197,160,60,0.4); }
 .pref-2 { background:rgba(60,130,197,0.2);color:#3C82C5;border:1px solid rgba(60,130,197,0.4); }
 .pref-3 { background:rgba(180,180,180,0.12);color:#888;border:1px solid #444; }
+.resp-count-badge { font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:900;color:#4BAF6A;margin-left:auto; }
 
-/* ── MAIN BOARD ── */
-.board-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:22px; }
+/* ── BOARD HEADER ── */
+.board-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:16px; }
 .board-title { font-family:'Montserrat',sans-serif;font-size:1rem;font-weight:900;color:#fff;letter-spacing:0.05em; }
 .board-scenario { font-size:0.65rem;color:#666;margin-top:2px; }
-.board-actions { display:flex;gap:8px; }
-.board-btn { padding:8px 16px;font-size:0.7rem;font-weight:900;cursor:pointer;background:transparent;color:var(--ui-accent);border:1px solid var(--ui-accent);border-radius:4px;font-family:'Montserrat',sans-serif;letter-spacing:0.08em;transition:0.2s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap; }
+.board-actions { display:flex;align-items:center;gap:8px; }
+.board-btn { padding:7px 14px;font-size:0.68rem;font-weight:900;cursor:pointer;background:transparent;color:var(--ui-accent);border:1px solid var(--ui-accent);border-radius:4px;font-family:'Montserrat',sans-serif;letter-spacing:0.08em;transition:0.2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap; }
 .board-btn:hover { background:var(--ui-accent);color:#fff; }
-.board-btn .material-symbols-outlined { font-size:0.88rem; }
+.board-btn .material-symbols-outlined { font-size:0.84rem; }
 .board-btn.ghost { color:#555;border-color:#333; }
 .board-btn.ghost:hover { color:#999;border-color:#666;background:transparent; }
 
+/* ── VIEW TABS ── */
+.view-tabs { display:flex;gap:2px;background:#111;padding:3px;border-radius:4px; }
+.view-tab { background:transparent;color:#555;border:none;padding:5px 14px;border-radius:3px;font-weight:900;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.68rem;letter-spacing:0.06em;transition:0.2s; }
+.view-tab.active { background:var(--ui-accent);color:#fff; }
+
+/* ── STATS BAR ── */
+.stats-bar { display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap; }
+.stat-chip { background:var(--ui-input);border:1px solid var(--ui-border);border-radius:4px;padding:7px 14px;display:flex;align-items:center;gap:8px; }
+.stat-chip-n { font-family:'Montserrat',sans-serif;font-size:1.1rem;font-weight:900;color:var(--ui-accent); }
+.stat-chip-n.ok { color:#4BAF6A; }
+.stat-chip-l { font-family:'Montserrat',sans-serif;font-size:0.52rem;font-weight:900;color:#555;letter-spacing:0.1em; }
+
+/* ── PLAYER POOL ── */
+.player-pool { display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;padding:12px 14px;background:var(--ui-bg);border:1px solid var(--ui-border);border-radius:7px;min-height:48px;align-items:center;transition:border-color 0.15s; }
+.pool-label { font-family:'Montserrat',sans-serif;font-size:0.52rem;font-weight:900;letter-spacing:0.14em;color:#555;width:100%;margin-bottom:4px; }
+.player-chip { display:inline-flex;align-items:center;padding:5px 11px;background:var(--ui-input);border:1px solid var(--ui-border);border-radius:20px;font-size:0.7rem;font-weight:700;color:var(--text-main);cursor:grab;user-select:none;transition:0.15s; }
+.player-chip:hover { border-color:#777; }
+.player-chip.dragging { opacity:0.3;cursor:grabbing; }
+.player-chip.assigned { color:#444;border-color:#2a2a2a;background:#1a1a1a;text-decoration:line-through;cursor:default; }
+.pool-empty { font-size:0.6rem;color:#444; }
+
 /* ── HO CARDS on board ── */
-.ho-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:28px; }
-.ho-card { background:var(--ui-bg);border:1px solid var(--ui-border);border-radius:8px;overflow:hidden;transition:border-color 0.15s; }
+.ho-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:20px; }
+.ho-card { background:var(--ui-bg);border:1px solid var(--ui-border);border-radius:8px;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s; }
+.ho-card.drag-over { border-color:var(--ui-accent);box-shadow:0 0 0 1px var(--ui-accent),0 0 20px rgba(197,55,60,0.15); }
 .ho-card-bar { height:3px; }
 .ho-card-body { padding:14px 16px; }
 .ho-card-meta { display:flex;align-items:center;gap:6px;margin-bottom:8px; }
 .ho-card-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0; }
 .ho-card-type { font-family:'Montserrat',sans-serif;font-size:0.48rem;font-weight:900;letter-spacing:0.15em;color:#666; }
 .ho-secret-badge { font-family:'Montserrat',sans-serif;font-size:0.44rem;font-weight:900;letter-spacing:0.1em;color:var(--ui-accent);border:1px solid rgba(197,55,60,0.4);background:rgba(197,55,60,0.08);padding:1px 5px;border-radius:2px;margin-left:auto; }
-.ho-card-name { font-size:0.82rem;font-weight:700;color:#fff;margin-bottom:4px;line-height:1.3; }
-.ho-card-desc { font-size:0.6rem;color:#777;line-height:1.5;margin-bottom:10px;min-height:18px; }
+.ho-card-name { font-size:0.82rem;font-weight:700;color:#fff;margin-bottom:10px;line-height:1.3; }
 .ho-card-secret-info { font-size:0.6rem;color:rgba(197,55,60,0.7);line-height:1.5;margin-bottom:10px;padding:5px 8px;background:rgba(197,55,60,0.06);border:1px solid rgba(197,55,60,0.15);border-radius:3px; }
 .ho-slots { display:flex;flex-direction:column;gap:5px;margin-bottom:10px; }
-.ho-slot { display:flex;align-items:center;gap:6px; }
+.ho-slot { display:flex;align-items:center;gap:5px; }
 .slot-num { font-family:'Montserrat',sans-serif;font-size:0.5rem;font-weight:900;color:#555;width:14px;text-align:center;flex-shrink:0; }
-.slot-select { flex:1;font-size:0.7rem;padding:5px 7px;background:var(--ui-input);border:1px solid #333;border-radius:3px;color:var(--text-main);cursor:pointer;outline:none;transition:border-color 0.15s; }
+.slot-select { flex:1;font-size:0.7rem;padding:5px 7px;background:var(--ui-input);border:1px solid #333;border-radius:3px;color:var(--text-main);cursor:pointer;outline:none;transition:border-color 0.15s;min-width:0; }
 .slot-select:focus { border-color:var(--ui-accent); }
-.slot-select.filled { border-color:#2a2a2a;background:#1a1a1a; }
-.slot-select.matched { border-color:rgba(75,175,106,0.5);color:#4BAF6A; }
+.slot-select.matched { border-color:rgba(75,175,106,0.4);color:#4BAF6A; }
+.slot-select.filled { background:#1a1a1a; }
 
-/* conflict + pref indicator on card */
-.ho-card-prefs { display:flex;flex-direction:column;gap:3px; }
+/* reason badges */
+.reason-badge { font-family:'Montserrat',sans-serif;font-size:0.44rem;font-weight:900;letter-spacing:0.04em;padding:2px 5px;border-radius:2px;flex-shrink:0;white-space:nowrap; }
+.reason-1 { background:rgba(197,160,60,0.15);color:#C5A03C;border:1px solid rgba(197,160,60,0.35); }
+.reason-2 { background:rgba(60,130,197,0.15);color:#3C82C5;border:1px solid rgba(60,130,197,0.35); }
+.reason-3 { background:rgba(180,180,180,0.1);color:#888;border:1px solid #3a3a3a; }
+.reason-m { background:rgba(75,175,106,0.1);color:#4BAF6A;border:1px solid rgba(75,175,106,0.3); }
+
+/* conflict + pref indicator */
+.ho-card-prefs { display:flex;flex-direction:column;gap:3px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.05); }
 .ho-pref-row { display:flex;align-items:center;gap:4px;font-size:0.58rem;color:#666; }
 .ho-pref-row .pref-badge { font-size:0.42rem;width:13px;height:13px; }
 .conflict-warn { display:flex;align-items:center;gap:5px;font-family:'Montserrat',sans-serif;font-size:0.52rem;font-weight:900;letter-spacing:0.08em;color:#C5A03C;margin-bottom:8px;padding:4px 7px;background:rgba(197,160,60,0.08);border:1px solid rgba(197,160,60,0.25);border-radius:3px; }
@@ -135,11 +164,20 @@ select:focus { border-color:var(--ui-accent); }
 .board-empty-icon { font-family:'Montserrat',sans-serif;font-size:0.7rem;font-weight:900;letter-spacing:0.35em; }
 .board-empty-sub { font-size:0.62rem;color:#3a3a3a;letter-spacing:0.08em; }
 
-/* stats bar */
-.stats-bar { display:flex;gap:8px;margin-bottom:20px; }
-.stat-chip { background:var(--ui-input);border:1px solid var(--ui-border);border-radius:4px;padding:8px 14px;display:flex;align-items:center;gap:8px; }
-.stat-chip-n { font-family:'Montserrat',sans-serif;font-size:1.1rem;font-weight:900;color:var(--ui-accent); }
-.stat-chip-l { font-family:'Montserrat',sans-serif;font-size:0.52rem;font-weight:900;color:#555;letter-spacing:0.1em; }
+/* ── MATRIX VIEW ── */
+.matrix-wrap { overflow-x:auto;border-radius:7px;border:1px solid var(--ui-border); }
+.matrix-table { border-collapse:collapse;width:100%;font-size:0.7rem;background:var(--ui-bg); }
+.matrix-table th { font-family:'Montserrat',sans-serif;font-size:0.52rem;font-weight:900;letter-spacing:0.08em;color:#555;padding:10px 14px;border-bottom:2px solid #2a2a2a;text-align:center;white-space:nowrap;position:sticky;top:0;background:var(--ui-bg); }
+.matrix-table th.col-player { text-align:left;min-width:110px;border-right:1px solid #2a2a2a; }
+.matrix-table td { padding:9px 14px;border-bottom:1px solid #1e1e1e;text-align:center;vertical-align:middle; }
+.matrix-table td.col-player { font-size:0.74rem;font-weight:700;color:var(--text-main);text-align:left;white-space:nowrap;border-right:1px solid #2a2a2a; }
+.matrix-table tr:last-child td { border-bottom:none; }
+.matrix-table tr:hover td { background:rgba(255,255,255,0.025); }
+.matrix-cell-assigned { background:rgba(75,175,106,0.07); }
+.m-icons { display:flex;align-items:center;justify-content:center;gap:3px;flex-wrap:wrap; }
+.m-pref { font-size:1rem;line-height:1; }
+.m-assigned-dot { width:8px;height:8px;border-radius:50%;background:#4BAF6A;flex-shrink:0; }
+.m-unassigned { color:#2a2a2a;font-size:0.7rem; }
 
 /* ─────────────────────────────────
    MODALS
@@ -148,20 +186,12 @@ select:focus { border-color:var(--ui-accent); }
 .overlay.open { opacity:1;pointer-events:all; }
 .modal { background:var(--ui-bg);border:1px solid var(--ui-border);border-radius:10px;padding:24px 26px;width:460px;max-width:calc(100vw - 32px);max-height:88vh;overflow-y:auto;transform:translateY(8px);transition:transform 0.18s; }
 .overlay.open .modal { transform:translateY(0); }
-.modal-wide { width:560px; }
+.modal-wide { width:600px; }
 .modal-title { font-family:'Montserrat',sans-serif;font-size:0.62rem;font-weight:900;letter-spacing:0.2em;color:var(--ui-accent);margin-bottom:14px; }
 .modal-btns { display:flex;gap:8px;margin-top:18px;justify-content:flex-end; }
-.modal-btns .btn-cancel { }
-
-/* link modal */
 .link-box { background:var(--ui-input);border:1px solid var(--ui-border);border-radius:4px;padding:10px 12px;font-size:0.65rem;color:#888;word-break:break-all;line-height:1.6;font-family:monospace;margin-bottom:10px; }
-.copy-note { font-size:0.6rem;color:#555;margin-top:6px; }
-
-/* discord modal */
-.discord-box { background:#1e1e2e;border:1px solid #3a3a5c;border-radius:6px;padding:14px 16px;font-size:0.7rem;color:#c4c9f5;line-height:1.8;font-family:'Noto Sans JP',monospace;white-space:pre-wrap;word-break:break-all;max-height:320px;overflow-y:auto; }
-
-/* response code modal (player → GM) */
-.resp-code-box { background:var(--ui-input);border:1px solid var(--ui-border);border-radius:6px;padding:12px;font-family:monospace;font-size:0.7rem;color:var(--text-main);word-break:break-all;line-height:1.7;margin-bottom:10px; }
+.discord-box { background:#1e1e2e;border:1px solid #3a3a5c;border-radius:6px;padding:14px 16px;font-size:0.7rem;color:#c4c9f5;line-height:1.9;font-family:'Noto Sans JP',monospace;white-space:pre-wrap;word-break:break-all;max-height:340px;overflow-y:auto; }
+.resp-code-box { background:var(--ui-input);border:1px solid var(--ui-border);border-radius:6px;padding:12px;font-family:monospace;font-size:0.68rem;color:var(--text-main);word-break:break-all;line-height:1.7;margin-bottom:10px; }
 
 /* toast */
 .toast { position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:#222;border:1px solid var(--ui-border);border-radius:20px;padding:8px 20px;font-size:0.67rem;color:#888;transition:transform 0.25s ease;z-index:9999;white-space:nowrap; }
@@ -172,28 +202,30 @@ select:focus { border-color:var(--ui-accent); }
    PLAYER VIEW
 ───────────────────────────────── */
 #player-view { display:none;min-height:100vh;padding:40px 20px 80px; }
-.player-wrap { max-width:560px;margin:0 auto; }
+.player-wrap { max-width:540px;margin:0 auto; }
 .player-header { margin-bottom:28px;border-bottom:3px solid var(--ui-accent);padding-bottom:14px; }
 .player-scenario { font-size:0.65rem;color:#666;letter-spacing:0.06em;margin-top:3px; }
-.player-name-sec { margin-bottom:24px; }
-.player-ho-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px; }
+.player-ho-grid { display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 22px; }
 @media(max-width:480px){ .player-ho-grid { grid-template-columns:1fr; } }
-.player-ho-card { background:var(--ui-bg);border:1px solid var(--ui-border);border-radius:7px;overflow:hidden;transition:border-color 0.15s; }
+.player-ho-card { background:var(--ui-bg);border:1px solid var(--ui-border);border-radius:7px;overflow:hidden; }
 .player-ho-card-bar { height:3px; }
-.player-ho-card-body { padding:12px 14px; }
-.player-ho-card-name { font-size:0.78rem;font-weight:700;color:#fff;margin-bottom:3px; }
-.player-ho-card-desc { font-size:0.6rem;color:#777;line-height:1.5; }
-.player-prefs-sec { margin-bottom:24px; }
+.player-ho-card-body { padding:10px 13px; }
+.player-ho-card-name { font-size:0.78rem;font-weight:700;color:#fff; }
+.player-ho-card-cap { font-family:'Montserrat',sans-serif;font-size:0.5rem;font-weight:900;color:#555;margin-top:2px; }
+.player-prefs-sec { margin-bottom:22px; }
 .player-pref-row { display:flex;align-items:center;gap:10px;margin-bottom:10px; }
 .player-pref-label { display:flex;align-items:center;gap:6px;font-size:0.7rem;font-weight:700;color:#888;white-space:nowrap; }
 .player-pref-label .pref-badge { font-size:0.55rem;width:18px;height:18px; }
-.player-pref-select { flex:1;font-size:0.74rem;padding:8px 10px; }
 .player-submit-note { font-size:0.62rem;color:#555;line-height:1.6;margin-bottom:16px; }
+
+input[type=file] { display:none; }
 </style>
 </head>
 <body>
 
-<!-- ═══════════════ GM VIEW ═══════════════ -->
+<!-- ══════════════════════════════
+     GM VIEW
+══════════════════════════════ -->
 <div id="gm-view">
   <aside class="sidebar">
     <div class="sidebar-scroll">
@@ -208,54 +240,54 @@ select:focus { border-color:var(--ui-accent); }
         <div class="sec-h">SCENARIO</div>
         <div class="form-grp">
           <label class="f-lbl">シナリオ名</label>
-          <input class="f-input" id="scenarioName" placeholder="例：永遠の街" maxlength="60">
+          <input class="f-input" id="scenarioName" placeholder="例：永遠の街" maxlength="60" oninput="onScenarioInput()">
         </div>
       </div>
 
-      <!-- ADD HO -->
+      <!-- HO 設定 -->
       <div class="control-group">
         <div class="sec-h">HO 設定</div>
         <div id="hoSidebarList"></div>
-        <div class="form-grp" style="margin-top:8px;">
-          <label class="f-lbl">HO名</label>
-          <input class="f-input" id="newHoName" placeholder="例：探偵" maxlength="30">
-        </div>
-        <div class="form-grp">
-          <label class="f-lbl">秘匿情報（GMのみ・URLに含まれません）</label>
-          <textarea class="f-area" id="newHoSecret" placeholder="プレイヤーには非表示" rows="2"></textarea>
-        </div>
-        <div class="form-row" style="margin-bottom:10px;">
-          <div style="flex:1;">
-            <label class="f-lbl">定員</label>
-            <input class="f-input f-input-sm" id="newHoCap" type="number" value="1" min="1" max="10">
+        <div style="margin-top:8px;">
+          <div class="form-grp">
+            <label class="f-lbl">HO名</label>
+            <input class="f-input" id="newHoName" placeholder="例：探偵" maxlength="30" onkeydown="if(event.key==='Enter')addHO()">
           </div>
+          <div class="form-grp">
+            <label class="f-lbl">秘匿情報（GMのみ・URLに含まれません）</label>
+            <textarea class="f-area" id="newHoSecret" placeholder="プレイヤーには非表示" rows="2"></textarea>
+          </div>
+          <div class="form-row" style="margin-bottom:10px;">
+            <div>
+              <label class="f-lbl">定員</label>
+              <input class="f-input f-input-sm" id="newHoCap" type="number" value="1" min="1" max="10">
+            </div>
+          </div>
+          <button class="btn-primary" onclick="addHO()">
+            <span class="material-symbols-outlined">add</span>HOを追加
+          </button>
         </div>
-        <button class="btn-primary" onclick="addHO()">
-          <span class="material-symbols-outlined">add</span>HOを追加
-        </button>
       </div>
 
       <!-- SHARE -->
       <div class="control-group">
         <div class="sec-h">SHARE</div>
-        <div class="act-col">
-          <button class="btn-ghost" onclick="openLinkModal()">
-            <span class="material-symbols-outlined">share</span>プレイヤーリンクを生成
-          </button>
-        </div>
+        <button class="btn-ghost" onclick="openLinkModal()">
+          <span class="material-symbols-outlined">share</span>プレイヤーリンクを生成
+        </button>
       </div>
 
       <!-- RESPONSES -->
       <div class="control-group">
-        <div class="sec-h">RESPONSES</div>
+        <div class="sec-h">RESPONSES <span class="resp-count-badge" id="respCountBadge"></span></div>
         <div class="form-grp">
-          <label class="f-lbl">レスポンスコードを貼り付け</label>
-          <textarea class="f-area" id="respCodeInput" placeholder="プレイヤーから受け取ったコードを1行ずつ貼り付け…" rows="3"></textarea>
+          <label class="f-lbl">レスポンスコードを貼り付け（複数可）</label>
+          <textarea class="f-area" id="respCodeInput" placeholder="コードを1行ずつ…" rows="3"></textarea>
         </div>
         <button class="btn-primary" onclick="importResponses()" style="margin-bottom:8px;">
           <span class="material-symbols-outlined">download</span>インポート
         </button>
-        <div id="respSidebarList"></div>
+        <div id="respSidebarList"><div style="font-size:0.6rem;color:#555;">まだ回答がありません</div></div>
       </div>
 
       <!-- ACTIONS -->
@@ -266,7 +298,7 @@ select:focus { border-color:var(--ui-accent); }
             <span class="material-symbols-outlined">auto_awesome</span>AUTO CAST
           </button>
           <button class="btn-ghost" onclick="openDiscord()">
-            <span class="material-symbols-outlined">content_copy</span>Discord出力
+            <span class="material-symbols-outlined">forum</span>Discord出力
           </button>
         </div>
       </div>
@@ -274,29 +306,50 @@ select:focus { border-color:var(--ui-accent); }
   </aside>
 
   <!-- MAIN BOARD -->
-  <div class="main-area" id="mainArea">
+  <div class="main-area">
     <div class="board-header">
       <div>
         <div class="board-title">CASTING BOARD</div>
         <div class="board-scenario" id="boardScenario">シナリオ未設定</div>
       </div>
       <div class="board-actions">
+        <div class="view-tabs">
+          <button class="view-tab active" id="tabBoard" onclick="switchView('board')">BOARD</button>
+          <button class="view-tab" id="tabMatrix" onclick="switchView('matrix')">MATRIX</button>
+        </div>
         <button class="board-btn ghost" onclick="resetAssignments()">
           <span class="material-symbols-outlined">restart_alt</span>リセット
         </button>
       </div>
     </div>
     <div class="stats-bar" id="statsBar"></div>
-    <div class="ho-grid" id="hoGrid">
-      <div class="board-empty">
-        <div class="board-empty-icon">✦ HO CASTING</div>
-        <div class="board-empty-sub">左パネルからHOを追加してください</div>
+
+    <!-- BOARD VIEW -->
+    <div id="boardView">
+      <div class="player-pool" id="playerPool">
+        <span class="pool-label">UNASSIGNED PLAYERS — ドラッグしてHOカードに割り当て</span>
+        <span class="pool-empty">回答を受け取るとここに表示されます</span>
+      </div>
+      <div class="ho-grid" id="hoGrid">
+        <div class="board-empty">
+          <div class="board-empty-icon">✦ HO CASTING</div>
+          <div class="board-empty-sub">左パネルからHOを追加してください</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MATRIX VIEW -->
+    <div id="matrixView" style="display:none;">
+      <div class="matrix-wrap">
+        <table class="matrix-table" id="matrixTable"></table>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ PLAYER VIEW ═══════════════ -->
+<!-- ══════════════════════════════
+     PLAYER VIEW
+══════════════════════════════ -->
 <div id="player-view">
   <div class="player-wrap">
     <a href="index.html" class="back-link"><span class="material-symbols-outlined">arrow_back_ios</span>BACK TO TOOLBOX</a>
@@ -305,73 +358,69 @@ select:focus { border-color:var(--ui-accent); }
       <div class="ui-title">HO 希望入力</div>
       <div class="player-scenario" id="playerScenario"></div>
     </div>
-    <div class="player-name-sec">
-      <div class="sec-h">YOUR NAME</div>
-      <div class="form-grp">
-        <label class="f-lbl">プレイヤー名</label>
-        <input class="f-input" id="playerName" placeholder="例：田中" maxlength="20">
-      </div>
+
+    <div class="sec-h">YOUR NAME</div>
+    <div class="form-grp" style="margin:10px 0 22px;">
+      <label class="f-lbl">プレイヤー名</label>
+      <input class="f-input" id="playerName" placeholder="例：田中" maxlength="20">
     </div>
+
     <div class="sec-h">HO 一覧</div>
-    <div class="player-ho-grid" id="playerHoGrid" style="margin-top:10px;"></div>
+    <div class="player-ho-grid" id="playerHoGrid"></div>
+
+    <div class="sec-h" style="margin-bottom:12px;">希望順位</div>
     <div class="player-prefs-sec">
-      <div class="sec-h">希望順位</div>
       <div class="player-pref-row">
         <div class="player-pref-label"><span class="pref-badge pref-1">1</span>第1希望</div>
-        <select class="f-input player-pref-select" id="pref1"><option value="">— 選択 —</option></select>
+        <select class="f-input" id="pref1" style="flex:1;"><option value="">— 選択 —</option></select>
       </div>
       <div class="player-pref-row">
         <div class="player-pref-label"><span class="pref-badge pref-2">2</span>第2希望</div>
-        <select class="f-input player-pref-select" id="pref2"><option value="">— 選択 —（任意）</option></select>
+        <select class="f-input" id="pref2" style="flex:1;"><option value="">— 選択 —（任意）</option></select>
       </div>
       <div class="player-pref-row">
         <div class="player-pref-label"><span class="pref-badge pref-3">3</span>第3希望</div>
-        <select class="f-input player-pref-select" id="pref3"><option value="">— 選択 —（任意）</option></select>
+        <select class="f-input" id="pref3" style="flex:1;"><option value="">— 選択 —（任意）</option></select>
       </div>
     </div>
-    <div class="player-submit-note">送信すると<strong style="color:var(--text-main);">レスポンスコード</strong>が生成されます。コードをコピーしてGMにお送りください。</div>
+    <div class="player-submit-note">送信すると<strong style="color:var(--text-main);">レスポンスコード</strong>が生成されます。コードをGMにお送りください。</div>
     <button class="btn-primary" onclick="submitPlayerPrefs()">
       <span class="material-symbols-outlined">send</span>希望を送信してコードを取得
     </button>
   </div>
 </div>
 
-<!-- ═══════════════ MODALS ═══════════════ -->
-
-<!-- Share Link Modal -->
+<!-- ══════════════════════════════
+     MODALS
+══════════════════════════════ -->
+<!-- Share Link -->
 <div class="overlay" id="linkOverlay" onclick="if(event.target===this)closeMod('linkOverlay')">
   <div class="modal">
     <div class="modal-title">PLAYER LINK</div>
-    <div style="font-size:0.7rem;color:#888;margin-bottom:12px;line-height:1.6;">プレイヤーに下記URLを共有してください。<br>HOの秘匿情報はリンクに含まれません。</div>
+    <div style="font-size:0.7rem;color:#888;margin-bottom:12px;line-height:1.6;">HOの秘匿情報はURLに含まれません。</div>
     <div class="link-box" id="linkBox"></div>
-    <button class="btn-primary" onclick="copyLink()">
-      <span class="material-symbols-outlined">content_copy</span>URLをコピー
-    </button>
+    <button class="btn-primary" onclick="copyLink()"><span class="material-symbols-outlined">content_copy</span>URLをコピー</button>
     <div class="modal-btns"><button class="btn-cancel" onclick="closeMod('linkOverlay')">閉じる</button></div>
   </div>
 </div>
 
-<!-- Response Code Modal (player) -->
+<!-- Response Code (player) -->
 <div class="overlay" id="respCodeOverlay" onclick="if(event.target===this)closeMod('respCodeOverlay')">
   <div class="modal">
     <div class="modal-title">RESPONSE CODE</div>
-    <div style="font-size:0.7rem;color:#888;margin-bottom:12px;line-height:1.6;">以下のコードをコピーして、GMにお送りください。</div>
+    <div style="font-size:0.7rem;color:#888;margin-bottom:12px;line-height:1.6;">以下のコードをコピーしてGMにお送りください。</div>
     <div class="resp-code-box" id="respCodeBox"></div>
-    <button class="btn-primary" onclick="copyRespCode()">
-      <span class="material-symbols-outlined">content_copy</span>コードをコピー
-    </button>
+    <button class="btn-primary" onclick="copyRespCode()"><span class="material-symbols-outlined">content_copy</span>コードをコピー</button>
     <div class="modal-btns"><button class="btn-cancel" onclick="closeMod('respCodeOverlay')">閉じる</button></div>
   </div>
 </div>
 
-<!-- Discord Modal -->
+<!-- Discord -->
 <div class="overlay" id="discordOverlay" onclick="if(event.target===this)closeMod('discordOverlay')">
   <div class="modal modal-wide">
     <div class="modal-title">DISCORD OUTPUT</div>
     <div class="discord-box" id="discordBox"></div>
-    <button class="btn-primary" style="margin-top:12px;" onclick="copyDiscord()">
-      <span class="material-symbols-outlined">content_copy</span>コピー
-    </button>
+    <button class="btn-primary" style="margin-top:12px;" onclick="copyDiscord()"><span class="material-symbols-outlined">content_copy</span>コピー</button>
     <div class="modal-btns"><button class="btn-cancel" onclick="closeMod('discordOverlay')">閉じる</button></div>
   </div>
 </div>
@@ -380,25 +429,29 @@ select:focus { border-color:var(--ui-accent); }
 <div class="wm">✦ IKATOOLBOX</div>
 
 <script>
-/* ═══════════════════════════════════════
+/* ══════════════════════════════
    STATE
-═══════════════════════════════════════ */
+══════════════════════════════ */
 const HO_COLORS = ['#C5373C','#3C82C5','#4BAF6A','#C5A03C','#9B59C5','#E67E22','#1ABC9C','#E91E8C','#00BCD4','#FF5722'];
-let hos = [];       // {id, name, desc, secret, capacity, color}
-let responses = []; // {player, prefs:[hoId,...]}
-let assignments = {}; // hoId → [playerName,...]
+let hos = [];        // {id, name, secret, capacity, color}
+let responses = [];  // {player, prefs:[hoId,...]}
+let assignments = {};// hoId → [playerName,...]
+let castReasons = {};// playerName → 0/1/2/'manual'  (0=第1希望,1=第2,2=第3)
 let hoIdCnt = 1;
+let currentView = 'board';
+let draggedPlayer = null;
 
 const $ = id => document.getElementById(id);
 
-/* ═══════════════════════════════════════
+/* ══════════════════════════════
    MODE DETECTION
-═══════════════════════════════════════ */
+══════════════════════════════ */
 const urlParams = new URLSearchParams(location.search);
 const sessionCode = urlParams.get('s');
 
 window.addEventListener('DOMContentLoaded', () => {
   if (sessionCode) {
+    $('gm-view').style.display = 'none';
     initPlayerView(sessionCode);
   } else {
     $('gm-view').style.display = 'flex';
@@ -406,32 +459,22 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-/* ═══════════════════════════════════════
-   ENCODING / DECODING
-═══════════════════════════════════════ */
-function encodeB64(obj) {
-  return btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
-}
-function decodeB64(str) {
-  try { return JSON.parse(decodeURIComponent(escape(atob(str)))); } catch { return null; }
-}
+/* ══════════════════════════════
+   ENCODE / DECODE
+══════════════════════════════ */
+function enc(obj) { return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))); }
+function dec(str) { try { return JSON.parse(decodeURIComponent(escape(atob(str)))); } catch { return null; } }
 
 function buildSessionData() {
   return {
     name: $('scenarioName').value.trim() || '無題シナリオ',
     hos: hos.map(h => ({ id: h.id, name: h.name, color: h.color, capacity: h.capacity }))
-    // secret は含めない
   };
 }
 
-function buildPlayerLink() {
-  const base = location.origin + location.pathname;
-  return base + '?s=' + encodeB64(buildSessionData());
-}
-
-/* ═══════════════════════════════════════
+/* ══════════════════════════════
    GM — HO MANAGEMENT
-═══════════════════════════════════════ */
+══════════════════════════════ */
 function addHO() {
   const name = $('newHoName').value.trim();
   if (!name) { toast('HO名を入力してください'); return; }
@@ -440,13 +483,14 @@ function addHO() {
     name,
     secret: $('newHoSecret').value.trim(),
     capacity: Math.max(1, parseInt($('newHoCap').value) || 1),
-    color: HO_COLORS[(hos.length) % HO_COLORS.length]
+    color: HO_COLORS[hos.length % HO_COLORS.length]
   };
   hos.push(ho);
   assignments[ho.id] = [];
   $('newHoName').value = '';
   $('newHoSecret').value = '';
   $('newHoCap').value = '1';
+  $('newHoName').focus();
   renderSidebarHOs();
   renderBoard();
 }
@@ -460,33 +504,29 @@ function deleteHO(id) {
 
 function renderSidebarHOs() {
   const el = $('hoSidebarList');
-  if (!hos.length) { el.innerHTML = ''; return; }
   el.innerHTML = hos.map(h => `
     <div class="ho-sidebar-item">
       <span class="ho-color-dot" style="background:${h.color}"></span>
       <span class="ho-sidebar-name">${esc(h.name)}</span>
       <span class="ho-sidebar-cap">×${h.capacity}</span>
       ${h.secret ? '<span class="ho-secret-dot" title="秘匿あり"></span>' : ''}
-      <button class="ho-del-btn" onclick="deleteHO('${h.id}')">
-        <span class="material-symbols-outlined">close</span>
-      </button>
+      <button class="ho-del-btn" onclick="deleteHO('${h.id}')"><span class="material-symbols-outlined">close</span></button>
     </div>`).join('');
 }
 
-/* ═══════════════════════════════════════
+/* ══════════════════════════════
    GM — RESPONSES
-═══════════════════════════════════════ */
+══════════════════════════════ */
 function importResponses() {
   const raw = $('respCodeInput').value.trim();
   if (!raw) { toast('コードを貼り付けてください'); return; }
   const lines = raw.split(/\n/).map(l => l.trim()).filter(Boolean);
   let added = 0, failed = 0;
   lines.forEach(line => {
-    const data = decodeB64(line);
+    const data = dec(line);
     if (!data || !data.player || !Array.isArray(data.prefs)) { failed++; return; }
-    const existing = responses.findIndex(r => r.player === data.player);
-    if (existing >= 0) responses[existing] = data;
-    else responses.push(data);
+    const idx = responses.findIndex(r => r.player === data.player);
+    if (idx >= 0) responses[idx] = data; else responses.push(data);
     added++;
   });
   $('respCodeInput').value = '';
@@ -497,24 +537,22 @@ function importResponses() {
 
 function deleteResponse(player) {
   responses = responses.filter(r => r.player !== player);
-  // clear assignments for this player
-  Object.keys(assignments).forEach(hid => {
-    assignments[hid] = assignments[hid].filter(p => p !== player);
-  });
+  Object.keys(assignments).forEach(hid => { assignments[hid] = assignments[hid].filter(p => p !== player); });
+  delete castReasons[player];
   renderSidebarResponses();
   renderBoard();
 }
 
 function renderSidebarResponses() {
   const el = $('respSidebarList');
+  const badge = $('respCountBadge');
+  badge.textContent = responses.length ? `${responses.length}人回答済み` : '';
   if (!responses.length) { el.innerHTML = '<div style="font-size:0.6rem;color:#555;">まだ回答がありません</div>'; return; }
   el.innerHTML = responses.map(r => {
     const prefsHtml = r.prefs.map((pid, i) => {
       const ho = hos.find(h => h.id === pid);
-      return `<div class="resp-pref">
-        <span class="pref-badge pref-${i+1}">${i+1}</span>
-        <span style="color:${ho ? ho.color : '#555'}">${ho ? esc(ho.name) : '不明'}</span>
-      </div>`;
+      return `<div class="resp-pref"><span class="pref-badge pref-${i+1}">${i+1}</span>
+        <span style="color:${ho ? ho.color : '#555'}">${ho ? esc(ho.name) : '不明'}</span></div>`;
     }).join('');
     return `<div class="resp-item">
       <div class="resp-item-head">
@@ -526,21 +564,19 @@ function renderSidebarResponses() {
   }).join('');
 }
 
-/* ═══════════════════════════════════════
+/* ══════════════════════════════
    GM — AUTO CAST
-═══════════════════════════════════════ */
+══════════════════════════════ */
 function autoCast() {
   if (!hos.length) { toast('HOを追加してください'); return; }
   if (!responses.length) { toast('プレイヤーの回答がありません'); return; }
-
-  // reset
   const result = {};
   hos.forEach(h => result[h.id] = []);
+  const newReasons = {};
   const assigned = new Set();
 
-  // greedy: 1st → 2nd → 3rd
   for (let priority = 0; priority < 3; priority++) {
-    // shuffle to be fair on ties
+    // shuffle for fairness on same priority
     const shuffled = [...responses].sort(() => Math.random() - 0.5);
     shuffled.forEach(resp => {
       if (assigned.has(resp.player)) return;
@@ -548,233 +584,338 @@ function autoCast() {
       if (!hoId) return;
       const ho = hos.find(h => h.id === hoId);
       if (!ho) return;
-      if (result[hoId].length < ho.capacity) {
+      if ((result[hoId] || []).length < ho.capacity) {
         result[hoId].push(resp.player);
         assigned.add(resp.player);
+        newReasons[resp.player] = priority; // 0=第1希望, 1=第2希望, 2=第3希望
       }
     });
   }
 
   assignments = result;
+  castReasons = newReasons;
   renderBoard();
-  toast('AUTO CASTを実行しました');
+  const unassigned = responses.filter(r => !assigned.has(r.player));
+  if (unassigned.length) {
+    toast(`配役完了（未配役: ${unassigned.map(r=>r.player).join('、')}）`);
+  } else {
+    toast('全員の配役が完了しました ✓');
+  }
 }
 
 function resetAssignments() {
   hos.forEach(h => assignments[h.id] = []);
+  castReasons = {};
   renderBoard();
 }
 
-/* ═══════════════════════════════════════
+/* ══════════════════════════════
    GM — BOARD RENDER
-═══════════════════════════════════════ */
+══════════════════════════════ */
 function renderBoard() {
-  // scenario label
-  const sname = ($('scenarioName')?.value || '').trim();
-  $('boardScenario').textContent = sname || 'シナリオ未設定';
-
   // stats
-  const totalPlayers = responses.length;
-  const assignedPlayers = new Set(Object.values(assignments).flat()).size;
   const totalCap = hos.reduce((s, h) => s + h.capacity, 0);
+  const assignedAll = new Set(Object.values(assignments).flat());
+  const assignedCount = assignedAll.size;
   $('statsBar').innerHTML = hos.length ? `
     <div class="stat-chip"><span class="stat-chip-n">${hos.length}</span><span class="stat-chip-l">HOs</span></div>
-    <div class="stat-chip"><span class="stat-chip-n">${totalPlayers}</span><span class="stat-chip-l">PLAYERS</span></div>
-    <div class="stat-chip"><span class="stat-chip-n">${assignedPlayers}/${totalPlayers}</span><span class="stat-chip-l">ASSIGNED</span></div>
+    <div class="stat-chip"><span class="stat-chip-n" style="color:${responses.length?'#4BAF6A':'var(--ui-accent)'}">${responses.length}</span><span class="stat-chip-l">RESPONSES</span></div>
+    <div class="stat-chip"><span class="stat-chip-n">${assignedCount}/${responses.length}</span><span class="stat-chip-l">ASSIGNED</span></div>
     <div class="stat-chip"><span class="stat-chip-n">${totalCap}</span><span class="stat-chip-l">CAPACITY</span></div>
   ` : '';
 
+  // player pool
+  const poolEl = $('playerPool');
+  if (responses.length) {
+    const chips = responses.map(r => {
+      const isAssigned = assignedAll.has(r.player);
+      const safePlayer = r.player.replace(/'/g, "\\'");
+      return `<span class="player-chip${isAssigned ? ' assigned' : ''}"
+        ${!isAssigned ? `draggable="true" ondragstart="onChipDragStart(event,'${safePlayer}')" ondragend="onChipDragEnd(event)"` : ''}
+      >${esc(r.player)}</span>`;
+    }).join('');
+    poolEl.innerHTML = '<span class="pool-label">UNASSIGNED PLAYERS — ドラッグしてHOカードに割り当て</span>' + chips;
+  } else {
+    poolEl.innerHTML = '<span class="pool-label">UNASSIGNED PLAYERS</span><span class="pool-empty">回答を受け取るとここに表示されます</span>';
+  }
+
+  // HO cards
   if (!hos.length) {
     $('hoGrid').innerHTML = `<div class="board-empty"><div class="board-empty-icon">✦ HO CASTING</div><div class="board-empty-sub">左パネルからHOを追加してください</div></div>`;
     return;
   }
 
-  // build player options for dropdowns
   const allPlayers = responses.map(r => r.player);
 
   $('hoGrid').innerHTML = hos.map(ho => {
     const curAssigned = assignments[ho.id] || [];
 
-    // preference analysis
+    // preference counts per priority
     const prefCounts = [[], [], []];
     responses.forEach(r => {
       r.prefs.forEach((pid, i) => { if (pid === ho.id && i < 3) prefCounts[i].push(r.player); });
     });
     const hasConflict = prefCounts[0].length > ho.capacity;
 
-    // slots (dropdowns)
-    const slots = Array.from({length: ho.capacity}, (_, i) => {
-      const currentPlayer = curAssigned[i] || '';
-      const options = ['<option value="">— 未配役 —</option>',
-        ...allPlayers.map(p => `<option value="${esc(p)}" ${p === currentPlayer ? 'selected' : ''}>${esc(p)}</option>`)
+    // assignment slots (dropdown + reason badge)
+    const slots = Array.from({ length: ho.capacity }, (_, i) => {
+      const cur = curAssigned[i] || '';
+      const reasonVal = cur ? castReasons[cur] : undefined;
+      const isFirstChoice = cur && prefCounts[0].includes(cur);
+      const reasonLabel = cur ? (
+        reasonVal === 'manual' ? '手動' :
+        reasonVal === 0 ? '第1希望' :
+        reasonVal === 1 ? '第2希望' :
+        reasonVal === 2 ? '第3希望' : '手動'
+      ) : '';
+      const reasonCls = reasonVal === 0 ? 'reason-1' : reasonVal === 1 ? 'reason-2' : reasonVal === 2 ? 'reason-3' : 'reason-m';
+      const selCls = cur ? (isFirstChoice ? 'slot-select matched' : 'slot-select filled') : 'slot-select';
+      const opts = ['<option value="">— 未配役 —</option>',
+        ...allPlayers.map(p => `<option value="${esc(p)}"${p===cur?' selected':''}>${esc(p)}</option>`)
       ].join('');
-      const cls = currentPlayer ? (prefCounts[0].includes(currentPlayer) ? 'slot-select matched' : 'slot-select filled') : 'slot-select';
       return `<div class="ho-slot">
-        <span class="slot-num">${i + 1}</span>
-        <select class="${cls}" onchange="setSlot('${ho.id}',${i},this.value)">${options}</select>
+        <span class="slot-num">${i+1}</span>
+        <select class="${selCls}" onchange="setSlot('${ho.id}',${i},this.value)">${opts}</select>
+        ${cur && reasonLabel ? `<span class="reason-badge ${reasonCls}">${reasonLabel}</span>` : ''}
       </div>`;
     }).join('');
 
-    // pref summary
+    // preference summary
     const prefSummary = prefCounts.map((players, i) => players.length ? `
       <div class="ho-pref-row">
         <span class="pref-badge pref-${i+1}">${i+1}</span>
-        <span>${players.map(p => esc(p)).join('、')}</span>
-        ${i === 0 && hasConflict ? `<span style="color:#C5A03C;font-weight:700;font-size:0.54rem;">競合</span>` : ''}
+        <span>${players.map(p=>esc(p)).join('、')}</span>
+        ${i===0&&hasConflict?'<span style="color:#C5A03C;font-weight:700;font-size:0.54rem;margin-left:2px;">競合</span>':''}
       </div>` : '').join('');
 
-    return `<div class="ho-card">
+    return `<div class="ho-card" id="ho-card-${ho.id}"
+      ondragover="onCardDragOver(event,'${ho.id}')"
+      ondragleave="onCardDragLeave('${ho.id}')"
+      ondrop="onCardDrop(event,'${ho.id}')">
       <div class="ho-card-bar" style="background:${ho.color}"></div>
       <div class="ho-card-body">
         <div class="ho-card-meta">
           <span class="ho-card-dot" style="background:${ho.color}"></span>
           <span class="ho-card-type">定員 ${ho.capacity}</span>
-          ${ho.secret ? `<span class="ho-secret-badge">秘匿あり</span>` : ''}
+          ${ho.secret ? '<span class="ho-secret-badge">秘匿あり</span>' : ''}
         </div>
-        ${hasConflict ? `<div class="conflict-warn"><span class="material-symbols-outlined">warning</span>第1希望が競合しています</div>` : ''}
+        ${hasConflict ? '<div class="conflict-warn"><span class="material-symbols-outlined">warning</span>第1希望が競合しています</div>' : ''}
         <div class="ho-card-name">${esc(ho.name)}</div>
         ${ho.secret ? `<div class="ho-card-secret-info">🔒 ${esc(ho.secret)}</div>` : ''}
         <div class="ho-slots">${slots}</div>
-        ${prefSummary ? `<div class="ho-card-prefs" style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.05);">${prefSummary}</div>` : ''}
+        ${prefSummary ? `<div class="ho-card-prefs">${prefSummary}</div>` : ''}
       </div>
     </div>`;
   }).join('');
+
+  if (currentView === 'matrix') renderMatrix();
 }
 
 function setSlot(hoId, slotIdx, playerName) {
-  // remove player from any other slot
   if (playerName) {
-    hos.forEach(h => {
-      assignments[h.id] = (assignments[h.id] || []).filter(p => p !== playerName);
-    });
+    hos.forEach(h => { assignments[h.id] = (assignments[h.id]||[]).filter(p=>p!==playerName); });
+    if (!assignments[hoId]) assignments[hoId] = [];
+    assignments[hoId][slotIdx] = playerName;
+    assignments[hoId] = assignments[hoId].filter(Boolean);
+    castReasons[playerName] = 'manual';
+  } else {
+    const prev = (assignments[hoId]||[])[slotIdx];
+    if (prev) delete castReasons[prev];
+    if (!assignments[hoId]) assignments[hoId] = [];
+    assignments[hoId].splice(slotIdx, 1);
   }
-  if (!assignments[hoId]) assignments[hoId] = [];
-  assignments[hoId][slotIdx] = playerName || undefined;
-  assignments[hoId] = assignments[hoId].filter(Boolean);
   renderBoard();
 }
 
-/* ═══════════════════════════════════════
-   GM — SHARE LINK MODAL
-═══════════════════════════════════════ */
+/* ══════════════════════════════
+   MATRIX VIEW
+══════════════════════════════ */
+function switchView(view) {
+  currentView = view;
+  $('tabBoard').classList.toggle('active', view==='board');
+  $('tabMatrix').classList.toggle('active', view==='matrix');
+  $('boardView').style.display = view==='board' ? '' : 'none';
+  $('matrixView').style.display = view==='matrix' ? '' : 'none';
+  if (view==='matrix') renderMatrix();
+}
+
+function renderMatrix() {
+  const tbl = $('matrixTable');
+  if (!hos.length || !responses.length) {
+    tbl.innerHTML = `<tr><td colspan="99" style="padding:40px;text-align:center;color:#444;font-size:0.7rem;">HOとプレイヤーの回答を追加してください</td></tr>`;
+    return;
+  }
+  const header = `<thead><tr>
+    <th class="col-player">PLAYER</th>
+    ${hos.map(h=>`<th style="color:${h.color}">${esc(h.name)}</th>`).join('')}
+  </tr></thead>`;
+
+  const rows = responses.map(r => {
+    const cells = hos.map(ho => {
+      const prefIdx = r.prefs.indexOf(ho.id);
+      const isAssigned = (assignments[ho.id]||[]).includes(r.player);
+      const reason = isAssigned ? castReasons[r.player] : undefined;
+      const reasonLabel = isAssigned ? (
+        reason==='manual'?'手動':reason===0?'第1':reason===1?'第2':reason===2?'第3':'手動'
+      ) : '';
+      const reasonCls = reason===0?'reason-1':reason===1?'reason-2':reason===2?'reason-3':'reason-m';
+      const emoji = prefIdx===0?'🥇':prefIdx===1?'🥈':prefIdx===2?'🥉':'';
+      const cls = isAssigned ? 'matrix-cell-assigned' : '';
+      return `<td class="${cls}"><div class="m-icons">
+        ${emoji ? `<span class="m-pref">${emoji}</span>` : '<span class="m-unassigned">—</span>'}
+        ${isAssigned ? `<span class="reason-badge ${reasonCls}" style="font-size:0.42rem;">${reasonLabel}</span>` : ''}
+      </div></td>`;
+    }).join('');
+    return `<tr><td class="col-player">${esc(r.player)}</td>${cells}</tr>`;
+  }).join('');
+
+  tbl.innerHTML = header + '<tbody>' + rows + '</tbody>';
+}
+
+/* ══════════════════════════════
+   DRAG & DROP
+══════════════════════════════ */
+function onChipDragStart(e, player) {
+  draggedPlayer = player;
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(()=>{ const el=document.querySelector(`.player-chip[ondragend]`); }, 0);
+}
+function onChipDragEnd(e) {
+  document.querySelectorAll('.player-chip').forEach(el=>el.classList.remove('dragging'));
+}
+function onCardDragOver(e, hoId) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  $('ho-card-'+hoId)?.classList.add('drag-over');
+}
+function onCardDragLeave(hoId) { $('ho-card-'+hoId)?.classList.remove('drag-over'); }
+function onCardDrop(e, hoId) {
+  e.preventDefault();
+  $('ho-card-'+hoId)?.classList.remove('drag-over');
+  const player = draggedPlayer || e.dataTransfer.getData('text/plain');
+  if (!player) return;
+  const ho = hos.find(h=>h.id===hoId);
+  if (!ho) return;
+  // remove from all
+  hos.forEach(h=>{ assignments[h.id]=(assignments[h.id]||[]).filter(p=>p!==player); });
+  if (!assignments[hoId]) assignments[hoId]=[];
+  if (assignments[hoId].length < ho.capacity) {
+    assignments[hoId].push(player);
+    castReasons[player] = 'manual';
+    draggedPlayer = null;
+    renderBoard();
+  } else {
+    toast(`${ho.name} の定員が満員です`);
+  }
+}
+
+/* ══════════════════════════════
+   SHARE LINK
+══════════════════════════════ */
 function openLinkModal() {
   if (!hos.length) { toast('先にHOを追加してください'); return; }
-  $('linkBox').textContent = buildPlayerLink();
+  const base = location.origin + location.pathname;
+  $('linkBox').textContent = base + '?s=' + enc(buildSessionData());
   openMod('linkOverlay');
 }
 function copyLink() {
-  navigator.clipboard.writeText($('linkBox').textContent).then(() => toast('URLをコピーしました'));
+  navigator.clipboard.writeText($('linkBox').textContent).then(()=>toast('URLをコピーしました'));
 }
 
-/* ═══════════════════════════════════════
-   GM — DISCORD OUTPUT
-═══════════════════════════════════════ */
+/* ══════════════════════════════
+   DISCORD OUTPUT
+══════════════════════════════ */
 function openDiscord() {
   if (!hos.length) { toast('HOを追加してください'); return; }
-  const sname = ($('scenarioName')?.value || '').trim() || '無題シナリオ';
+  const sname = ($('scenarioName')?.value||'').trim()||'無題シナリオ';
+  const assignedSet = new Set(Object.values(assignments).flat());
+  const unassigned = responses.filter(r=>!assignedSet.has(r.player));
+
   const lines = [
     `【配役結果】${sname}`,
-    '━━━━━━━━━━━━━━━━━━━━━━━━',
+    '━━━━━━━━━━━━━━━━━━━━',
     ...hos.map(h => {
-      const players = (assignments[h.id] || []);
-      const playerStr = players.length ? players.map(p => `@${p}`).join('、') : '（未配役）';
-      return `**${h.name}** → ${playerStr}`;
+      const players = assignments[h.id]||[];
+      const playerStr = players.length
+        ? players.map(p=>{
+            const r=castReasons[p];
+            const tag=r===0?'（第1希望）':r===1?'（第2希望）':r===2?'（第3希望）':r==='manual'?'（手動）':'';
+            return `@${p}${tag}`;
+          }).join('、')
+        : '（未配役）';
+      return `**${esc(h.name)}** → ${playerStr}`;
     }),
-    '━━━━━━━━━━━━━━━━━━━━━━━━',
-    '',
-    // unassigned players
-    (() => {
-      const assigned = new Set(Object.values(assignments).flat());
-      const unassigned = responses.filter(r => !assigned.has(r.player));
-      return unassigned.length ? `⚠️ 未配役: ${unassigned.map(r => r.player).join('、')}` : '✅ 全員配役済み';
-    })()
+    '━━━━━━━━━━━━━━━━━━━━',
+    unassigned.length
+      ? `⚠️ 未配役: ${unassigned.map(r=>r.player).join('、')}`
+      : '✅ 全員配役済み'
   ];
   $('discordBox').textContent = lines.join('\n');
   openMod('discordOverlay');
 }
 function copyDiscord() {
-  navigator.clipboard.writeText($('discordBox').textContent).then(() => toast('コピーしました'));
+  navigator.clipboard.writeText($('discordBox').textContent).then(()=>toast('コピーしました'));
 }
 
-/* ═══════════════════════════════════════
+/* ══════════════════════════════
    PLAYER VIEW
-═══════════════════════════════════════ */
+══════════════════════════════ */
 function initPlayerView(code) {
-  const data = decodeB64(code);
+  const data = dec(code);
   if (!data || !data.hos) {
     $('player-view').style.display = 'block';
-    $('player-view').innerHTML = '<div class="player-wrap" style="padding-top:60px;text-align:center;color:#555;">リンクが無効または期限切れです。</div>';
+    $('player-view').innerHTML = '<div class="player-wrap" style="padding-top:60px;text-align:center;color:#555;font-size:0.8rem;">リンクが無効です</div>';
     return;
   }
-  $('gm-view').style.display = 'none';
   $('player-view').style.display = 'block';
   $('playerScenario').textContent = data.name || '';
-
-  // HO grid for player
-  $('playerHoGrid').innerHTML = (data.hos || []).map(h => `
+  $('playerHoGrid').innerHTML = (data.hos||[]).map(h=>`
     <div class="player-ho-card">
-      <div class="player-ho-card-bar" style="background:${h.color || '#555'}"></div>
+      <div class="player-ho-card-bar" style="background:${h.color||'#555'}"></div>
       <div class="player-ho-card-body">
         <div class="player-ho-card-name">${esc(h.name)}</div>
-        <div class="player-ho-card-desc" style="color:#555;font-size:0.58rem;">詳細はGMにご確認ください</div>
+        <div class="player-ho-card-cap">定員 ${h.capacity}人</div>
       </div>
     </div>`).join('');
-
-  // populate selects
-  const hoOpts = (data.hos || []).map(h => `<option value="${h.id}">${esc(h.name)}</option>`).join('');
-  ['pref1','pref2','pref3'].forEach((id, i) => {
-    const emptyLabel = i === 0 ? '— 選択 —' : '— 選択 —（任意）';
-    $(id).innerHTML = `<option value="">${emptyLabel}</option>` + hoOpts;
+  const hoOpts = (data.hos||[]).map(h=>`<option value="${h.id}">${esc(h.name)}</option>`).join('');
+  ['pref1','pref2','pref3'].forEach((id,i)=>{
+    $(id).innerHTML = `<option value="">${i===0?'— 選択 —':'— 選択 —（任意）'}</option>` + hoOpts;
   });
-
-  // store session data for submit
-  window._sessionData = data;
 }
 
 function submitPlayerPrefs() {
-  const player = ($('playerName')?.value || '').trim();
+  const player = ($('playerName')?.value||'').trim();
   if (!player) { toast('プレイヤー名を入力してください'); return; }
   const pref1 = $('pref1').value;
   if (!pref1) { toast('第1希望を選択してください'); return; }
-  const prefs = [pref1, $('pref2').value, $('pref3').value].filter(Boolean);
-  // check duplicates
+  const prefs = [pref1,$('pref2').value,$('pref3').value].filter(Boolean);
   if (new Set(prefs).size !== prefs.length) { toast('同じHOを複数の希望に選ばないでください'); return; }
-
-  const code = encodeB64({ player, prefs });
-  $('respCodeBox').textContent = code;
+  $('respCodeBox').textContent = enc({ player, prefs });
   openMod('respCodeOverlay');
 }
-
 function copyRespCode() {
-  navigator.clipboard.writeText($('respCodeBox').textContent).then(() => toast('コードをコピーしました'));
+  navigator.clipboard.writeText($('respCodeBox').textContent).then(()=>toast('コードをコピーしました'));
 }
 
-/* ═══════════════════════════════════════
-   MODAL HELPERS
-═══════════════════════════════════════ */
+/* ══════════════════════════════
+   MODALS / UTIL
+══════════════════════════════ */
 function openMod(id) { $(id).classList.add('open'); }
 function closeMod(id) { $(id).classList.remove('open'); }
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') document.querySelectorAll('.overlay.open').forEach(el => el.classList.remove('open'));
+  if (e.key==='Escape') document.querySelectorAll('.overlay.open').forEach(el=>el.classList.remove('open'));
 });
 
-/* ═══════════════════════════════════════
-   UTIL
-═══════════════════════════════════════ */
+function onScenarioInput() {
+  $('boardScenario').textContent = $('scenarioName').value.trim() || 'シナリオ未設定';
+}
+
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 let toastTimer;
 function toast(msg) {
-  const el = $('toast'); el.textContent = msg; el.classList.add('show');
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+  const el=$('toast'); el.textContent=msg; el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
 }
-
-// scenario name reactivity
-document.addEventListener('DOMContentLoaded', () => {
-  const inp = $('scenarioName');
-  if (inp) inp.addEventListener('input', () => {
-    $('boardScenario').textContent = inp.value.trim() || 'シナリオ未設定';
-  });
-});
 </script>
 </body>
 </html>
