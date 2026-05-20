@@ -159,6 +159,20 @@
         .mobile-menu-btn.is-active .three-dots span:nth-child(2) { opacity: 0; transform: scale(0); }
         .mobile-menu-btn.is-active .three-dots span:nth-child(3) { transform: translateY(-8px) rotate(-45deg) scaleX(3.5); border-radius: 2px; }
 
+        /* ── 途中保存UI ── */
+        .save-load-group { display: flex; gap: 6px; margin-bottom: 6px; }
+        .sl-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 7px 6px; background: #1a1a1a; border: 1px solid var(--ui-border); color: #aaa; font-size: 0.68rem; font-weight: 700; border-radius: 4px; cursor: pointer; transition: 0.15s; font-family: inherit; letter-spacing: 0.04em; }
+        .sl-btn:hover:not(:disabled) { background: #2a2a2a; color: #fff; border-color: #666; }
+        .sl-btn:disabled { opacity: 0.35; cursor: default; }
+        .sl-btn.primary { background: rgba(197,55,60,0.12); border-color: rgba(197,55,60,0.4); color: var(--accent); }
+        .sl-btn.primary:hover:not(:disabled) { background: rgba(197,55,60,0.22); border-color: var(--accent); }
+        .sl-btn .material-symbols-outlined { font-size: 0.95rem !important; }
+        #saveStatusText { font-size: 0.6rem; color: #555; min-height: 1.2em; margin-bottom: 8px; font-family: 'Montserrat', sans-serif; letter-spacing: 0.03em; }
+
+        /* トースト通知 */
+        #saveToast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(10px); background: #2a2a2a; color: #fff; font-size: 0.75rem; font-weight: 700; padding: 9px 20px; border-radius: 20px; border: 1px solid #444; opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s; z-index: 9999; white-space: nowrap; font-family: 'Montserrat', sans-serif; letter-spacing: 0.06em; }
+        #saveToast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
         @media screen and (max-width: 1024px) {
             .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); height: 100%; width: 85%; max-width: 380px; }
             .sidebar.active { transform: translateX(0); box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
@@ -194,6 +208,29 @@
         <input type="file" id="logFile" accept=".html" style="display:none" onchange="processLog(this.files[0])">
         <div class="file-input-area" id="dropZone" onclick="document.getElementById('logFile').click()">
             <p style="font-size:0.75rem; color:var(--text-sub); margin:0;">HTMLをドロップするか<br><span class="file-label">ファイルを選択</span></p>
+        </div>
+    </div>
+
+    <!-- 途中保存・読み込みセクション（常に表示） -->
+    <div class="control-group">
+        <h2>途中保存 / 読み込み</h2>
+        <div id="saveStatusText">保存データなし</div>
+        <div class="save-load-group">
+            <button class="sl-btn primary" onclick="saveProgress()">
+                <span class="material-symbols-outlined">save</span>途中保存
+            </button>
+            <button class="sl-btn" id="loadProgressBtn" onclick="loadProgress(null)" disabled>
+                <span class="material-symbols-outlined">restore</span>復元
+            </button>
+        </div>
+        <div class="save-load-group">
+            <button class="sl-btn" onclick="exportSaveJson()">
+                <span class="material-symbols-outlined">download</span>JSONで保存
+            </button>
+            <input type="file" id="importJsonFile" accept=".json" style="display:none" onchange="importSaveJson(this.files[0])">
+            <button class="sl-btn" onclick="document.getElementById('importJsonFile').click()">
+                <span class="material-symbols-outlined">upload</span>JSONから復元
+            </button>
         </div>
     </div>
 
@@ -405,6 +442,15 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+    // ページ読み込み時に保存状態を確認
+    const existingSave = localStorage.getItem(SAVE_KEY);
+    if (existingSave) {
+        try {
+            const s = JSON.parse(existingSave);
+            updateSaveStatus(s.savedAt);
+        } catch(e) { localStorage.removeItem(SAVE_KEY); }
+    }
+
     const dropArea = document.getElementById('dropZone');
     if (!dropArea) return;
 
@@ -940,6 +986,129 @@ function applyRubyToRow(index, type) {
     textarea.setSelectionRange(newCursorPos, newCursorPos);
 }
 
+// ── 途中保存 / 読み込み ──────────────────────────────
+
+const SAVE_KEY = 'ikatoolbox_save';
+
+function saveProgress() {
+    if (logData.length === 0) {
+        showToast('保存するデータがありません');
+        return;
+    }
+    const state = {
+        savedAt: new Date().toLocaleString('ja-JP'),
+        logTitleInput: document.getElementById('logTitleInput').value,
+        fileNameInput: document.getElementById('fileNameInput').value,
+        systemSelect: document.getElementById('systemSelect').value,
+        customSystemInput: document.getElementById('customSystemInput').value,
+        logData: logData,
+        charSettings: charSettings,
+        tabStyleMap: tabStyleMap
+    };
+    try {
+        localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+        updateSaveStatus(state.savedAt);
+        showToast('💾 途中保存しました');
+    } catch(e) {
+        alert('保存に失敗しました。ブラウザのストレージ容量を確認してください。\n' + e.message);
+    }
+}
+
+function loadProgress(state) {
+    if (!state) {
+        const raw = localStorage.getItem(SAVE_KEY);
+        if (!raw) { showToast('保存データが見つかりません'); return; }
+        try { state = JSON.parse(raw); } catch(e) { alert('データの読み込みに失敗しました。'); return; }
+    }
+    if (!state.logData || state.logData.length === 0) {
+        showToast('有効なデータがありません');
+        return;
+    }
+    if (logData.length > 0 && !confirm('現在の編集内容は破棄されます。読み込みますか？')) return;
+
+    logData       = state.logData       || [];
+    charSettings  = state.charSettings  || {};
+    tabStyleMap   = state.tabStyleMap   || {};
+    selectedIndices = [];
+    lastSelectedIndex = -1;
+
+    document.getElementById('logTitleInput').value      = state.logTitleInput      || '';
+    document.getElementById('fileNameInput').value      = state.fileNameInput      || '';
+    document.getElementById('systemSelect').value       = state.systemSelect       || 'CUSTOM';
+    document.getElementById('customSystemInput').value  = state.customSystemInput  || '';
+    toggleCustomSystem(state.systemSelect || 'CUSTOM');
+
+    document.getElementById('emptyState').style.display    = 'none';
+    document.getElementById('postUploadControls').style.display = 'block';
+    document.getElementById('downloadBtn').disabled = false;
+
+    renderCharConfigs();
+    renderTabSettings();
+    renderEditor(true);
+    renderAnchorPanel();
+    updateSaveStatus(state.savedAt);
+    showToast('📂 データを復元しました');
+}
+
+function exportSaveJson() {
+    // 現在の編集状態を直接JSONに落とす（保存操作不要）
+    if (logData.length === 0) { showToast('書き出すデータがありません'); return; }
+    const state = {
+        savedAt: new Date().toLocaleString('ja-JP'),
+        logTitleInput: document.getElementById('logTitleInput').value,
+        fileNameInput: document.getElementById('fileNameInput').value,
+        systemSelect: document.getElementById('systemSelect').value,
+        customSystemInput: document.getElementById('customSystemInput').value,
+        logData: logData,
+        charSettings: charSettings,
+        tabStyleMap: tabStyleMap
+    };
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    const fname = (document.getElementById('fileNameInput').value || 'save') + '_ikatoolbox.json';
+    a.download = fname;
+    a.click();
+    showToast('JSONを書き出しました');
+}
+
+function importSaveJson(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const state = JSON.parse(e.target.result);
+            if (!state.logData) throw new Error('logDataが見つかりません');
+            localStorage.setItem(SAVE_KEY, e.target.result);
+            loadProgress(state);
+        } catch (err) {
+            alert('JSONの読み込みに失敗しました:\n' + err.message);
+        }
+    };
+    reader.readAsText(file);
+    // 同じファイルを再選択できるようリセット
+    file = null;
+    document.getElementById('importJsonFile').value = '';
+}
+
+function updateSaveStatus(savedAt) {
+    const el = document.getElementById('saveStatusText');
+    if (el) el.textContent = savedAt ? `最終保存: ${savedAt}` : '保存データなし';
+    const btn = document.getElementById('loadProgressBtn');
+    if (btn) btn.disabled = !localStorage.getItem(SAVE_KEY);
+}
+
+function showToast(msg) {
+    const toast = document.getElementById('saveToast');
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+// ────────────────────────────────────────────────────
+
 function exportLog() {
     const h1Title = document.getElementById('logTitleInput').value || 'LOG';
     const fileName = document.getElementById('fileNameInput').value || 'log';
@@ -982,7 +1151,7 @@ function exportLog() {
 
     let html = `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><title>${h1Title}</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet"><style>
     :root { --outer-bg: #0f0f0f; --inner-bg: #050505; --block-bg: #111111; --text: #dbdee1; --accent: ${dynamicAccent}; --sub-line: #444; --border: #222; --tab-text: #666; --chat-text: #8a8a8a; --container-width: 680px; } 
-    html, body { height: 100%; } body { background: var(--outer-bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; margin: 0; padding: 0; line-height: 1.7; display: flex; flex-direction: column; align-items: center; } 
+    html, body { min-height: 100%; } body { background: var(--outer-bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; margin: 0; padding: 0; line-height: 1.7; display: flex; flex-direction: column; align-items: center; } 
     
     header { position: fixed; top: 0; left: 0; width: 100%; background: rgba(5, 5, 5, 0.98); backdrop-filter: blur(12px); z-index: 1000; border-bottom: 1px solid var(--border); display: flex; justify-content: center; padding: 0; } 
     .header-inner { width: 90%; max-width: var(--container-width); height: calc(60px + env(safe-area-inset-top)); display: flex; justify-content: space-between; align-items: center; padding-top: env(safe-area-inset-top); box-sizing: border-box; } 
@@ -1135,6 +1304,8 @@ function exportLog() {
     a.click();
 }
 </script>
+
+<div id="saveToast"></div>
 
 <div style="position: fixed; bottom: 10px; right: 15px; font-family: sans-serif; font-size: 10px; color: rgba(255,255,255,0.1); letter-spacing: 0.1em; font-weight: bold; pointer-events: none; z-index: 9999;">✦ IKATOOLBOX</div>
 </body>
