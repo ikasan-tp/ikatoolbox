@@ -291,12 +291,39 @@
             </div>
         </div>
 
+        <div class="control-group" id="autoIndexSection">
+            <h2>4. 目次の自動検出</h2>
+            <div style="font-size:0.68rem; color:#666; margin-bottom:10px; line-height:1.6;">場面転換を自動で検出して目次を設定します。検出後、各行で個別に調整できます。</div>
+
+            <label class="sub-label">検出タブ（どのタブを対象にするか）</label>
+            <select id="autoIndexTab" style="margin-bottom:10px;"></select>
+
+            <label class="sub-label">検出キーワード（1行に1つ、部分一致）</label>
+            <textarea id="sceneKeywords" style="width:100%; background:var(--ui-input); border:1px solid var(--ui-border); color:#fff; padding:8px 10px; border-radius:4px; font-size:0.75rem; box-sizing:border-box; font-family:inherit; resize:vertical; min-height:80px; outline:none; line-height:1.6;" placeholder="Scene&#10;場面&#10;＊＊＊&#10;―――&#10;chapter"></textarea>
+
+            <div style="margin-top:8px; display:flex; gap:6px; align-items:center;">
+                <label style="font-size:0.65rem; color:#666; display:flex; align-items:center; gap:4px; cursor:pointer; white-space:nowrap;">
+                    <input type="checkbox" id="autoIndexClearFirst" checked style="accent-color:var(--accent);"> 既存の目次をクリア
+                </label>
+            </div>
+
+            <div style="margin-top:10px; display:flex; gap:6px;">
+                <button onclick="autoDetectScenes()" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:9px; background:rgba(197,55,60,0.12); border:1px solid rgba(197,55,60,0.4); color:var(--accent); font-size:0.72rem; font-weight:900; border-radius:4px; cursor:pointer; transition:0.15s; font-family:inherit; letter-spacing:0.04em;" onmouseover="this.style.background='rgba(197,55,60,0.22)'" onmouseout="this.style.background='rgba(197,55,60,0.12)'">
+                    <span class="material-symbols-outlined" style="font-size:1rem;">auto_stories</span>目次を自動検出
+                </button>
+                <button onclick="clearAllAnchors()" title="目次をすべてクリア" style="padding:9px 12px; background:#1a1a1a; border:1px solid #333; color:#555; font-size:0.72rem; border-radius:4px; cursor:pointer; transition:0.15s; font-family:inherit;" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">
+                    <span class="material-symbols-outlined" style="font-size:1rem;">delete_sweep</span>
+                </button>
+            </div>
+            <div id="autoIndexResult" style="font-size:0.65rem; color:#666; margin-top:8px; min-height:1.2em; font-family:'Montserrat',sans-serif; letter-spacing:0.03em;"></div>
+        </div>
+
         <div class="control-group">
-            <h2>4. キャラクター設定</h2>
+            <h2>5. キャラクター設定</h2>
             <div id="charGrid"></div>
         </div>
         <div class="control-group">
-            <h2>5. タブ装飾設定</h2>
+            <h2>6. タブ装飾設定</h2>
             <div id="tabStyleSettings"></div>
         </div>
     </div> 
@@ -358,9 +385,16 @@
         </div>
     </div>
     <div class="guide-item">
+        <span class="material-symbols-outlined guide-icon">auto_stories</span>
+        <div class="guide-text">
+            <b>5. 目次を自動検出</b>
+            <p>キーワードや特定タブを指定して、場面転換を自動で検出・目次設定します。</p>
+        </div>
+    </div>
+    <div class="guide-item">
         <span class="material-symbols-outlined guide-icon">shortcut</span>
         <div class="guide-text">
-            <b>5. 目次をつける</b>
+            <b>6. 目次をつける</b>
             <p>「目次」にチェックを入れて命名すると、ログ内にリンクを作成します。</p>
         </div>
     </div>
@@ -520,7 +554,7 @@
         document.getElementById('emptyState').style.display = 'none';
         document.getElementById('postUploadControls').style.display = 'block';
         document.getElementById('downloadBtn').disabled = false;
-        renderCharConfigs(); renderTabSettings(); renderEditor(true); renderAnchorPanel();
+        renderCharConfigs(); renderTabSettings(); renderEditor(true); renderAnchorPanel(); populateAutoIndexTab();
     }
 
     function renderCharConfigs() {
@@ -895,6 +929,109 @@ function renderRowContent(row, index) {
             list.appendChild(el);
         });
     }
+    function populateAutoIndexTab() {
+        const sel = document.getElementById('autoIndexTab');
+        if (!sel) return;
+        const tabs = Object.keys(tabStyleMap);
+        const prev = sel.value;
+        sel.innerHTML = '<option value="__all__">すべてのタブ</option>' +
+            tabs.map(t => `<option value="${t}" ${t === prev ? 'selected' : ''}>${t}</option>`).join('');
+    }
+
+    function autoDetectScenes() {
+        if (logData.length === 0) { showToast('ログが読み込まれていません'); return; }
+
+        const keywordsRaw = document.getElementById('sceneKeywords').value;
+        const targetTab   = document.getElementById('autoIndexTab').value;
+        const clearFirst  = document.getElementById('autoIndexClearFirst').checked;
+
+        const keywords = keywordsRaw.split('\n').map(k => k.trim()).filter(k => k.length > 0);
+
+        if (keywords.length === 0) {
+            showToast('キーワードを1つ以上入力してください');
+            return;
+        }
+
+        if (clearFirst) {
+            logData.forEach(item => { item.anchor = ''; });
+        }
+
+        let detected = 0;
+        let sceneNum  = 1;
+
+        // 既存の目次数を起点に (clearFirstがfalseの場合)
+        if (!clearFirst) {
+            sceneNum = logData.filter(item => item.anchor && item.anchor.trim()).length + 1;
+        }
+
+        logData.forEach((item, idx) => {
+            if (targetTab !== '__all__' && item.tab !== targetTab) return;
+
+            const content = item.content;
+            const matched = keywords.some(kw => content.includes(kw));
+
+            if (matched) {
+                // 既にanchorが設定済みならスキップ
+                if (!clearFirst && item.anchor && item.anchor.trim()) return;
+
+                // コンテンツからシーン名を生成: キーワードを含む最初の行を抜粋
+                const firstLine = content.split('\n')[0].trim();
+                const sceneName = firstLine.length > 20
+                    ? firstLine.substring(0, 20) + '…'
+                    : firstLine || `Scene ${sceneNum}`;
+
+                item.anchor = `Scene ${sceneNum}：${sceneName}`;
+                sceneNum++;
+                detected++;
+
+                // DOMのanchorチェックボックスとinputを更新（レンダリング済みの行）
+                const row = document.getElementById('row-' + idx);
+                if (row) {
+                    const cb    = row.querySelector('.anchor-check');
+                    const input = row.querySelector('.anchor-input');
+                    if (cb)    { cb.checked = true; }
+                    if (input) { input.style.display = 'block'; input.value = item.anchor; }
+                }
+            }
+        });
+
+        // clearFirstの場合: anchorが外れた行のDOMも更新
+        if (clearFirst) {
+            logData.forEach((item, idx) => {
+                if (item.anchor) return; // 検出済み行はスキップ
+                const row = document.getElementById('row-' + idx);
+                if (!row) return;
+                const cb    = row.querySelector('.anchor-check');
+                const input = row.querySelector('.anchor-input');
+                if (cb)    cb.checked = false;
+                if (input) { input.style.display = 'none'; input.value = ''; }
+            });
+        }
+
+        renderAnchorPanel();
+
+        const resultEl = document.getElementById('autoIndexResult');
+        if (resultEl) {
+            resultEl.style.color = detected > 0 ? 'var(--accent)' : '#666';
+            resultEl.textContent = detected > 0
+                ? `✦ ${detected} 件のシーン転換を検出しました`
+                : '一致するシーンが見つかりませんでした';
+        }
+
+        if (detected > 0) showToast(`${detected} 件の目次を自動設定しました`);
+    }
+
+    function clearAllAnchors() {
+        if (!confirm('すべての目次をクリアしますか？')) return;
+        logData.forEach(item => { item.anchor = ''; });
+        document.querySelectorAll('.anchor-check').forEach(cb => { cb.checked = false; });
+        document.querySelectorAll('.anchor-input').forEach(inp => { inp.style.display = 'none'; inp.value = ''; });
+        renderAnchorPanel();
+        const resultEl = document.getElementById('autoIndexResult');
+        if (resultEl) { resultEl.style.color = '#666'; resultEl.textContent = '目次をすべてクリアしました'; }
+        showToast('目次をクリアしました');
+    }
+
     function handleSearch() { currentSearchIdx = -1; renderEditor(); }
     function navSearch(dir) {
         if (searchMatches.length === 0) return;
