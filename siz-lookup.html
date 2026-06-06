@@ -230,6 +230,11 @@
             <svg style="width:10px;height:10px;vertical-align:middle;margin-right:3px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5"/><line x1="12" y1="14" x2="12" y2="20"/><line x1="9" y1="18" x2="15" y2="18"/></svg>FEMALE
           </button>
         </div>
+        <!-- 地域切り替え -->
+        <div class="sex-tabs">
+          <button class="tab-btn active" id="tab-jp" onclick="switchRegion('JP')">JP</button>
+          <button class="tab-btn" id="tab-we" onclick="switchRegion('WE')">WE</button>
+        </div>
         <!-- CS読み込み：クリップボード -->
         <button class="btn-load" id="btn-load-clip" onclick="loadCSFromClipboard()">
           <span class="material-symbols-outlined">content_paste</span>
@@ -401,8 +406,64 @@ const BASE_F = {
   25:{h:[228,251,292],w:[141,183,252],n:"ゴルゴン・トロールクラスの怪物"},
 };
 
-const ADJ7 = {h:2, w:3};
 
+
+// ── 欧米人テーブル ──────────────────────────────────────
+// 男性平均: SIZ12≈178cm/80kg  女性平均: SIZ10≈165cm/65kg
+const BASE_WM = {
+  1:{h:[95,104,116],w:[16,22,30],n:"幼児・極めて小柄な存在"},
+  2:{h:[101,111,122],w:[19,26,35],n:"小学校低学年ほどの体格"},
+  3:{h:[107,118,129],w:[22,30,40],n:"小学校中学年ほどの体格"},
+  4:{h:[113,125,136],w:[25,35,46],n:"小学校高学年ほどの体格"},
+  5:{h:[119,132,143],w:[29,40,53],n:"中学生前半ほどの体格"},
+  6:{h:[126,139,150],w:[33,45,58],n:"中学生後半・小柄な成人"},
+  7:{h:[133,146,157],w:[37,50,64],n:"成人としてやや小柄な体格"},
+  8:{h:[140,152,163],w:[41,55,70],n:"欧米人男性のやや小柄な体格"},
+  9:{h:[147,158,169],w:[46,60,76],n:"欧米人男性の平均よりやや下"},
+  10:{h:[153,164,174],w:[51,65,82],n:"欧米人男性のやや小柄〜標準下"},
+  11:{h:[158,170,181],w:[55,71,89],n:"欧米人男性の標準よりやや小柄"},
+  12:{h:[164,178,189],w:[60,80,98],n:"欧米人男性の標準的な体格（SIZ12が男性平均）"},
+  13:{h:[169,183,194],w:[65,86,105],n:"欧米人男性平均〜やや大柄"},
+  14:{h:[174,187,199],w:[70,91,112],n:"欧米人男性 大柄"},
+  15:{h:[179,192,204],w:[75,97,119],n:"欧米人男性 かなり大柄"},
+  16:{h:[183,196,209],w:[80,103,127],n:"スポーツ選手クラスの体格"},
+  17:{h:[187,200,214],w:[86,110,136],n:"バスケット・バレー選手クラス"},
+  18:{h:[191,204,219],w:[92,117,145],n:"プロスポーツ選手・大型体格"},
+  19:{h:[196,209,225],w:[98,126,156],n:"大型ラグビー・アメフト選手クラス"},
+  20:{h:[201,215,232],w:[106,136,170],n:"非常に大柄・プロレスラー級"},
+  21:{h:[207,222,241],w:[114,148,187],n:"人間の限界に近い巨躯"},
+  22:{h:[213,230,252],w:[124,162,205],n:"巨人・人外レベルの体格"},
+  23:{h:[220,240,265],w:[134,178,228],n:"半人外クラス（深きものの混血など）"},
+  24:{h:[227,251,282],w:[145,195,254],n:"明らかに人間外の体躯"},
+  25:{h:[235,263,302],w:[158,215,284],n:"ゴルゴン・トロールクラスの怪物"},
+};
+const BASE_WF = {
+  1:{h:[93,101,112],w:[14,19,27],n:"幼児・極めて小柄な存在"},
+  2:{h:[99,108,119],w:[17,23,32],n:"小学校低学年ほどの体格"},
+  3:{h:[105,115,126],w:[20,27,37],n:"小学校中学年ほどの体格"},
+  4:{h:[111,122,133],w:[23,31,42],n:"小学校高学年ほどの体格"},
+  5:{h:[116,128,139],w:[26,36,48],n:"中学生前半ほどの体格"},
+  6:{h:[122,134,145],w:[29,40,53],n:"中学生後半・小柄な女性"},
+  7:{h:[128,140,151],w:[33,45,58],n:"成人女性としてやや小柄な体格"},
+  8:{h:[135,146,157],w:[37,50,64],n:"欧米人女性のやや小柄な体格"},
+  9:{h:[142,153,163],w:[41,55,70],n:"欧米人女性の平均よりやや下"},
+  10:{h:[149,160,171],w:[46,60,76],n:"欧米人女性の標準よりやや小柄"},
+  11:{h:[155,165,176],w:[50,65,82],n:"欧米人女性の標準的な体格（SIZ11が女性平均付近）"},
+  12:{h:[160,170,181],w:[54,70,88],n:"欧米人女性平均〜やや大柄"},
+  13:{h:[165,175,186],w:[58,75,94],n:"欧米人女性 大柄"},
+  14:{h:[169,179,190],w:[62,80,101],n:"女性大型スポーツ選手クラス"},
+  15:{h:[173,183,195],w:[66,86,108],n:"女性プロアスリートクラス"},
+  16:{h:[177,187,200],w:[71,92,116],n:"非常に大柄な女性・あるいは人外"},
+  17:{h:[181,191,205],w:[76,98,124],n:"女性人外クラス（半人外など）"},
+  18:{h:[185,195,210],w:[81,105,133],n:"明らかに人外な体躯"},
+  19:{h:[190,200,216],w:[87,113,143],n:"完全に人外レベルの体格"},
+  20:{h:[195,206,224],w:[94,122,156],n:"怪物クラスの体格"},
+  21:{h:[201,213,233],w:[101,133,172],n:"巨人クラスの体格"},
+  22:{h:[207,221,244],w:[111,146,190],n:"人外・巨人レベル"},
+  23:{h:[214,231,257],w:[121,161,212],n:"深きものの混血などの半人外"},
+  24:{h:[221,242,274],w:[132,177,237],n:"明らかに人間外の体躯"},
+  25:{h:[229,254,294],w:[145,196,265],n:"ゴルゴン・トロールクラスの怪物"},
+};
 const BODY_TYPE_ICONS = {
   athletic:`<svg viewBox="0 0 24 24" fill="none" stroke="#C5373C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M7 22v-5l-2-3 3-2 4 3 4-3 3 2-2 3v5"/><path d="M9 13v-3h6v3"/></svg>`,
   solid:`<svg viewBox="0 0 24 24" fill="none" stroke="#C5373C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M12 7v6l3 4"/><path d="M12 13l-3 4"/><path d="M9 17h6"/></svg>`,
@@ -414,6 +475,7 @@ const BODY_TYPE_ICONS = {
 // ── 状態 ────────────────────────────────────────────────
 let currentEdition = 7;
 let currentSex = 'M';
+let currentRegion = 'JP'; // 'JP' | 'WE'
 
 // ── 版切り替え ────────────────────────────────────────
 function switchEdition(ed) {
@@ -445,13 +507,21 @@ function updateInputsForEdition(ed) {
 function setInputRange(id, mn, mx, ph) {
   const el = document.getElementById(id);
   if (!el) return;
-  // 既存の値を版変換して引き継ぐ
   const prev = parseInt(el.value);
   if (!isNaN(prev)) {
-    if (mn === 5 && prev <= 25) el.value = prev * 5;      // 6→7: ×5
-    else if (mx === 25 && prev >= 5 && prev % 5 === 0) el.value = Math.round(prev / 5); // 7→6: ÷5
+    const going7th = mn === 5;   // 6→7: ×5
+    const going6th = mn === 1;   // 7→6: ÷5
+    if (going7th && prev >= 1 && prev <= 30) el.value = prev * 5;
+    else if (going6th && prev >= 5 && prev % 5 === 0) el.value = Math.round(prev / 5);
   }
   el.min = mn; el.max = mx; el.placeholder = ph;
+}
+
+function switchRegion(region) {
+  currentRegion = region;
+  document.getElementById('tab-jp').classList.toggle('active', region === 'JP');
+  document.getElementById('tab-we').classList.toggle('active', region === 'WE');
+  render();
 }
 
 function switchSex(sex) {
@@ -531,6 +601,17 @@ function parseAndApplyCS(json, filename) {
   else if (json.character)      raw = json.character;
   else if (json.data)           raw = json.data;
 
+  // パターン6: params が [{label:"SIZ", value:"40"}, ...] の配列形式（CCFolia / いあきゃら）
+  const normalizeArray = (arr) => {
+    const out = {};
+    for (const item of arr) {
+      if (item.label && item.value !== undefined) {
+        out[item.label.toUpperCase()] = item.value;
+      }
+    }
+    return out;
+  };
+
   // キー名の正規化（大文字小文字、prefix対応）
   const normalize = (obj) => {
     const out = {};
@@ -539,7 +620,11 @@ function parseAndApplyCS(json, filename) {
     }
     return out;
   };
-  const d = normalize(raw);
+
+  const d = Array.isArray(raw) ? normalizeArray(raw) : normalize(raw);
+
+  // キャラ名をdata直下からも取得できるよう補完
+  const charaNameFallback = json.data?.name ?? null;
 
   // 版の検出
   // いあきゃら: var=6 or var=7、あるいはSTRが50以上なら7版(×5済み)の可能性
@@ -585,7 +670,7 @@ function parseAndApplyCS(json, filename) {
   switchEdition(detectedEdition);
 
   // バナー表示
-  const charaName = json.name ?? json.chara_name ?? json.character_name ?? raw.name ?? filename.replace('.json','');
+  const charaName = json.name ?? json.chara_name ?? json.character_name ?? charaNameFallback ?? (Array.isArray(raw) ? null : raw.name) ?? filename.replace('.json','');
   const rawStr = [
     siz !== null ? `SIZ:${siz}` : '',
     str !== null ? `STR:${str}` : '',
@@ -647,7 +732,7 @@ function bodyType(siz, str, con) {
     desc="SIZに対してSTRが大幅に低い。病弱・老齢・あるいは体脂肪過多で筋力が伴っていない体型。";
     wMod = Math.round(siz*1.05);
   }
-  const tbl = currentSex === 'M' ? BASE_M : BASE_F;
+  const tbl = currentRegion==='JP' ? (currentSex==='M' ? BASE_M : BASE_F) : (currentSex==='M' ? BASE_WM : BASE_WF);
   const base = tbl[Math.min(siz,25)];
   if (wMod !== null) wMod += Math.round((con - siz) * 0.3);
   else wMod = base.w[1] + Math.round((con - siz) * 0.3);
@@ -681,12 +766,11 @@ function render() {
     return;
   }
 
-  const tbl = currentSex === 'M' ? BASE_M : BASE_F;
+  const tbl = currentRegion==='JP' ? (currentSex==='M' ? BASE_M : BASE_F) : (currentSex==='M' ? BASE_WM : BASE_WF);
   const d = tbl[Math.min(siz, 25)];
-  const adj = currentEdition === 7 ? ADJ7 : {h:0,w:0};
 
-  const hMin = d.h[0]+adj.h, hMid = d.h[1]+adj.h, hMax = d.h[2]+adj.h;
-  const wMin = d.w[0]+adj.w, wMid = d.w[1]+adj.w, wMax = d.w[2]+adj.w;
+  const hMin = d.h[0], hMid = d.h[1], hMax = d.h[2];
+  const wMin = d.w[0], wMid = d.w[1], wMax = d.w[2];
 
   const hasStr = str !== null && !isNaN(str);
   const hasCon = con !== null && !isNaN(con);
@@ -733,18 +817,17 @@ function render() {
   document.getElementById('w-max').textContent = wMax;
 
   // notes
-  const sexRef = currentSex==='M'
-    ? 'SIZ12=男性平均170cm / SIZ8=140cm台'
-    : 'SIZ10=女性平均157cm / SIZ8=140cm台';
-  const edRef = currentEdition===7 ? '7版補正: 身長+2cm・体重+3kg（英米人基準）' : '6版: SIZ=(2D6+6)の期待値基準';
+  const regionRef = currentRegion==='JP'
+    ? (currentSex==='M' ? '基準: 日本人男性 SIZ12=170cm' : '基準: 日本人女性 SIZ10=157cm')
+    : (currentSex==='M' ? '基準: 欧米人男性 SIZ12=178cm' : '基準: 欧米人女性 SIZ11=165cm付近');
   const strNote = hasStr ? `　STR${str}:SIZ${siz}比 = ${(str/siz).toFixed(2)}` : '';
   const conNote = hasCon ? `  CON${con}` : '';
   document.getElementById('r-notes').textContent =
-    `${d.n}${strNote}${conNote}　／　${edRef}　／　${sexRef}　／　BMI幅: ${bmi(hMin,wMin)}〜${bmi(hMax,wMax)}`;
+    `${d.n}${strNote}${conNote}　／　${regionRef}　／　BMI幅: ${bmi(hMin,wMin)}〜${bmi(hMax,wMax)}`;
 }
 
 // 初期化
-window.addEventListener('DOMContentLoaded', () => { switchEdition(7); updateInputsForEdition(7); });
+window.addEventListener('DOMContentLoaded', () => { switchEdition(7); updateInputsForEdition(7); switchRegion('JP'); });
 </script>
 </body>
 </html>
