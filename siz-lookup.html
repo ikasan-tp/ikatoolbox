@@ -710,15 +710,20 @@ function onStatInput() {
 // ── 体型判定 ─────────────────────────────────────────
 function bodyType(siz, str, con) {
   const r = str / siz;
+  const tbl = currentRegion==='JP' ? (currentSex==='M' ? BASE_M : BASE_F) : (currentSex==='M' ? BASE_WM : BASE_WF);
+  const base = tbl[Math.min(siz,25)];
+  const baseW = base.w[1]; // SIZテーブルの標準体重を出発点にする
+
   let key, type, desc, wMod;
   if (r >= 1.25) {
     key="athletic"; type="ATHLETIC / 筋肉質";
     desc="SIZに対してSTRが高く筋肉量が多い体型。脂肪が少なく引き締まっており実際の体重はやや重い。";
-    wMod = Math.round(siz*1.5 + (str-siz)*0.9);
+    // ベース体重 + STR超過分を筋肉量として換算（1STR超過 ≈ +2.5kg）
+    wMod = Math.round(baseW + (str - siz) * 2.5);
   } else if (r >= 1.05) {
     key="solid"; type="SOLID / 標準筋肉質";
     desc="SIZとSTRがほぼ均衡。平均的なスポーツ経験者に近い体型。";
-    wMod = Math.round(siz*1.3 + (str-siz)*0.5);
+    wMod = Math.round(baseW + (str - siz) * 1.5);
   } else if (r >= 0.85) {
     key="average"; type="AVERAGE / 標準";
     desc="SIZとSTRが釣り合った一般的な体型。特段の筋肉量も体脂肪の偏りもない普通の体格。";
@@ -726,16 +731,15 @@ function bodyType(siz, str, con) {
   } else if (r >= 0.65) {
     key="slender"; type="SLENDER / 細身";
     desc="SIZに対してSTRが低め。華奢な体型、または筋肉量が少ない傾向。";
-    wMod = Math.round(siz*1.1 - (siz-str)*0.5);
+    wMod = Math.round(baseW - (siz - str) * 1.2);
   } else {
     key="frail"; type="FRAIL / 虚弱";
     desc="SIZに対してSTRが大幅に低い。病弱・老齢・あるいは体脂肪過多で筋力が伴っていない体型。";
-    wMod = Math.round(siz*1.05);
+    wMod = Math.round(baseW - (siz - str) * 0.8);
   }
-  const tbl = currentRegion==='JP' ? (currentSex==='M' ? BASE_M : BASE_F) : (currentSex==='M' ? BASE_WM : BASE_WF);
-  const base = tbl[Math.min(siz,25)];
-  if (wMod !== null) wMod += Math.round((con - siz) * 0.3);
-  else wMod = base.w[1] + Math.round((con - siz) * 0.3);
+  // CON補正：CONがSIZより高いほど体に厚みが出る
+  if (wMod !== null) wMod += Math.round((con - siz) * 0.5);
+  else wMod = baseW + Math.round((con - siz) * 0.5);
   return {key, type, desc, wMod};
 }
 
