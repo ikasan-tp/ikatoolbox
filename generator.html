@@ -1380,7 +1380,7 @@ function exportLog() {
     // #888系カラーをメインタブカラーで代替
     const mainTabEntry = Object.values(tabStyleMap).find(t => t.style === 'style-default');
     const mainTabColor = mainTabEntry ? mainTabEntry.color : '#C5373C';
-    const isGray = (col) => /^#(888|888888|aaaaaa|999|999999|666|666666)$/i.test(col);
+    const isGray = (col) => /^#(888|888888|9e9e9e|aaaaaa|999|999999|666|666666)$/i.test(col);
 
     logData.forEach((item, i) => {
         const char = charSettings[item.charKey];
