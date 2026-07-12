@@ -822,22 +822,30 @@ function renderRowContent(row, index) {
     function deleteRow(index) {
         if (!confirm("この行を削除しますか？")) return;
         logData.splice(index, 1);
-        renderEditor(true);
+        const row = document.getElementById(`row-${index}`);
+        if (row) row.remove();
+        selectedIndices = selectedIndices.filter(i => i !== index).map(i => i > index ? i - 1 : i);
+        lastSelectedIndex = -1;
+        syncRowIdentities();
+        renderEditor();
+        renderAnchorPanel();
     }
 
     function deleteSelectedRows() {
         if (selectedIndices.length === 0) return;
         if (!confirm(`${selectedIndices.length}件の行を削除しますか？`)) return;
-        const remainingData = [];
         const movingSet = new Set(selectedIndices);
-        for (let i = 0; i < logData.length; i++) {
-            if (!movingSet.has(i)) remainingData.push(logData[i]);
-        }
-        logData = remainingData;
+        logData = logData.filter((_, i) => !movingSet.has(i));
+        selectedIndices.forEach(i => {
+            const row = document.getElementById(`row-${i}`);
+            if (row) row.remove();
+        });
         selectedIndices = [];
         lastSelectedIndex = -1;
         document.getElementById('groupPanel').style.display = 'none';
-        renderEditor(true);
+        syncRowIdentities();
+        renderEditor();
+        renderAnchorPanel();
     }
 
     function moveRow(index, direction) {
@@ -848,28 +856,35 @@ function renderRowContent(row, index) {
         const rowB = document.getElementById(`row-${newIndex}`);
         if (direction === 1) container.insertBefore(rowB, rowA);
         else container.insertBefore(rowA, rowB);
-        rowA.id = `row-temp`;
-        rowB.id = `row-${index}`;
-        rowA.id = `row-${newIndex}`;
-        updateRowIndex(rowA, newIndex);
-        updateRowIndex(rowB, index);
+
         const temp = logData[index];
         logData[index] = logData[newIndex];
         logData[newIndex] = temp;
+
         if (selectedIndices.includes(index)) {
             selectedIndices = selectedIndices.map(i => i === index ? newIndex : (i === newIndex ? index : i));
         } else if (selectedIndices.includes(newIndex)) {
             selectedIndices = selectedIndices.map(i => i === newIndex ? index : i);
         }
+
+        syncRowIdentities();
+        renderAnchorPanel();
     }
 
-    function updateRowIndex(row, newIdx) {
-        // data-index属性を更新するだけでOK。イベントリスナーはgetIdx()で最新値を参照する
-        row.dataset.index = newIdx;
-        const cb = row.querySelector('.row-checkbox');
-        const lbl = row.querySelector('.select-label');
-        if (cb) cb.id = 'check-' + newIdx;
-        if (lbl) lbl.setAttribute('for', 'check-' + newIdx);
+    // 行のDOMノードはそのまま（描画済みの高さを維持したまま）、
+    // id / data-index / チェックボックスの対応関係だけを現在の並び順に合わせて更新する。
+    // これにより削除・並べ替え後も全行を作り直さずに済み、スクロール位置のズレを防ぐ。
+    function syncRowIdentities() {
+        const container = document.getElementById('logEditor');
+        Array.from(container.children).forEach((row, i) => {
+            if (row.id !== `row-${i}`) row.id = `row-${i}`;
+            row.dataset.index = i;
+            const cb = row.querySelector('.row-checkbox');
+            if (cb) { cb.id = 'check-' + i; cb.checked = selectedIndices.includes(i); }
+            const lbl = row.querySelector('.select-label');
+            if (lbl) lbl.setAttribute('for', 'check-' + i);
+            row.classList.toggle('selected', selectedIndices.includes(i));
+        });
     }
 
     function moveGroup(direction) {
@@ -891,9 +906,23 @@ function renderRowContent(row, index) {
             if (i === targetIdx) newData.push(...movingItems);
             if (!movingSet.has(i)) newData.push(logData[i]);
         }
-        logData = newData; 
+        logData = newData;
+
+        // 既存の行ノードを実際にDOM内で移動させる（作り直さない）。
+        // これにより描画済みの高さが保持され、大きなスクロールのズレが起きない。
+        const container = document.getElementById('logEditor');
+        const marker = document.createComment('group-move-anchor');
+        const anchorRow = document.getElementById(`row-${targetIdx}`);
+        container.insertBefore(marker, anchorRow);
+        const movingRows = selectedIndices.map(i => document.getElementById(`row-${i}`));
+        movingRows.forEach(row => row && row.remove());
+        movingRows.forEach(row => { if (row) container.insertBefore(row, marker); });
+        marker.remove();
+
         selectedIndices = Array.from({length: movingItems.length}, (_, i) => targetIdx + i);
-        renderEditor(true);
+        syncRowIdentities();
+        renderEditor();
+        renderAnchorPanel();
     }
 
     function clearSelection() { selectedIndices = []; lastSelectedIndex = -1; document.getElementById('groupPanel').style.display = 'none'; renderEditor(); }
@@ -1073,25 +1102,32 @@ function handleReplace() {
     }
 
 function cleanUpLogData() {
-    const beforeCount = logData.length;
-
-    logData = logData.filter(item => {
+    const indicesToRemove = [];
+    logData.forEach((item, idx) => {
         const contentStr = String(item.content);
         const hasDeletedText = contentStr.includes('削除済');
         const isEmpty = !contentStr.trim();
-        
-        return !(hasDeletedText || isEmpty);
+        if (hasDeletedText || isEmpty) indicesToRemove.push(idx);
     });
 
-    const afterCount = logData.length;
-    const diff = beforeCount - afterCount;
-
-    if (diff === 0) {
+    if (indicesToRemove.length === 0) {
         alert('掃除する行（削除済・空行）は見つかりませんでした。');
-    } else {
-        renderEditor(true);
-        alert(`掃除完了！\n不要な ${diff} 行をリストから完全に消去しました🦑`);
+        return;
     }
+
+    const removeSet = new Set(indicesToRemove);
+    logData = logData.filter((_, idx) => !removeSet.has(idx));
+    indicesToRemove.forEach(idx => {
+        const row = document.getElementById(`row-${idx}`);
+        if (row) row.remove();
+    });
+    selectedIndices = [];
+    lastSelectedIndex = -1;
+    syncRowIdentities();
+    renderEditor();
+    renderAnchorPanel();
+
+    alert(`掃除完了！\n不要な ${indicesToRemove.length} 行をリストから完全に消去しました🦑`);
 }
 
 function applyRubyToRow(index, type) {
