@@ -125,28 +125,54 @@ progress{display:block;width:100%;height:6px;margin-bottom:6px;accent-color:var(
 #previewCanvas{display:block;max-width:100%;max-height:calc(100vh - 220px);max-height:calc(100dvh - 220px)}
 .preview-label{margin-top:10px;font-size:.72rem;line-height:1.7;color:var(--sub);word-break:break-word}
 .gbox{max-height:calc(100vh - 140px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:#444 transparent}
+.help{margin:0 0 10px}
+.help summary{display:inline-flex;align-items:center;gap:6px;font-size:.68rem;color:var(--mute);cursor:pointer;list-style:none}
+.help summary::-webkit-details-marker{display:none}
+.help summary::before{content:"?";display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border:1px solid var(--mute);border-radius:50%;font-size:.6rem;font-weight:700}
+.help summary:hover{color:#fff}
+.help p{margin:8px 0 0;padding:8px 10px;background:#181818;border-radius:4px;font-size:.68rem;line-height:1.7;color:var(--sub)}
+.fold>summary{display:flex;align-items:center;gap:8px;margin:0;font-family:var(--font-en);font-size:.66rem;font-weight:900;color:var(--accent);letter-spacing:.2em;cursor:pointer;list-style:none;user-select:none}
+.fold>summary::-webkit-details-marker{display:none}
+.fold>summary::after{content:"+";margin-left:auto;font-size:.9rem;color:var(--mute)}
+.fold[open]>summary::after{content:"−"}
+.fold[open]>summary{margin-bottom:12px}
+.seg{display:flex;border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.seg label{flex:1;cursor:pointer}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:block;padding:7px 6px;background:var(--input);text-align:center;font-size:.72rem;font-weight:700;color:var(--sub);transition:.15s}
+.seg label+label span{border-left:1px solid var(--border)}
+.seg input:checked+span{background:var(--accent);color:#fff}
+.seg input:focus-visible+span{outline:2px solid var(--accent-ink);outline-offset:-2px}
+.gmeta{display:flex;align-items:center;gap:8px;margin:-2px 0 9px;font-size:.62rem;color:var(--mute)}
+.gmeta .gtag{margin-left:0}
+.gmeta .gdel{margin-left:auto;border-color:transparent;padding:1px 6px}
+.name-edit{width:100%;margin-bottom:2px;padding:3px 6px;font-size:.7rem;font-weight:700}
+.name-edit[hidden]{display:none}
+.thumb .meta .nm.off{color:var(--mute);font-family:var(--font-jp);font-weight:400}
 .gcard{margin-bottom:10px;padding:11px 12px;background:#1a1a1a;border:1px solid var(--line);border-radius:6px}
 .gcard.off{background:#171717}
 .ghead{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:9px}
 .gcheck{display:flex;align-items:center;gap:8px;min-width:0;cursor:pointer}
 .gcheck input{width:15px;height:15px;margin:0;accent-color:var(--accent)}
-.gcheck strong{font-size:.82rem;color:#fff;word-break:break-word}
 .gcount{font-family:var(--font-en);font-size:.62rem;font-weight:700;color:var(--mute)}
-.gname{flex:1 1 90px;min-width:70px;max-width:160px;padding:2px 6px;background:transparent;border:1px solid transparent;border-radius:4px;color:#fff;font:inherit;font-size:.82rem;font-weight:700}
+.gname{flex:1 1 90px;min-width:70px;padding:2px 6px;background:transparent;border:1px solid transparent;border-radius:4px;color:#fff;font:inherit;font-size:.82rem;font-weight:700}
 .gname:hover{border-color:var(--line)}
 .gname:focus{outline:none;border-color:var(--accent-ink);background:#141414}
 .gpart{padding:1px 4px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:999px;color:var(--accent-ink);font:inherit;font-size:.62rem;font-weight:700}
 .gpart option{background:#1b1b1b;color:#e2e4e8}
 .gdel{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:none;border:1px solid var(--line);border-radius:4px;color:var(--sub);font:inherit;font-size:.62rem;cursor:pointer}
 .gdel:hover{color:#fff;border-color:var(--accent)}
-.chipx{display:inline-flex;margin-left:4px;padding:0;background:none;border:none;color:inherit;opacity:.55;font-size:.8rem;cursor:pointer}
+.chipx{display:none;margin-left:4px;padding:0;background:none;border:none;color:inherit;opacity:.7;font-size:.8rem;cursor:pointer}
+.chip:hover .chipx,.chip:focus-within .chipx{display:inline-flex}
 .chipx:hover{opacity:1}
+@media (hover:none){.chipx{display:inline-flex}}
 .trow .iconBtn.grp.on{color:var(--accent-ink)}
 .trow.addable{opacity:.8}
 .gtag{margin-left:auto;font-size:.62rem;color:var(--mute)}
 .gcard.off .gtag{color:var(--accent-ink)}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{position:relative;cursor:pointer}
+.chip{position:relative;display:inline-flex;align-items:center;cursor:pointer}
+.chip .chipx{position:absolute;top:-6px;right:-6px;width:16px;height:16px;align-items:center;justify-content:center;margin:0;background:#2a2a2a;border:1px solid var(--border);border-radius:50%;font-size:.7rem;z-index:1}
 .chip input{position:absolute;opacity:0;pointer-events:none}
 .chip span{display:block;padding:4px 10px;border:1px solid var(--border);border-radius:4px;font-size:.72rem;color:var(--sub);word-break:break-word;transition:.15s}
 .chip:hover span{border-color:#777;color:#fff}
@@ -236,7 +262,9 @@ progress{display:block;width:100%;height:6px;margin-bottom:6px;accent-color:var(
 
     <div class="control-group">
       <h2>2. レイヤー</h2>
-      <p class="hint">目のアイコンで通常レイヤーの表示を切り替えます。丸印の候補はクリックでプレビューに反映されます。<br>割当ての修正: 候補右の「×」でグループから外す(通常レイヤーに戻る)/ フォルダ右端の積層アイコンでグループ化・解除。</p>
+      <details class="help"><summary>操作のヒント</summary>
+        <p>目のアイコン: 通常レイヤーの表示/非表示。丸印の候補はクリックでプレビューに反映。<br>候補右の「×」: グループから外して通常レイヤーに戻す。<br>フォルダ右端の積層アイコン: そのフォルダをグループ化 / 解除。</p>
+      </details>
       <div class="tool-row"><input type="text" id="treeSearch" placeholder="レイヤー名で検索…" aria-label="レイヤー名で検索"></div>
       <div class="tool-row">
         <button class="btn" id="expandAllBtn" type="button">すべて展開</button>
@@ -246,8 +274,16 @@ progress{display:block;width:100%;height:6px;margin-bottom:6px;accent-color:var(
       <div class="colbox" id="treeBox"><p class="hint">PSDを読み込むとレイヤーツリーが表示されます。</p></div>
     </div>
 
-    <div class="control-group">
-      <h2>3. 出力設定</h2>
+    <details class="control-group fold" open>
+      <summary>3. 出力設定</summary>
+      <div class="field">
+        <span class="sub-label">ファイル名の付け方</span>
+        <div class="seg" role="radiogroup" aria-label="ファイル名の付け方">
+          <label><input type="radio" name="nameMode" value="num" checked><span>連番 (@01)</span></label>
+          <label><input type="radio" name="nameMode" value="name"><span>表情名</span></label>
+        </div>
+        <p class="sample" id="nameModeNote">書き出さない差分を外すと、番号は詰めて振り直されます。</p>
+      </div>
       <div class="field">
         <label class="sub-label" for="quality">WebP品質</label>
         <div class="range-row">
@@ -259,14 +295,14 @@ progress{display:block;width:100%;height:6px;margin-bottom:6px;accent-color:var(
         <label class="sub-label" for="namePrefix">ファイル名の接頭辞(任意)</label>
         <div class="input-ext">
           <input type="text" id="namePrefix" placeholder="例: chara_">
-          <span>@01.webp</span>
+          <span id="nameSuffix">@01.webp</span>
         </div>
         <p class="sample">出力例: <b id="nameSample">@01.webp</b></p>
       </div>
-    </div>
+    </details>
 
-    <div class="control-group">
-      <h2>4. 除外ルール</h2>
+    <details class="control-group fold">
+      <summary>4. 除外ルール</summary>
       <p class="hint">「目3 と 口2 は同時に使わない」のように、不要な組み合わせを生成前に除外します。</p>
       <div id="exclCard" hidden>
         <div class="ex-grid"><select id="exA_group" aria-label="グループA"></select><select id="exA_opt" aria-label="候補A"></select></div>
@@ -276,10 +312,10 @@ progress{display:block;width:100%;height:6px;margin-bottom:6px;accent-color:var(
       </div>
       <p class="hint" id="exclHint">PSD読み込み後、使用中の排他グループが2つ以上あると設定できます。</p>
       <ul class="chip-list" id="exclList"></ul>
-    </div>
+    </details>
 
-    <div class="control-group">
-      <h2>5. パーツ判定キーワード</h2>
+    <details class="control-group fold">
+      <summary>5. パーツ判定キーワード</summary>
       <p class="hint">フォルダ名にこの文字を含むとき、指定した種別として扱います(標準の目・眉・口などの判定より優先)。</p>
       <div class="ex-grid">
         <input type="text" id="kwInput" placeholder="キーワード(例: 傷)" aria-label="キーワード">
@@ -287,7 +323,7 @@ progress{display:block;width:100%;height:6px;margin-bottom:6px;accent-color:var(
       </div>
       <button class="btn primary block" id="addKwBtn" type="button" style="margin-top:8px">キーワードを追加</button>
       <ul class="chip-list" id="kwList"></ul>
-    </div>
+    </details>
   </div>
 
   <div class="sidebar-footer">
@@ -345,7 +381,9 @@ progress{display:block;width:100%;height:6px;margin-bottom:6px;accent-color:var(
       </section>
       <section class="panel">
         <h2>表情グループ</h2>
-        <p class="hint">候補を選んでプレビューを確認します。チェックを外したグループは組み合わせに含めず、選択中の1枚に固定します。顔などが消える場合は「グループ解除」か候補の「×」で、不要なレイヤーを外してください。</p>
+        <details class="help"><summary>グループの使い方</summary>
+          <p>候補を選ぶとプレビューに反映されます。チェックを外したグループは組み合わせに含めず、選択中の1枚に固定します。<br>顔などが消えるときは「グループ解除」か候補の「×」で、不要なレイヤーを外してください。名前とパーツ種別は直接変更できます。</p>
+        </details>
         <div class="gbox" id="groupsBox"></div>
       </section>
     </div>
@@ -690,17 +728,20 @@ function renderGroupsPanel(){
     const types = PART_ORDER.slice(); customKeywords.forEach(k => { if (!types.includes(k.label)) types.push(k.label); }); if (!types.includes(g.partType)) types.push(g.partType);
     types.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; if (t === g.partType) o.selected = true; badge.appendChild(o); });
     badge.onchange = () => { g.partType = badge.value; g.partManual = true; refreshAll(); };
-    const cnt = document.createElement('span'); cnt.className = 'gcount'; cnt.textContent = g.options.length + '枚';
+    const cnt = document.createElement('span'); cnt.className = 'gcount'; cnt.textContent = g.options.length + '候補';
     const tag = document.createElement('span'); tag.className = 'gtag';
-    const setTag = () => { tag.textContent = g.active ? '組み合わせに使う' : '固定(選択中の1枚のみ)'; card.classList.toggle('off', !g.active); };
+    const setTag = () => { tag.textContent = g.active ? '組み合わせに使う' : '固定中(選択中の1枚)'; card.classList.toggle('off', !g.active); };
     setTag();
     cb.onchange = () => { g.active = cb.checked; setTag(); updateCombosCount(); populateExclusionSelectors(); };
     const del = document.createElement('button'); del.type = 'button'; del.className = 'gdel';
     del.title = 'このグループを解除し、中のレイヤーを通常レイヤー(元の表示/非表示)に戻します';
-    del.textContent = 'グループ解除';
+    del.textContent = '解除';
     del.onclick = () => { dissolveGroup(g); refreshAll(); };
-    head.appendChild(lab); head.appendChild(nm); head.appendChild(badge); head.appendChild(cnt); head.appendChild(tag); head.appendChild(del);
+    head.appendChild(lab); head.appendChild(nm); head.appendChild(badge);
     card.appendChild(head);
+    const meta = document.createElement('div'); meta.className = 'gmeta';
+    meta.appendChild(cnt); meta.appendChild(tag); meta.appendChild(del);
+    card.appendChild(meta);
 
     const chips = document.createElement('div'); chips.className = 'chips';
     g.options.forEach(o => {
@@ -789,8 +830,45 @@ $('addKwBtn').addEventListener('click', () => {
 });
 
 /* ---- output settings ---- */
-function updateNameSample(){ $('nameSample').textContent = $('namePrefix').value.trim() + '@01.webp'; }
-$('namePrefix').addEventListener('input', updateNameSample);
+const nameMode = () => (document.querySelector('input[name=nameMode]:checked') || {}).value || 'num';
+function sanitizeName(n){ return String(n).replace(/[\\\/:*?"<>|\u0000-\u001f]/g, '_').trim(); }
+function autoName(r){ return sanitizeName(r.parts.join('_')) || 'diff'; }
+function computeNames(){
+  const prefix = $('namePrefix').value.trim(), kept = results.filter(r => r.keep);
+  results.forEach(r => { r.final = null; });
+  if (nameMode() === 'num'){
+    const pad = Math.max(2, String(kept.length).length);
+    kept.forEach((r, i) => { r.final = prefix + '@' + String(i + 1).padStart(pad, '0'); });
+  } else {
+    const used = new Set();
+    kept.forEach(r => {
+      const base = prefix + (sanitizeName(r.custom || '') || autoName(r));
+      let nm = base, n = 2;
+      while (used.has(nm.toLowerCase())) nm = base + '_' + (n++);
+      used.add(nm.toLowerCase()); r.final = nm;
+    });
+  }
+}
+function paintNames(){
+  const named = nameMode() === 'name';
+  results.forEach(r => {
+    if (!r.nmEl) return;
+    r.nmEl.textContent = r.final ? r.final + '.' + r.ext : '書き出さない';
+    r.nmEl.classList.toggle('off', !r.final);
+    r.nmEl.hidden = named && r.keep;
+    r.inEl.hidden = !(named && r.keep);
+    r.inEl.placeholder = autoName(r);
+  });
+}
+function updateNameSample(){
+  const prefix = $('namePrefix').value.trim(), named = nameMode() === 'name';
+  $('nameSuffix').textContent = named ? '表情名.webp' : '@01.webp';
+  $('nameSample').textContent = named ? prefix + (results[0] ? autoName(results[0]) : '通常_閉じ') + '.webp' : prefix + '@01.webp';
+  $('nameModeNote').textContent = named ? '各差分の名前は、書き出し結果のカードで自由に書き換えられます。' : '書き出さない差分を外すと、番号は詰めて振り直されます。';
+}
+function onNamingChange(){ updateNameSample(); computeNames(); paintNames(); }
+$('namePrefix').addEventListener('input', onNamingChange);
+document.querySelectorAll('input[name=nameMode]').forEach(r => r.addEventListener('change', onNamingChange));
 $('quality').addEventListener('input', e => { $('qval').textContent = (+e.target.value).toFixed(2); });
 updateNameSample();
 
@@ -878,8 +956,6 @@ $('genBtn').addEventListener('click', async () => {
     return;
   }
   prog.hidden = false; prog.max = all.length; prog.value = 0;
-  const pad = Math.max(2, String(all.length).length);
-  const prefix = $('namePrefix').value.trim();
   let fallbackNotified = false, failed = null;
   try{
     for (let i = 0; i < all.length; i++){
@@ -892,7 +968,7 @@ $('genBtn').addEventListener('click', async () => {
       const ext = blob.type === 'image/webp' ? 'webp' : (blob.type === 'image/png' ? 'png' : 'img');
       if (ext !== 'webp' && !fallbackNotified){ fallbackNotified = true; showToast('このブラウザはWebP出力に未対応のため、PNGで書き出します'); }
       const label = active.length ? active.map(g => g.name + ':' + (selMap.get(g.id).name || '(無名)')).join(' / ') : '現在のプレビュー';
-      results.push({ name: prefix + '@' + String(i + 1).padStart(pad, '0'), ext, blob, label, keep: true });
+      results.push({ parts: active.length ? active.map(g => selMap.get(g.id).name || '(無名)') : ['現在のプレビュー'], custom: '', ext, blob, label, keep: true });
       prog.value = i + 1;
       progText.textContent = '生成中… ' + (i + 1) + ' / ' + all.length + '枚';
     }
@@ -905,6 +981,7 @@ $('genBtn').addEventListener('click', async () => {
   if (failed) progText.textContent = '生成中にエラーが発生しました: ' + failed.message + '(' + results.length + '枚まで生成済み)';
   else progText.textContent = '完了: ' + results.length + '枚 生成しました';
   if (results.length){
+    computeNames(); updateNameSample();
     renderResults();
     if (isNarrow()) setDrawer(false);
     $('resultCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -923,36 +1000,43 @@ function renderResults(){
   results.forEach(r => {
     const url = URL.createObjectURL(r.blob); resultUrls.push(url);
     const card = document.createElement('div'); card.className = 'thumb';
-    const img = new Image(); img.src = url; img.alt = r.name; img.loading = 'lazy'; img.decoding = 'async';
+    const img = new Image(); img.src = url; img.alt = r.label; img.loading = 'lazy'; img.decoding = 'async';
     const meta = document.createElement('div'); meta.className = 'meta';
-    meta.innerHTML = '<b>' + escapeHtml(r.name) + '.' + r.ext + '</b>' + escapeHtml(r.label);
+    const nmEl = document.createElement('b'); nmEl.className = 'nm';
+    const inEl = document.createElement('input'); inEl.type = 'text'; inEl.className = 'name-edit'; inEl.value = r.custom || ''; inEl.setAttribute('aria-label', '差分の名前');
+    inEl.addEventListener('input', () => { r.custom = inEl.value; computeNames(); paintNames(); });
+    meta.appendChild(nmEl); meta.appendChild(inEl); meta.appendChild(document.createTextNode(r.label));
+    r.nmEl = nmEl; r.inEl = inEl;
     const lbl = document.createElement('label'); lbl.className = 'select-label';
     const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = r.keep;
     lbl.appendChild(cb); lbl.appendChild(document.createTextNode('書き出しに含める'));
     r.cb = cb; r.card = card;
-    const apply = () => { r.keep = cb.checked; card.classList.toggle('off', !r.keep); updateSelInfo(); };
+    const apply = () => { r.keep = cb.checked; card.classList.toggle('off', !r.keep); computeNames(); paintNames(); updateSelInfo(); };
     cb.addEventListener('change', apply);
     img.addEventListener('click', () => { cb.checked = !cb.checked; apply(); });
     card.appendChild(img); card.appendChild(meta); card.appendChild(lbl);
     grid.appendChild(card);
   });
   $('resultCard').hidden = false;
+  computeNames(); paintNames();
   updateSelInfo();
 }
 function setAllKeep(v){
   results.forEach(r => { r.keep = v; if (r.cb) r.cb.checked = v; if (r.card) r.card.classList.toggle('off', !v); });
+  computeNames(); paintNames();
   updateSelInfo();
 }
 $('allOn').addEventListener('click', () => setAllKeep(true));
 $('allOff').addEventListener('click', () => setAllKeep(false));
 
 $('zipBtn').addEventListener('click', async () => {
+  computeNames();
   const keep = results.filter(r => r.keep);
   if (!keep.length) return;
   const btn = $('zipBtn'); btn.disabled = true;
   try{
     const zip = new JSZip();
-    keep.forEach(r => zip.file(r.name + '.' + r.ext, r.blob));
+    keep.forEach(r => zip.file(r.final + '.' + r.ext, r.blob));
     const blob = await zip.generateAsync({ type: 'blob' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob); a.download = 'expression_diff.zip';
