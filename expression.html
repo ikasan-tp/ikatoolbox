@@ -132,6 +132,11 @@ progress{display:block;width:100%;height:6px;margin-bottom:6px;accent-color:var(
 .gcheck input{width:15px;height:15px;margin:0;accent-color:var(--accent)}
 .gcheck strong{font-size:.82rem;color:#fff;word-break:break-word}
 .gcount{font-family:var(--font-en);font-size:.62rem;font-weight:700;color:var(--mute)}
+.gname{flex:1 1 90px;min-width:70px;max-width:160px;padding:2px 6px;background:transparent;border:1px solid transparent;border-radius:4px;color:#fff;font:inherit;font-size:.82rem;font-weight:700}
+.gname:hover{border-color:var(--line)}
+.gname:focus{outline:none;border-color:var(--accent-ink);background:#141414}
+.gpart{padding:1px 4px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:999px;color:var(--accent-ink);font:inherit;font-size:.62rem;font-weight:700}
+.gpart option{background:#1b1b1b;color:#e2e4e8}
 .gdel{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:none;border:1px solid var(--line);border-radius:4px;color:var(--sub);font:inherit;font-size:.62rem;cursor:pointer}
 .gdel:hover{color:#fff;border-color:var(--accent)}
 .chipx{display:inline-flex;margin-left:4px;padding:0;background:none;border:none;color:inherit;opacity:.55;font-size:.8rem;cursor:pointer}
@@ -409,7 +414,7 @@ $('mainScrollArea').addEventListener('click', () => { if (sidebar.classList.cont
 const PART_DICT = [
   ['眉間', /眉間/],
   ['眉', /眉|brow/i],
-  ['目', /目|瞳|eye/i],
+  ['目', /目|眼|瞳|眸|eye/i],
   ['鼻', /鼻|nose/i],
   ['口', /口|mouth/i],
   ['歯', /歯|tooth|teeth/i],
@@ -672,9 +677,19 @@ function renderGroupsPanel(){
     const head = document.createElement('div'); head.className = 'ghead';
     const lab = document.createElement('label'); lab.className = 'gcheck';
     const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = g.active;
-    const nm = document.createElement('strong'); nm.textContent = g.name;
-    lab.appendChild(cb); lab.appendChild(nm);
-    const badge = document.createElement('span'); badge.className = 'badge'; badge.textContent = g.partType;
+    lab.appendChild(cb);
+    const nm = document.createElement('input'); nm.type = 'text'; nm.className = 'gname'; nm.value = g.name;
+    nm.title = 'グループ名(クリックして編集)'; nm.setAttribute('aria-label', 'グループ名');
+    nm.onkeydown = e => { if (e.key === 'Enter') nm.blur(); };
+    nm.onchange = () => {
+      g.name = nm.value.trim() || g.name;
+      if (!g.partManual) g.partType = detectPartType(g.name);
+      refreshAll();
+    };
+    const badge = document.createElement('select'); badge.className = 'gpart'; badge.title = 'パーツ種別(並び順に使います)'; badge.setAttribute('aria-label', 'パーツ種別');
+    const types = PART_ORDER.slice(); customKeywords.forEach(k => { if (!types.includes(k.label)) types.push(k.label); }); if (!types.includes(g.partType)) types.push(g.partType);
+    types.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; if (t === g.partType) o.selected = true; badge.appendChild(o); });
+    badge.onchange = () => { g.partType = badge.value; g.partManual = true; refreshAll(); };
     const cnt = document.createElement('span'); cnt.className = 'gcount'; cnt.textContent = g.options.length + '枚';
     const tag = document.createElement('span'); tag.className = 'gtag';
     const setTag = () => { tag.textContent = g.active ? '組み合わせに使う' : '固定(選択中の1枚のみ)'; card.classList.toggle('off', !g.active); };
@@ -684,7 +699,7 @@ function renderGroupsPanel(){
     del.title = 'このグループを解除し、中のレイヤーを通常レイヤー(元の表示/非表示)に戻します';
     del.textContent = 'グループ解除';
     del.onclick = () => { dissolveGroup(g); refreshAll(); };
-    head.appendChild(lab); head.appendChild(badge); head.appendChild(cnt); head.appendChild(tag); head.appendChild(del);
+    head.appendChild(lab); head.appendChild(nm); head.appendChild(badge); head.appendChild(cnt); head.appendChild(tag); head.appendChild(del);
     card.appendChild(head);
 
     const chips = document.createElement('div'); chips.className = 'chips';
@@ -736,6 +751,8 @@ $('addExclBtn').addEventListener('click', () => {
 function renderExclList(){
   const ul = $('exclList'); ul.innerHTML = '';
   excludeRules.forEach((r, i) => {
+    const ga = groups.find(g => g.id === r.aGroup), gb = groups.find(g => g.id === r.bGroup);
+    if (ga && gb) r.label = ga.name + ':' + (r.aOpt.name || '(無名)') + ' × ' + gb.name + ':' + (r.bOpt.name || '(無名)');
     const li = document.createElement('li');
     const sp = document.createElement('span'); sp.textContent = r.label + ' は組み合わせない';
     const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'iconBtn'; btn.setAttribute('aria-label', 'ルールを削除'); btn.innerHTML = ICONS.x;
@@ -760,7 +777,7 @@ function renderKwList(){
 }
 function reapplyPartTypes(){
   if (!psd) return;
-  groups.forEach(g => g.partType = detectPartType(g.name));
+  groups.forEach(g => { if (!g.partManual) g.partType = detectPartType(g.name); });
   sortGroups(); renderTree(); renderGroupsPanel();
 }
 $('addKwBtn').addEventListener('click', () => {
