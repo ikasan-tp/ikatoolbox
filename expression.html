@@ -614,7 +614,7 @@ function nodeRow(node, depth, term){
   return row;
 }
 function renderTreeInto(container, node, depth, term){
-  (node.children || []).forEach(child => {
+  (node.children || []).slice().reverse().forEach(child => { /* Photoshopと同じく上のレイヤーを先頭に表示 */
     child.__parent = node;
     if (term){
       if (!subtreeMatches(child, term)) return;
@@ -782,7 +782,7 @@ const BLEND = {normal:'source-over',multiply:'multiply',screen:'screen',darken:'
 function drawNode(ctx, node, selMap){
   if (node.__exclusiveOf){ if (selMap.get(node.__exclusiveOf) !== node) return; }
   else if (node.hidden) return;
-  if (node.children){ for (let i = node.children.length - 1; i >= 0; i--) drawNode(ctx, node.children[i], selMap); }
+  if (node.children){ for (let i = 0; i < node.children.length; i++) drawNode(ctx, node.children[i], selMap); /* ag-psdは下→上の順 */ }
   else if (node.canvas){
     ctx.save();
     ctx.globalAlpha = node.opacity == null ? 1 : node.opacity;
