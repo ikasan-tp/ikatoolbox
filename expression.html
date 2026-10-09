@@ -132,6 +132,12 @@ progress{display:block;width:100%;height:6px;margin-bottom:6px;accent-color:var(
 .gcheck input{width:15px;height:15px;margin:0;accent-color:var(--accent)}
 .gcheck strong{font-size:.82rem;color:#fff;word-break:break-word}
 .gcount{font-family:var(--font-en);font-size:.62rem;font-weight:700;color:var(--mute)}
+.gdel{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:none;border:1px solid var(--line);border-radius:4px;color:var(--sub);font:inherit;font-size:.62rem;cursor:pointer}
+.gdel:hover{color:#fff;border-color:var(--accent)}
+.chipx{display:inline-flex;margin-left:4px;padding:0;background:none;border:none;color:inherit;opacity:.55;font-size:.8rem;cursor:pointer}
+.chipx:hover{opacity:1}
+.trow .iconBtn.grp.on{color:var(--accent-ink)}
+.trow.addable{opacity:.8}
 .gtag{margin-left:auto;font-size:.62rem;color:var(--mute)}
 .gcard.off .gtag{color:var(--accent-ink)}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
@@ -225,7 +231,7 @@ progress{display:block;width:100%;height:6px;margin-bottom:6px;accent-color:var(
 
     <div class="control-group">
       <h2>2. レイヤー</h2>
-      <p class="hint">目のアイコンで通常レイヤーの表示を切り替えます。丸印の候補はクリックでプレビューに反映されます。</p>
+      <p class="hint">目のアイコンで通常レイヤーの表示を切り替えます。丸印の候補はクリックでプレビューに反映されます。<br>割当ての修正: 候補右の「×」でグループから外す(通常レイヤーに戻る)/ フォルダ右端の積層アイコンでグループ化・解除。</p>
       <div class="tool-row"><input type="text" id="treeSearch" placeholder="レイヤー名で検索…" aria-label="レイヤー名で検索"></div>
       <div class="tool-row">
         <button class="btn" id="expandAllBtn" type="button">すべて展開</button>
@@ -334,7 +340,7 @@ progress{display:block;width:100%;height:6px;margin-bottom:6px;accent-color:var(
       </section>
       <section class="panel">
         <h2>表情グループ</h2>
-        <p class="hint">候補を選んでプレビューを確認します。チェックを外したグループは組み合わせに含めず、選択中の1枚に固定します。</p>
+        <p class="hint">候補を選んでプレビューを確認します。チェックを外したグループは組み合わせに含めず、選択中の1枚に固定します。顔などが消える場合は「グループ解除」か候補の「×」で、不要なレイヤーを外してください。</p>
         <div class="gbox" id="groupsBox"></div>
       </section>
     </div>
@@ -374,6 +380,7 @@ const ICONS = {
   chevronDown: svg('<path d="M6 9l6 6 6-6"/>'),
   x: svg('<path d="M6 6l12 12M18 6L6 18"/>'),
   layers: svg('<path d="M12 3L3 8l9 5 9-5-9-5z"/><path d="M3 13l9 5 9-5"/>'),
+  plus: svg('<path d="M12 5v14M5 12h14"/>'),
   ban: svg('<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/>'),
   star: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6z"/></svg>'
 };
@@ -442,6 +449,35 @@ function resetResults(){
   $('progText').textContent = '';
 }
 
+let manualSeq = 0;
+function refreshAll(){
+  sortGroups(); renderTree(); renderGroupsPanel(); renderFloatWarning();
+  populateExclusionSelectors(); renderExclList(); updatePreview(); updateCombosCount();
+}
+function dissolveGroup(g){
+  g.options.forEach(o => { delete o.__exclusiveOf; });
+  (function f(n){ if (n.__groupId === g.id){ delete n.__groupId; return true; } return (n.children || []).some(f); })(psd);
+  groups = groups.filter(x => x !== g); previewSel.delete(g.id);
+  excludeRules = excludeRules.filter(r => r.aGroup !== g.id && r.bGroup !== g.id);
+}
+function makeGroup(folder){
+  const kids = folder.children || [];
+  if (kids.length < 2){ showToast('子レイヤーが2つ以上あるフォルダのみグループにできます'); return; }
+  const id = 'm' + (manualSeq++);
+  kids.forEach(c => c.__exclusiveOf = id);
+  folder.__groupId = id;
+  groups.push({ id, name: folder.name || '(ルート)', options: kids.slice(), active: true, partType: detectPartType(folder.name) });
+  previewSel.set(id, kids.find(o => !o.hidden) || kids[0]);
+}
+function removeOption(g, o){
+  if (g.options.length <= 2){ dissolveGroup(g); showToast('候補が1つになるため「' + g.name + '」のグループを解除しました'); return; }
+  g.options = g.options.filter(x => x !== o); delete o.__exclusiveOf;
+  if (previewSel.get(g.id) === o) previewSel.set(g.id, g.options[0]);
+  excludeRules = excludeRules.filter(r => r.aOpt !== o && r.bOpt !== o);
+}
+function addOption(g, o){
+  o.__exclusiveOf = g.id; g.options.push(o);
+}
 async function loadPsd(f){
   err.textContent = '';
   if (!/\.psd$/i.test(f.name)){
@@ -458,7 +494,7 @@ async function loadPsd(f){
     resetResults();
     psd = parsed;
     groups = []; previewSel = new Map(); excludeRules = [];
-    let gid = 0;
+    let gid = 0; manualSeq = 0;
     (function analyze(node){
       const kids = node.children;
       if (!kids) return;
@@ -516,6 +552,14 @@ function nodeRow(node, depth, term){
     const dot = document.createElement('span'); dot.className = 'rdot';
     row.appendChild(dot); row.appendChild(nameSpan);
     row.onclick = () => { previewSel.set(node.__exclusiveOf, node); renderTree(); renderGroupsPanel(); updatePreview(); updateCombosCount(); };
+    const gg = groups.find(x => x.id === node.__exclusiveOf);
+    if (gg){
+      const xb = document.createElement('button'); xb.type = 'button'; xb.className = 'iconBtn';
+      xb.title = 'このレイヤーをグループから外す(通常レイヤーに戻す)'; xb.setAttribute('aria-label', 'グループから外す'); xb.innerHTML = ICONS.x;
+      xb.style.marginLeft = 'auto';
+      xb.onclick = ev => { ev.stopPropagation(); removeOption(gg, node); refreshAll(); };
+      row.appendChild(xb);
+    }
     return row;
   }
 
@@ -542,10 +586,36 @@ function nodeRow(node, depth, term){
   paintEye();
   eye.onclick = ev => { ev.stopPropagation(); node.hidden = !node.hidden; paintEye(); updatePreview(); renderFloatWarning(); };
   row.appendChild(eye);
+  if (isFolder){
+    const gb = document.createElement('button'); gb.type = 'button';
+    const isG = !!node.__groupId;
+    gb.className = 'iconBtn grp' + (isG ? ' on' : '');
+    gb.title = isG ? 'グループを解除' : 'このフォルダの子を排他グループにする'; gb.setAttribute('aria-label', gb.title);
+    gb.innerHTML = ICONS.layers;
+    gb.onclick = ev => {
+      ev.stopPropagation();
+      if (isG){ const g = groups.find(x => x.id === node.__groupId); if (g) dissolveGroup(g); }
+      else makeGroup(node);
+      refreshAll();
+    };
+    row.appendChild(gb);
+  }
+  const par = node.__parent;
+  if (par && par.__groupId){
+    const g = groups.find(x => x.id === par.__groupId);
+    if (g){
+      row.classList.add('addable');
+      const ab = document.createElement('button'); ab.type = 'button'; ab.className = 'iconBtn';
+      ab.title = 'グループの候補に追加'; ab.setAttribute('aria-label', 'グループの候補に追加'); ab.innerHTML = ICONS.plus;
+      ab.onclick = ev => { ev.stopPropagation(); addOption(g, node); refreshAll(); };
+      row.appendChild(ab);
+    }
+  }
   return row;
 }
 function renderTreeInto(container, node, depth, term){
   (node.children || []).forEach(child => {
+    child.__parent = node;
     if (term){
       if (!subtreeMatches(child, term)) return;
       container.appendChild(nodeRow(child, depth, term));
@@ -596,7 +666,7 @@ function renderFloatWarning(){
 function renderGroupsPanel(){
   const box = $('groupsBox'), st = box.scrollTop;
   box.innerHTML = '';
-  if (!groups.length){ box.innerHTML = '<p class="hint">排他グループはありません。</p>'; return; }
+  if (!groups.length){ box.innerHTML = '<p class="hint">排他グループはありません。左のレイヤー一覧で、フォルダ右端のレイヤーアイコンを押すと、そのフォルダの中身を排他グループにできます。</p>'; return; }
   groups.forEach(g => {
     const card = document.createElement('div'); card.className = 'gcard' + (g.active ? '' : ' off');
     const head = document.createElement('div'); head.className = 'ghead';
@@ -610,7 +680,11 @@ function renderGroupsPanel(){
     const setTag = () => { tag.textContent = g.active ? '組み合わせに使う' : '固定(選択中の1枚のみ)'; card.classList.toggle('off', !g.active); };
     setTag();
     cb.onchange = () => { g.active = cb.checked; setTag(); updateCombosCount(); populateExclusionSelectors(); };
-    head.appendChild(lab); head.appendChild(badge); head.appendChild(cnt); head.appendChild(tag);
+    const del = document.createElement('button'); del.type = 'button'; del.className = 'gdel';
+    del.title = 'このグループを解除し、中のレイヤーを通常レイヤー(元の表示/非表示)に戻します';
+    del.textContent = 'グループ解除';
+    del.onclick = () => { dissolveGroup(g); refreshAll(); };
+    head.appendChild(lab); head.appendChild(badge); head.appendChild(cnt); head.appendChild(tag); head.appendChild(del);
     card.appendChild(head);
 
     const chips = document.createElement('div'); chips.className = 'chips';
@@ -619,7 +693,10 @@ function renderGroupsPanel(){
       const r = document.createElement('input'); r.type = 'radio'; r.name = g.id; r.checked = previewSel.get(g.id) === o;
       const s = document.createElement('span'); s.textContent = o.name || '(無名)';
       r.onchange = () => { previewSel.set(g.id, o); renderTree(); updatePreview(); updateCombosCount(); };
-      l.appendChild(r); l.appendChild(s); chips.appendChild(l);
+      l.appendChild(r); l.appendChild(s);
+      const cx = document.createElement('button'); cx.type = 'button'; cx.className = 'chipx'; cx.title = '候補から外す'; cx.setAttribute('aria-label', (o.name || '') + 'を候補から外す'); cx.innerHTML = ICONS.x;
+      cx.onclick = ev => { ev.preventDefault(); ev.stopPropagation(); removeOption(g, o); refreshAll(); };
+      l.appendChild(cx); chips.appendChild(l);
     });
     card.appendChild(chips);
     box.appendChild(card);
