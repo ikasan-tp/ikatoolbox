@@ -77,6 +77,45 @@
   .file-item-info { flex: 1; min-width: 0; }
   .file-name { font-size: 0.82em; color: #fff; font-family: monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
   .file-anchors { font-size: 0.68em; color: #555; margin-top: 2px; }
+  .label-setting { display: flex; align-items: center; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .label-setting-title { font-size: 0.72rem; font-weight: 700; color: var(--text-sub); flex-shrink: 0; }
+  .label-select, .label-custom {
+    background: #111; border: 1px solid var(--ui-border); color: #fff; padding: 6px 10px;
+    border-radius: 4px; font-size: 0.8rem; font-family: inherit; outline: none; box-sizing: border-box;
+  }
+  .label-select { cursor: pointer; }
+  .label-custom { flex: 1; min-width: 140px; }
+  .label-select:focus, .label-custom:focus { border-color: var(--accent); }
+  .label-help { display: none; font-size: 0.66rem; color: var(--text-sub); opacity: 0.6; margin-top: 6px; }
+  .list-tools { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .list-tools-hint { font-size: 0.68rem; color: var(--text-sub); opacity: 0.6; }
+  .sort-btn {
+    display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: #1a1a1a;
+    border: 1px solid var(--ui-border); color: #aaa; font-size: 0.72rem; font-weight: 700;
+    border-radius: 4px; cursor: pointer; font-family: inherit; transition: 0.15s;
+  }
+  .sort-btn:hover { background: #2a2a2a; color: #fff; border-color: #666; }
+  .sort-btn .material-symbols-outlined { font-size: 16px !important; width: 16px !important; height: 16px !important; }
+  .drag-handle { cursor: grab; color: #555; flex-shrink: 0; font-size: 22px !important; width: 22px !important; height: 22px !important; user-select: none; transition: color 0.15s; }
+  .drag-handle:hover { color: #ccc; }
+  .drag-handle:active { cursor: grabbing; }
+  .file-item { position: relative; }
+  .file-item.dragging { opacity: 0.4; }
+  .file-item.drop-before::before, .file-item.drop-after::after {
+    content: ''; position: absolute; left: 0; right: 0; height: 3px; background: var(--accent); border-radius: 2px; pointer-events: none;
+  }
+  .file-item.drop-before::before { top: -6px; }
+  .file-item.drop-after::after { bottom: -6px; }
+  .order-btn { padding: 6px 10px; }
+  .order-btn .material-symbols-outlined { font-size: 24px !important; width: 24px !important; height: 24px !important; }
+  .chapter-field { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .chapter-field-label { font-family: 'Montserrat', sans-serif; font-size: 0.58rem; font-weight: 900; color: var(--accent); letter-spacing: 0.2em; flex-shrink: 0; }
+  .chapter-input {
+    flex: 1; min-width: 0; background: #111; border: 1px solid var(--ui-border); color: #fff;
+    padding: 6px 10px; border-radius: 4px; font-size: 0.82rem; font-family: inherit;
+    box-sizing: border-box; outline: none; transition: border-color 0.15s;
+  }
+  .chapter-input:focus { border-color: var(--accent); }
 
   .icon-btn {
     background: transparent; color: #555; border: none; cursor: pointer; padding: 2px;
@@ -122,12 +161,33 @@
       <div class="ui-title">LOG MERGER <span class="ui-title-sub">for HTML LOG</span></div>
     </div>
 
-    <p class="privacy-note">分割されたログを好きな順番で一本に結合します。目次・見出しはすべて維持されます。</p>
+    <p class="privacy-note">分割されたログを好きな順番で一本に結合します。目次・見出しはすべて維持されます。各ファイルが1つの「章」になり、章タイトルは下の欄で編集できます。</p>
 
     <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
       <span class="material-symbols-outlined drop-zone-icon">library_add</span>
       <p>HTMLログをドロップするか<br><span class="drop-zone-link">ファイルを選択</span></p>
       <input type="file" id="fileInput" multiple accept=".html" style="display:none" onchange="addFiles(event)">
+    </div>
+
+    <div class="label-setting">
+      <span class="label-setting-title">章の表記</span>
+      <select id="labelStyle" class="label-select" onchange="onLabelStyleChange()">
+        <option value="chapter">CHAPTER 01</option>
+        <option value="episode">EPISODE 01</option>
+        <option value="wa_k">第一話</option>
+        <option value="sho_k">第一章</option>
+        <option value="none">表記なし（タイトルだけ）</option>
+        <option value="custom">自由入力…</option>
+      </select>
+      <input type="text" id="labelCustom" class="label-custom" value="第{k}幕" style="display:none;" oninput="renderFileList()" placeholder="例: 第{k}幕 / Act {n} / {nn}">
+    </div>
+    <div class="label-help" id="labelHelp">自由入力では {n}=1、{nn}=01、{k}=一 が使えます（半角数字の「第1話」なら 第{n}話）。</div>
+
+    <div id="listTools" class="list-tools" style="display:none;">
+      <span class="list-tools-hint">つまみ（⋮⋮）をドラッグ、または矢印で章を移動</span>
+      <button type="button" class="sort-btn" onclick="sortFilesByName()">
+        <span class="material-symbols-outlined">sort_by_alpha</span>名前順に並べる
+      </button>
     </div>
 
     <div id="fileList" class="file-list">
@@ -146,13 +206,61 @@
   <script>
     let filesData = [];
 
+    function escapeHtml(s) {
+      return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // 章タイトル（空欄＝タイトルなし。その場合は表記だけの見出しになる）
+    function getChapterTitle(f) {
+      return (f.chapterTitle || '').trim();
+    }
+
+    // ── 章の表記（CHAPTER 01 / 第一話 など）──
+    // {n}=1, {nn}=01, {k}=一（漢数字）
+    const LABEL_PRESETS = {
+      chapter: 'CHAPTER {nn}',
+      episode: 'EPISODE {nn}',
+      wa_k:    '第{k}話',
+      sho_k:   '第{k}章',
+      none:    ''
+    };
+    function toKanji(n) {
+      const d = ['〇','一','二','三','四','五','六','七','八','九'];
+      if (n < 10) return d[n];
+      if (n < 20) return '十' + (n % 10 ? d[n % 10] : '');
+      if (n < 100) return d[Math.floor(n / 10)] + '十' + (n % 10 ? d[n % 10] : '');
+      return String(n);
+    }
+    function getLabelTemplate() {
+      const v = document.getElementById('labelStyle').value;
+      return v === 'custom' ? document.getElementById('labelCustom').value : (LABEL_PRESETS[v] ?? '');
+    }
+    function formatLabel(i) {
+      const n = i + 1;
+      return getLabelTemplate()
+        .replace(/\{nn\}/g, String(n).padStart(2, '0'))
+        .replace(/\{n\}/g, String(n))
+        .replace(/\{k\}/g, toKanji(n))
+        .trim();
+    }
+    function onLabelStyleChange() {
+      const isCustom = document.getElementById('labelStyle').value === 'custom';
+      document.getElementById('labelCustom').style.display = isCustom ? 'block' : 'none';
+      document.getElementById('labelHelp').style.display = isCustom ? 'block' : 'none';
+      renderFileList();
+    }
+
     const dz = document.getElementById('dropZone');
     dz.addEventListener('dragover',  (e) => { e.preventDefault(); dz.classList.add('dragover'); });
     dz.addEventListener('dragleave', (e) => { e.preventDefault(); dz.classList.remove('dragover'); });
     dz.addEventListener('drop',      (e) => { e.preventDefault(); dz.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
     function addFiles(e) { handleFiles(e.target.files); e.target.value = ''; }
 
+    // 名前順（01, 02, … 10 のように数字は数の大きさで）に並べるための比較関数
+    const byName = (a, b) => a.name.localeCompare(b.name, 'ja', { numeric: true });
+
     async function handleFiles(files) {
+      const added = [];
       for (const file of Array.from(files)) {
         if (!file.name.endsWith('.html')) continue;
         const text = await file.text();
@@ -184,22 +292,48 @@ const heroTitleText = heroArea
         // コンテンツ本体（.containerの中身）
         const contentHTML = container ? container.innerHTML : doc.body.innerHTML;
 
-        filesData.push({
+        added.push({
           name: file.name,
           headHTML,
           inlineStyle,
           heroTitle,
           heroTitleText,
+          chapterTitle: heroTitleText, // 章タイトル（ファイル一覧で編集できる）
           contentHTML,
           anchors
         });
       }
+      // まとめて追加したファイルは名前順に並べてから末尾へ（すでに並べた分の順番は崩さない）
+      added.sort(byName);
+      filesData.push(...added);
       renderFileList();
+    }
+
+    // 並べ替え: from の章を to の位置（to は「その手前」を指す 0〜件数）へ移す
+    function moveFile(from, to) {
+      if (from < 0 || from >= filesData.length) return;
+      if (to > from) to -= 1;
+      if (to === from) return;
+      const [moved] = filesData.splice(from, 1);
+      filesData.splice(to, 0, moved);
+      renderFileList();
+    }
+
+    function sortFilesByName() {
+      filesData.sort(byName);
+      renderFileList();
+    }
+
+    let dragIndex = -1;
+    function clearDropMarks() {
+      document.querySelectorAll('.file-item.drop-before, .file-item.drop-after')
+        .forEach(el => el.classList.remove('drop-before', 'drop-after'));
     }
 
     function renderFileList() {
       const list = document.getElementById('fileList');
       const btn  = document.getElementById('mergeBtn');
+      document.getElementById('listTools').style.display = filesData.length >= 2 ? 'flex' : 'none';
 
       if (filesData.length === 0) {
         list.innerHTML = '<p class="file-list-empty">ファイルが追加されていません</p>';
@@ -212,18 +346,23 @@ const heroTitleText = heroArea
         const item = document.createElement('div');
         item.className = 'file-item';
         item.innerHTML = `
-          <div style="display:flex; align-items:center; gap:10px;">
+          <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:0;">
+            <span class="drag-handle material-symbols-outlined" title="ドラッグして章を移動">drag_indicator</span>
             <div class="file-item-order">
-              <button class="icon-btn" ${i === 0 ? 'disabled' : ''} data-swap-a="${i}" data-swap-b="${i-1}">
+              <button class="icon-btn order-btn" title="ひとつ上へ" ${i === 0 ? 'disabled' : ''} data-swap-a="${i}" data-swap-b="${i-1}">
                 <span class="material-symbols-outlined">expand_less</span>
               </button>
-              <button class="icon-btn" ${i === filesData.length - 1 ? 'disabled' : ''} data-swap-a="${i}" data-swap-b="${i+1}">
+              <button class="icon-btn order-btn" title="ひとつ下へ" ${i === filesData.length - 1 ? 'disabled' : ''} data-swap-a="${i}" data-swap-b="${i+1}">
                 <span class="material-symbols-outlined">expand_more</span>
               </button>
             </div>
             <div class="file-item-info">
               <span class="file-name">${i + 1}. ${f.name}</span>
               <div class="file-anchors">目次エントリ: ${f.anchors.length}件</div>
+              <div class="chapter-field">
+                ${formatLabel(i) ? `<span class="chapter-field-label">${escapeHtml(formatLabel(i))}</span>` : ''}
+                <input type="text" class="chapter-input" data-chapter="${i}" value="${escapeHtml(f.chapterTitle)}" placeholder="章タイトル（空欄なら表記だけ表示）">
+              </div>
             </div>
           </div>
           <button class="icon-btn remove-btn" data-remove="${i}">
@@ -231,12 +370,53 @@ const heroTitleText = heroArea
           </button>
         `;
         list.appendChild(item);
+
+        // ドラッグで並べ替え（つまみ部分を掴んだときだけドラッグ可能にして、入力欄の文字選択を邪魔しない）
+        const handle = item.querySelector('.drag-handle');
+        handle.addEventListener('mousedown', () => { item.draggable = true; });
+        handle.addEventListener('mouseup',   () => { item.draggable = false; });
+        item.addEventListener('dragstart', (e) => {
+          dragIndex = i;
+          item.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', String(i));
+        });
+        item.addEventListener('dragend', () => {
+          item.draggable = false;
+          item.classList.remove('dragging');
+          clearDropMarks();
+          dragIndex = -1;
+        });
+        item.addEventListener('dragover', (e) => {
+          if (dragIndex < 0) return;
+          e.preventDefault();
+          const r = item.getBoundingClientRect();
+          const after = e.clientY > r.top + r.height / 2;
+          clearDropMarks();
+          item.classList.add(after ? 'drop-after' : 'drop-before');
+          item.dataset.dropAfter = after ? '1' : '0';
+        });
+        item.addEventListener('drop', (e) => {
+          if (dragIndex < 0) return;
+          e.preventDefault();
+          const from = dragIndex;
+          const to = i + (item.dataset.dropAfter === '1' ? 1 : 0);
+          dragIndex = -1;
+          clearDropMarks();
+          moveFile(from, to);
+        });
       });
 
       // イベント委譲でボタン処理（インラインonclickを避ける安全な方式）
       list.querySelectorAll('[data-swap-a]').forEach(btn => {
         btn.addEventListener('click', () => {
           swapFile(parseInt(btn.dataset.swapA), parseInt(btn.dataset.swapB));
+        });
+      });
+      // 章タイトルの編集（入力のたびに一覧を作り直すとフォーカスが外れるので、データだけ更新する）
+      list.querySelectorAll('.chapter-input').forEach(inp => {
+        inp.addEventListener('input', () => {
+          filesData[parseInt(inp.dataset.chapter)].chapterTitle = inp.value;
         });
       });
       list.querySelectorAll('[data-remove]').forEach(btn => {
@@ -268,9 +448,15 @@ const heroTitleText = heroArea
       // 全ファイルの目次を結合（ファイルごとにIDプレフィックスを付けてアンカー衝突を防ぐ）
       let allIndexLinks = '';
       filesData.forEach((f, fi) => {
-        if (f.anchors.length === 0) return;
-        // ファイル名をセクション区切りとして表示
-        allIndexLinks += `<div style="font-family:'Montserrat';font-size:0.55rem;font-weight:900;color:#C5373C;letter-spacing:0.3em;padding:15px 20px 5px;opacity:0.8;">${f.heroTitleText}</div>`;
+        // 章見出し（色はログ本体のアクセントカラーに追従。クリックでその章の先頭へ移動）
+        const label = formatLabel(fi);
+        const title = getChapterTitle(f);
+        if (label || title) {
+          let inner = '';
+          if (label && title) inner = `<span class="index-chapter-num">${escapeHtml(label)}</span><span class="index-chapter-title">${escapeHtml(title)}</span>`;
+          else inner = `<span class="index-chapter-title">${escapeHtml(label || title)}</span>`; // どちらか片方だけなら見出し1行
+          allIndexLinks += `<a href="#chapter-${fi}" class="index-chapter" onclick="closeMenu()">${inner}</a>`;
+        }
         f.anchors.forEach(anchor => {
           // href例: "#log-5" → "#f0-log-5"（ファイルインデックスのプレフィックスを付ける）
           const newHref = anchor.href.replace('#', `#f${fi}-`);
@@ -280,11 +466,19 @@ const heroTitleText = heroArea
 
       // 各ファイルのコンテンツ本体（IDにファイルインデックスのプレフィックスを付けてアンカー衝突を防ぐ）
       let mergedSections = '';
-      const sep = '<hr style="border:0; border-top:2px solid #1a1a1a; margin:0; clear:both;">';
-
       filesData.forEach((f, fi) => {
         // タイトルは最初のファイルのみ表示
         let sectionHtml = (fi === 0) ? f.heroTitle : '';
+
+        // 章の区切り（全章の先頭に表示）
+        const label = formatLabel(fi);
+        const title = getChapterTitle(f);
+        if (label || title) {
+          let inner = '';
+          if (label && title) inner = `<span class="chapter-divider-num">${escapeHtml(label)}</span><div class="chapter-divider-title">${escapeHtml(title)}</div>`;
+          else inner = `<div class="chapter-divider-title">${escapeHtml(label || title)}</div>`; // どちらか片方だけなら見出し1行
+          sectionHtml += `<div class="chapter-divider" id="chapter-${fi}">${inner}</div>`;
+        }
 
         // コンテンツ内の id="log-N" を id="fN-log-N" に書き換えてID衝突を防ぐ
         let content = f.contentHTML;
@@ -298,8 +492,17 @@ const heroTitleText = heroArea
 
         sectionHtml += content;
         mergedSections += sectionHtml;
-        if (fi < filesData.length - 1) mergedSections += sep;
       });
+
+      // 章の区切りと目次の章見出し用スタイル（色はすべて var(--accent) を参照）
+      const chapterStyle = `<style>
+    .chapter-divider { margin: 0; padding: 48px 25px 20px; scroll-margin-top: calc(70px + env(safe-area-inset-top)); }
+    .chapter-divider-num { display: block; font-family: 'Montserrat', sans-serif; font-size: 0.6rem; font-weight: 900; color: var(--accent); letter-spacing: 0.5em; margin-bottom: 10px; }
+    .chapter-divider-title { font-family: 'Montserrat', 'Noto Sans JP', sans-serif; font-size: 1.3rem; font-weight: 900; color: #fff; border-left: 3px solid var(--accent); padding-left: 15px; line-height: 1.4; }
+    .index-chapter { display: block; text-decoration: none; padding: 22px 20px 8px; border-bottom: 1px solid var(--accent); }
+    .index-chapter-num { display: block; font-family: 'Montserrat', sans-serif; font-size: 0.55rem; font-weight: 900; color: var(--accent); letter-spacing: 0.3em; margin-bottom: 4px; }
+    .index-chapter-title { display: block; font-size: 0.9rem; font-weight: 700; color: #fff; }
+  </style>`;
 
       const fullHtml = `<!DOCTYPE html>
 <html lang="ja">
@@ -307,6 +510,7 @@ const heroTitleText = heroArea
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   ${baseHead}
+  ${chapterStyle}
 </head>
 <body>
 
