@@ -39,7 +39,10 @@
     gap:20px;
     align-items:start;
   }
-  .left-panel { position:sticky; top:20px; }
+  /* 左パネルは画面に追従しつつ、内容が長いときは中でスクロールできる（下が見切れない） */
+  .left-panel { position:sticky; top:20px; max-height:calc(100vh - 40px); overflow-y:auto; padding-right:6px; scrollbar-width:thin; scrollbar-color:#444 transparent; }
+  .left-panel::-webkit-scrollbar { width:6px; }
+  .left-panel::-webkit-scrollbar-thumb { background:#444; border-radius:3px; }
   .right-panel { min-width:0; }
   .back-link {
     position:absolute; top:30px; left:20px;
@@ -60,7 +63,10 @@
   .privacy-note { font-size:0.75em; color:var(--text-sub); margin-bottom:16px; }
 
   /* ステップインジケーター */
-  .step-indicator { display:flex; align-items:center; gap:0; margin-bottom:16px; }
+  .step-indicator { display:flex; align-items:flex-start; gap:0; margin-bottom:16px; }
+  .step { display:flex; flex-direction:column; align-items:center; gap:5px; width:52px; flex-shrink:0; }
+  .step span { font-size:0.6rem; color:var(--text-sub); letter-spacing:0.04em; white-space:nowrap; }
+  .step-indicator .step-line { margin-top:10px; }
   .step-dot { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Montserrat',sans-serif; font-size:0.6rem; font-weight:900; flex-shrink:0; transition:0.3s; }
   .step-dot.done  { background:var(--accent); color:#fff; }
   .step-dot.active{ background:#fff; color:#1a1a1a; }
@@ -94,6 +100,11 @@
   .settings-box { background:#181818; border-radius:8px; padding:14px 16px; }
   .settings-box-title { font-family:'Montserrat',sans-serif; font-size:0.68rem; font-weight:900; color:var(--accent); letter-spacing:0.3em; margin-bottom:10px; }
   .tag-list { display:flex; flex-wrap:wrap; gap:6px; }
+  #charTagList { max-height:170px; overflow-y:auto; }
+  .result-toolbar { position:sticky; top:0; z-index:20; background:var(--card-bg); margin:-24px -28px 14px; padding:16px 28px 10px; border-bottom:1px solid var(--ui-border); border-radius:12px 12px 0 0; }
+  .mini-btn { background:transparent; border:1px solid var(--ui-border); color:var(--text-sub); border-radius:12px; padding:2px 10px; font-size:0.68rem; font-weight:700; cursor:pointer; font-family:'Montserrat','Noto Sans JP',sans-serif; transition:0.15s; }
+  .mini-btn:hover:not(:disabled) { border-color:var(--accent); color:var(--accent); }
+  .mini-btn:disabled { opacity:0.3; cursor:default; }
   .tag-item { background:#252525; padding:5px 12px; border-radius:20px; font-size:0.78em; cursor:pointer; transition:0.15s; color:var(--text-sub); border:1px solid transparent; user-select:none; }
   .tag-item:hover { background:#2e2e2e; }
   .tag-item.on { color:#fff; border-color:#6e7278; background:#383a40; }
@@ -103,6 +114,7 @@
   .tag-item.on.fa  { border-color:var(--ui-border);    color:var(--text-main); }
   .tag-item.on.fu  { border-color:var(--col-fumble);   color:var(--col-fumble);   background:rgba(255,82,82,0.08); }
   .tag-item.on.ini { border-color:var(--col-initial);  color:var(--col-initial);  background:rgba(0,188,212,0.08); }
+  .exclude-note { font-size:0.72rem; color:var(--text-sub); margin-top:8px; line-height:1.6; }
   .select-links { display:flex; gap:8px; margin-bottom:8px; }
   .select-link { font-size:0.72rem; color:var(--text-sub); cursor:pointer; text-decoration:underline; transition:color 0.15s; }
   .select-link:hover { color:var(--accent); }
@@ -193,6 +205,7 @@
   @media (max-width:640px) {
     body { padding:60px 14px 60px; }
     .card { padding:18px 14px; }
+    .result-toolbar { margin:-18px -14px 12px; padding:12px 14px 8px; }
     .back-link { top:10px; left:10px; }
     .skill-row { grid-template-columns:18px 1fr 60px 48px 26px 1fr; gap:5px; font-size:0.8rem; }
     .ui-header { flex-direction:column; align-items:flex-start; gap:10px; }
@@ -224,16 +237,13 @@
 
       <!-- ステップインジケーター -->
       <div class="step-indicator" id="stepIndicator">
-        <div class="step-dot active" id="sd1">1</div>
+        <div class="step"><div class="step-dot active" id="sd1">1</div><span>読み込み</span></div>
         <div class="step-line" id="sl1"></div>
-        <div class="step-dot idle" id="sd2">2</div>
+        <div class="step"><div class="step-dot idle" id="sd2">2</div><span>絞り込み</span></div>
         <div class="step-line" id="sl2"></div>
-        <div class="step-dot idle" id="sd3">3</div>
+        <div class="step"><div class="step-dot idle" id="sd3">3</div><span>ロール</span></div>
         <div class="step-line" id="sl3"></div>
-        <div class="step-dot idle" id="sd4">4</div>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:0.6rem;color:var(--text-sub);font-family:'Montserrat',sans-serif;letter-spacing:0.04em;margin-bottom:14px;padding:0 2px;">
-        <span>読み込み</span><span style="margin-left:10px;">絞り込み</span><span>ロール</span><span>書き出し</span>
+        <div class="step"><div class="step-dot idle" id="sd4">4</div><span>書き出し</span></div>
       </div>
 
       <p class="privacy-note">※ログはサーバーに送信されず、ブラウザ内でのみ処理されます。</p>
@@ -260,7 +270,7 @@
       </div>
 
       <div class="btn-group">
-        <button id="extractBtn" class="btn" disabled>抽出する</button>
+        <button id="extractBtn" class="btn" disabled>抽出し直す</button>
         <button id="resetBtn" class="btn-ghost" style="display:none;">リセット</button>
       </div>
       <div id="status"></div>
@@ -282,6 +292,11 @@
             <div class="settings-box-title">判定種別</div>
             <div class="tag-list" id="filterTagList"></div>
           </div>
+          <div class="settings-box">
+            <div class="settings-box-title">成長対象外の判定</div>
+            <div class="tag-list" id="excludeTagList"></div>
+            <div class="exclude-note" id="excludeNote"></div>
+          </div>
         </div>
         <p style="font-size:0.72rem;color:var(--text-sub);text-align:center;margin-top:10px;margin-bottom:0;">タグをクリックすると即時反映されます</p>
       </div>
@@ -292,9 +307,11 @@
   <div class="right-panel">
     <div id="resultSection">
       <div class="card">
+       <div class="result-toolbar">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
           <div class="section-label" style="margin-bottom:0;">✦ 成長チェック</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button id="collapseAllBtn" class="btn-ghost">全て折りたたむ</button>
             <button id="rollAllBtn" class="btn">全技能をロール</button>
             <button id="exportBtn" class="btn-ghost">テキスト書き出し</button>
           </div>
@@ -306,8 +323,9 @@
             <span id="progressText">0 / 0 ロール済み</span>
             <span id="progressGrew"></span>
           </div>
-          <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+          <div class="progress-bar-wrap" style="margin-bottom:0;"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
         </div>
+       </div>
 
         <!-- 成長サマリー -->
         <div id="growthSummary">
@@ -386,11 +404,17 @@ let allEntries = {}; // char -> [{ skill, expr, roll, threshold, judgement, kind
 let skillState = {}; // char -> skill -> { checked, value, rolled, result }
 let charEnabled = {};
 let filterEnabled = { special:true, critical:true, success:true, initial:false, fail:false, fumble:false };
+let excludeNonGrowable = true; // 成長対象外の判定（アイデア・知識・幸運など）を除くか
 
 // エディション切替
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    edition = parseInt(btn.dataset.ed);
+    const newEd = parseInt(btn.dataset.ed);
+    if (newEd === edition) return;
+    // 版を変えると判定の分類が変わるため再抽出する。ロール済みの結果は消えるので確認する
+    const anyRolled = Object.values(skillState).some(bySkill => Object.values(bySkill).some(s => s.rolled));
+    if (anyRolled && !confirm('版を切り替えると、ロール済みの結果が消えます。切り替えますか？')) return;
+    edition = newEd;
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
     // 版に応じてフィルター初期値を切り替え
     if (edition === 6) {
@@ -399,6 +423,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
       filterEnabled = { special:true, critical:true, success:true, initial:false, fail:false, fumble:false };
     }
     buildFilterTags();
+    if (rawHtml) extract(); // 読み込み済みなら新しい版で自動的に抽出し直す
   });
 });
 
@@ -423,6 +448,7 @@ function handleFile(file) {
     rawHtml = ev.target.result;
     document.getElementById('extractBtn').disabled = false;
     updateSteps(1);
+    extract(); // 読み込んだらそのまま抽出する（「抽出する」ボタンでいつでもやり直し可）
   };
   reader.readAsText(file, 'UTF-8');
 }
@@ -505,7 +531,29 @@ function parseLogLine(text, ed) {
     kind = 'critical';
   }
 
-  return { skill, expr: `${threshold} | 出目:${roll}`, roll, threshold, judgement: judgement.trim(), kind, raw: text.trim() };
+  return { skill, expr: `${threshold} | 出目:${roll}`, roll, threshold, judgement: judgement.trim(), kind, raw: text.trim(), nonGrowable: isNonGrowable(skill) };
+}
+
+// ---- 成長の対象にならない判定（技能ではないもの）----
+// アイデア・知識・幸運・正気度（SAN）・能力値ロールなど。
+// クトゥルフ神話技能も、経験による成長チェックはできないので含める。
+const NON_GROWABLE_EXACT = new Set([
+  'アイデア','知識','幸運','ラック','LUCK','LUK',
+  '正気度','正気度ロール','SAN','SANC','SANチェック','SAN値','発狂',
+  'STR','CON','POW','DEX','APP','SIZ','INT','EDU',
+  '筋力','体力','体格','体躯','敏捷性','敏捷','外見','知性','精神力','教育','意志','耐久力',
+  '現在値','能力値'
+]);
+function isNonGrowable(skillName) {
+  // 全角英数を半角にそろえ、空白と末尾の（…）を取り除く（例:「ＳＴＲ」「アイデア（INT×5）」）
+  let s = String(skillName || '').normalize('NFKC').replace(/\s+/g, '').toUpperCase();
+  s = s.replace(/[（(].*[）)]$/, '');
+  if (NON_GROWABLE_EXACT.has(s)) return true;
+  // 「STR×5」「POW*5」のような能力値の倍数ロール
+  if (/^(STR|CON|POW|DEX|APP|SIZ|INT|EDU)[×X*]\d+$/.test(s)) return true;
+  // クトゥルフ神話（「クトゥルフ神話技能」などの表記ゆれも）
+  if (s.startsWith('クトゥルフ神話')) return true;
+  return false;
 }
 
 // ---- 抽出 ----
@@ -544,6 +592,7 @@ function extract() {
 
   buildCharTags(chars);
   buildFilterTags();
+  buildExcludeTag();
   document.getElementById('settingsSection').style.display = 'block';
   updateSteps(2);
   applyFilter(false);
@@ -602,6 +651,38 @@ function buildFilterTags() {
   });
 }
 
+// 成長対象外（アイデア・知識・幸運・SAN・能力値・神話）を除くかどうかのタグ
+function buildExcludeTag() {
+  const list = document.getElementById('excludeTagList');
+  list.innerHTML = '';
+  const tag = document.createElement('span');
+  tag.className = 'tag-item' + (excludeNonGrowable ? ' on' : '');
+  tag.textContent = 'アイデア・知識・幸運・SAN・能力値・神話を除く';
+  tag.addEventListener('click', () => {
+    excludeNonGrowable = !excludeNonGrowable;
+    tag.classList.toggle('on', excludeNonGrowable);
+    applyFilter(false);
+  });
+  list.appendChild(tag);
+}
+
+// 何が除外されたかを表示（見落としや、除外しすぎの確認用）
+function renderExcludeNote() {
+  const el = document.getElementById('excludeNote');
+  if (!el) return;
+  const counts = {};
+  Object.entries(allEntries).forEach(([char, entries]) => {
+    if (!charEnabled[char]) return;
+    entries.forEach(e => {
+      if (!e.nonGrowable || !filterEnabled[e.kind]) return;
+      counts[e.skill] = (counts[e.skill] || 0) + 1;
+    });
+  });
+  const text = Object.entries(counts).map(([k, n]) => `${k}×${n}`).join('、');
+  if (!excludeNonGrowable) el.textContent = text ? `除外せずに表示中: ${text}` : '';
+  else el.textContent = text ? `除外中: ${text}` : '除外された判定はありません';
+}
+
 function buildFiltered() {
   const filtered = {};
   Object.entries(allEntries).forEach(([char, entries]) => {
@@ -609,6 +690,7 @@ function buildFiltered() {
     const bySkill = {};
     entries.forEach(e => {
       if (!filterEnabled[e.kind]) return;
+      if (excludeNonGrowable && e.nonGrowable) return;
       if (!bySkill[e.skill]) bySkill[e.skill] = [];
       bySkill[e.skill].push(e);
     });
@@ -633,6 +715,7 @@ function applyFilter(scroll) {
 
   renderResult(filtered);
   updateProgress(filtered);
+  renderExcludeNote();
   const hasResult = Object.keys(filtered).length > 0;
   document.getElementById('resultSection').style.display = hasResult ? 'block' : 'none';
   document.getElementById('emptyState').style.display = hasResult ? 'none' : 'block';
@@ -716,22 +799,32 @@ function renderResult(filtered) {
     let miniText = charRolled > 0 ? `${charRolled}/${skillList.length} ロール済` : `${skillList.length} 技能`;
     if (charRolled === skillList.length && skillList.length > 0) miniText = `成長 ${charGrew}/${skillList.length}`;
 
+    const isCollapsed = !!collapsedChars[char];
+    const allRolled = skillList.every(s => !skillState[char]?.[s]?.checked || skillState[char]?.[s]?.rolled);
     header.innerHTML =
       `<span class="char-name">${char}</span>` +
       `<div class="char-meta">` +
         `<span class="char-progress-mini${charGrew > 0 ? ' has-grew' : ''}">${miniText}</span>` +
-        `<span class="char-toggle ${true ? 'open' : 'closed'}">▼</span>` +
+        `<button type="button" class="mini-btn char-roll" ${allRolled ? 'disabled' : ''} title="このキャラクターの技能をまとめてロール">ロール</button>` +
+        `<span class="char-toggle ${isCollapsed ? 'closed' : 'open'}">${isCollapsed ? '▶' : '▼'}</span>` +
       `</div>`;
+    header.querySelector('.char-roll').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      rollChar(char, filtered);
+    });
     header.addEventListener('click', () => {
       const body = block.querySelector('.char-body');
       const open = body.style.display !== 'none';
+      collapsedChars[char] = open;
       body.style.display = open ? 'none' : 'block';
       header.querySelector('.char-toggle').textContent = open ? '▶' : '▼';
       header.querySelector('.char-toggle').className = 'char-toggle ' + (open ? 'closed' : 'open');
+      updateCollapseBtn();
     });
 
     const body = document.createElement('div');
     body.className = 'char-body';
+    if (isCollapsed) body.style.display = 'none';
 
     // ヘッダ行
     const hr = document.createElement('div');
@@ -829,6 +922,39 @@ function doRoll(char, skill, currentVal) {
   state.value = String(currentVal);
   state.result = { roll, grew, gain, newVal: grew ? currentVal + gain : currentVal };
 }
+
+// キャラクター単位のロール（未ロール・チェック済みの技能だけ）
+function rollChar(char, filtered) {
+  let hasError = false;
+  Object.keys(filtered[char] || {}).forEach(skill => {
+    const state = skillState[char]?.[skill];
+    if (!state || !state.checked || state.rolled) return;
+    const v = parseInt(state.value);
+    if (!v || v < 1 || v > 99) { hasError = true; return; }
+    doRoll(char, skill, v);
+  });
+  const statusEl = document.getElementById('status');
+  if (hasError) { statusEl.className = 'warn'; statusEl.textContent = `⚠ ${char} に現在値が未入力の技能があります。`; }
+  else { statusEl.className = ''; statusEl.textContent = ''; }
+  renderResult(filtered);
+  updateProgress(filtered);
+}
+
+// キャラクターの開閉状態（再描画しても維持する）
+const collapsedChars = {};
+function updateCollapseBtn() {
+  const names = Object.keys(buildFiltered());
+  const allClosed = names.length > 0 && names.every(n => collapsedChars[n]);
+  document.getElementById('collapseAllBtn').textContent = allClosed ? '全て開く' : '全て折りたたむ';
+}
+document.getElementById('collapseAllBtn').addEventListener('click', () => {
+  const filtered = buildFiltered();
+  const names = Object.keys(filtered);
+  const allClosed = names.length > 0 && names.every(n => collapsedChars[n]);
+  names.forEach(n => { collapsedChars[n] = !allClosed; });
+  renderResult(filtered);
+  updateCollapseBtn();
+});
 
 document.getElementById('rollAllBtn').addEventListener('click', () => {
   const filtered = buildFiltered();
