@@ -125,6 +125,17 @@ progress{display:block;width:100%;height:6px;margin-bottom:6px;accent-color:var(
 #previewCanvas{display:block;max-width:100%;max-height:calc(100vh - 220px);max-height:calc(100dvh - 220px)}
 .preview-label{margin-top:10px;font-size:.72rem;line-height:1.7;color:var(--sub);word-break:break-word}
 .gbox{overflow:visible}
+.input-ext[hidden]{display:none}
+.linkbtn{display:block;margin-top:8px;padding:0;background:none;border:none;color:var(--mute);font:inherit;font-size:.66rem;text-decoration:underline;cursor:pointer}
+.linkbtn:hover{color:#fff}
+.linkbtn[hidden]{display:none}
+.thumb .dup{display:block;margin-bottom:2px;color:var(--accent-ink);font-weight:700}
+.thumb .dup[hidden]{display:none}
+.thumb.dragover{outline:2px dashed var(--accent);outline-offset:-2px}
+.mv{display:inline-flex;align-items:center;gap:2px;margin-left:auto}
+.mv .iconBtn{font-size:.9rem}
+.mv .iconBtn.l svg{transform:scaleX(-1)}
+.grip{cursor:grab;touch-action:none}
 .help{margin:0 0 10px}
 .help summary{display:inline-flex;align-items:center;gap:6px;font-size:.68rem;color:var(--mute);cursor:pointer;list-style:none}
 .help summary::-webkit-details-marker{display:none}
@@ -256,6 +267,7 @@ progress{display:block;width:100%;height:6px;margin-bottom:6px;accent-color:var(
       </div>
       <input type="file" id="file" accept=".psd" hidden>
       <div class="file-name" id="fileNameLabel"></div>
+      <button class="linkbtn" id="resetSavedBtn" type="button" hidden>保存した設定を初期化(自動検出に戻す)</button>
       <div class="loading" id="loading" hidden>読み込み中…(大きいファイルは少し時間がかかります)</div>
       <div class="err" id="err"></div>
     </div>
@@ -276,6 +288,21 @@ progress{display:block;width:100%;height:6px;margin-bottom:6px;accent-color:var(
 
     <details class="control-group fold" open>
       <summary>3. 出力設定</summary>
+      <div class="field">
+        <label class="sub-label" for="sizeMode">出力サイズ</label>
+        <select id="sizeMode">
+          <option value="100">元サイズ</option>
+          <option value="75">75%</option>
+          <option value="50">50%</option>
+          <option value="25">25%</option>
+          <option value="long">長辺を指定</option>
+        </select>
+        <div class="input-ext" id="sizePxWrap" style="margin-top:6px" hidden>
+          <input type="text" inputmode="numeric" id="sizePx" placeholder="例: 1000" aria-label="長辺のピクセル数">
+          <span>px</span>
+        </div>
+        <p class="sample" id="sizeNote"></p>
+      </div>
       <div class="field">
         <span class="sub-label">ファイル名の付け方</span>
         <div class="seg" role="radiogroup" aria-label="ファイル名の付け方">
@@ -382,7 +409,7 @@ progress{display:block;width:100%;height:6px;margin-bottom:6px;accent-color:var(
       <section class="panel">
         <h2>表情グループ</h2>
         <details class="help"><summary>グループの使い方</summary>
-          <p>候補を選ぶとプレビューに反映されます。チェックを外したグループは組み合わせに含めず、選択中の1枚に固定します。<br>顔などが消えるときは「グループ解除」か候補の「×」で、不要なレイヤーを外してください。名前とパーツ種別は直接変更できます。</p>
+          <p>候補を選ぶとプレビューに反映されます。チェックを外したグループは組み合わせに含めず、選択中の1枚に固定します。<br>@01は各グループの「通常」(名前に「通常」を含む候補。なければプレビューで選択中の候補)の顔で、以降は通常から変える箇所が少ない順、「その他」種別のグループを変えるものは最後に並びます。<br>顔などが消えるときは「グループ解除」か候補の「×」で、不要なレイヤーを外してください。名前とパーツ種別は直接変更できます。</p>
         </details>
         <div class="gbox" id="groupsBox"></div>
       </section>
@@ -390,10 +417,11 @@ progress{display:block;width:100%;height:6px;margin-bottom:6px;accent-color:var(
 
     <section class="panel" id="resultCard" hidden>
       <h2>生成結果</h2>
-      <p class="hint">画像をクリックすると、書き出しに含める/含めないを切り替えられます。</p>
+      <p class="hint">画像クリックで書き出しの有無を切替。⋮⋮のつまみのドラッグか「‹ ›」で順番を入れ替えられます(連番の並びに反映)。見た目が同じ差分は自動で外し、「重複」と表示します。</p>
       <div class="result-head">
         <button class="btn" id="allOn" type="button">全選択</button>
         <button class="btn" id="allOff" type="button">全解除</button>
+        <button class="btn" id="dupOff" type="button" hidden>重複を外す</button>
         <span class="sel-info" id="selInfo"></span>
       </div>
       <div class="thumb-grid" id="grid"></div>
@@ -419,6 +447,7 @@ const ICONS = {
   eyeOff: svg('<path d="M3 3l18 18"/><path d="M10.6 10.6a3 3 0 0 0 4.24 4.24"/><path d="M6.6 6.6C4 8.3 2 12 2 12s4 7 11 7c1.9 0 3.6-.4 5.1-1.1M17.9 17.9C20.4 16.1 22 12 22 12s-1.4-2.5-3.9-4.4"/>'),
   folder: svg('<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>'),
   image: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>'),
+  grip: svg('<circle cx="9" cy="6" r="1.2"/><circle cx="15" cy="6" r="1.2"/><circle cx="9" cy="12" r="1.2"/><circle cx="15" cy="12" r="1.2"/><circle cx="9" cy="18" r="1.2"/><circle cx="15" cy="18" r="1.2"/>'),
   chevronRight: svg('<path d="M9 6l6 6-6 6"/>'),
   chevronDown: svg('<path d="M6 9l6 6 6-6"/>'),
   x: svg('<path d="M6 6l12 12M18 6L6 18"/>'),
@@ -492,7 +521,95 @@ function resetResults(){
   $('progText').textContent = '';
 }
 
-let manualSeq = 0;
+let manualSeq = 0, currentFile = '';
+function clearMarks(n){ delete n.__exclusiveOf; delete n.__groupId; (n.children || []).forEach(clearMarks); }
+function autoDetect(){
+  groups = []; previewSel = new Map(); excludeRules = [];
+  let gid = 0; manualSeq = 0;
+  (function analyze(node){
+    const kids = node.children;
+    if (!kids) return;
+    const allLeaf = kids.length >= 2 && kids.every(c => !c.children);
+    if (allLeaf){
+      const id = 'g' + (gid++);
+      kids.forEach(c => c.__exclusiveOf = id);
+      node.__groupId = id;
+      groups.push({ id, name: node.name || '(ルート)', options: kids, active: true, partType: detectPartType(node.name), folder: node });
+      previewSel.set(id, kids.find(o => !o.hidden) || kids[0]);
+    } else { kids.forEach(analyze); }
+  })(psd);
+}
+/* ---- 設定の保存(ブラウザ内 localStorage、ファイル名+サイズごと) ---- */
+const SKEY = 'ika-expression:';
+const fileKey = () => SKEY + 'file:' + currentFile + ':' + (psd ? psd.width + 'x' + psd.height : '');
+function nodeAtPath(path){ let n = psd; for (const i of path){ n = n && n.children && n.children[i]; } return n || null; }
+function buildPathMap(){
+  const m = new Map();
+  (function f(n, p){ m.set(n, p); (n.children || []).forEach((c, i) => f(c, p.concat(i))); })(psd, []);
+  return m;
+}
+let saveTimer = null;
+function saveSettings(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try{
+      localStorage.setItem(SKEY + 'global', JSON.stringify({ quality: $('quality').value, prefix: $('namePrefix').value, nameMode: nameMode(), sizeMode: $('sizeMode').value, sizePx: $('sizePx').value }));
+      if (!psd || !currentFile) return;
+      const pm = buildPathMap();
+      const gs = groups.filter(g => g.folder && pm.has(g.folder)).map(g => ({
+        path: pm.get(g.folder), fname: g.folder.name || '', name: g.name, partType: g.partType, partManual: !!g.partManual, active: g.active,
+        opts: g.options.map(o => g.folder.children.indexOf(o)), sel: g.folder.children.indexOf(previewSel.get(g.id))
+      }));
+      const rules = excludeRules.map(r => {
+        const ga = groups.find(g => g.id === r.aGroup), gb = groups.find(g => g.id === r.bGroup);
+        if (!ga || !gb || !ga.folder || !gb.folder) return null;
+        return { a: pm.get(ga.folder), ao: ga.folder.children.indexOf(r.aOpt), b: pm.get(gb.folder), bo: gb.folder.children.indexOf(r.bOpt) };
+      }).filter(Boolean);
+      const eyes = [];
+      pm.forEach((path, n) => { if (n !== psd && !n.__exclusiveOf && !!n.hidden !== !!n.__h0) eyes.push([path, !!n.hidden]); });
+      localStorage.setItem(fileKey(), JSON.stringify({ v: 1, groups: gs, rules, eyes }));
+    }catch(e){ /* 保存できない環境では何もしない */ }
+  }, 300);
+}
+function restoreSettings(){
+  let data = null;
+  try{ data = JSON.parse(localStorage.getItem(fileKey()) || 'null'); }catch(e){ return false; }
+  if (!data || !Array.isArray(data.groups) || !data.groups.length) return false;
+  clearMarks(psd); groups = []; previewSel = new Map(); excludeRules = [];
+  data.groups.forEach(sg => {
+    const folder = nodeAtPath(sg.path);
+    if (!folder || !folder.children || (folder.name || '') !== sg.fname) return;
+    const kids = sg.opts.map(i => folder.children[i]).filter(Boolean);
+    if (kids.length < 2) return;
+    const id = 'r' + (manualSeq++);
+    kids.forEach(c => c.__exclusiveOf = id); folder.__groupId = id;
+    groups.push({ id, name: sg.name, options: kids, active: sg.active !== false, partType: sg.partType, partManual: !!sg.partManual, folder });
+    const sel = folder.children[sg.sel];
+    previewSel.set(id, sel && kids.includes(sel) ? sel : kids[0]);
+  });
+  if (!groups.length){ autoDetect(); return false; }
+  (data.rules || []).forEach(r => {
+    const fa = nodeAtPath(r.a), fb = nodeAtPath(r.b);
+    const ga = groups.find(g => g.folder === fa), gb = groups.find(g => g.folder === fb);
+    if (!ga || !gb) return;
+    const ao = fa.children[r.ao], bo = fb.children[r.bo];
+    if (!ao || !bo || !ga.options.includes(ao) || !gb.options.includes(bo)) return;
+    excludeRules.push({ aGroup: ga.id, aOpt: ao, bGroup: gb.id, bOpt: bo, label: '' });
+  });
+  (data.eyes || []).forEach(([path, h]) => { const n = nodeAtPath(path); if (n && !n.__exclusiveOf) n.hidden = h; });
+  return true;
+}
+function loadGlobalSettings(){
+  try{
+    const g = JSON.parse(localStorage.getItem(SKEY + 'global') || 'null');
+    if (!g) return;
+    if (g.quality) { $('quality').value = g.quality; $('qval').textContent = (+g.quality).toFixed(2); }
+    if (typeof g.prefix === 'string') $('namePrefix').value = g.prefix;
+    const nm = document.querySelector('input[name=nameMode][value="' + g.nameMode + '"]'); if (nm) nm.checked = true;
+    if (g.sizeMode && [...$('sizeMode').options].some(o => o.value === g.sizeMode)) $('sizeMode').value = g.sizeMode;
+    if (typeof g.sizePx === 'string') $('sizePx').value = g.sizePx;
+  }catch(e){}
+}
 function refreshAll(){
   sortGroups(); renderTree(); renderGroupsPanel(); renderFloatWarning();
   populateExclusionSelectors(); renderExclList(); updatePreview(); updateCombosCount();
@@ -509,7 +626,7 @@ function makeGroup(folder){
   const id = 'm' + (manualSeq++);
   kids.forEach(c => c.__exclusiveOf = id);
   folder.__groupId = id;
-  groups.push({ id, name: folder.name || '(ルート)', options: kids.slice(), active: true, partType: detectPartType(folder.name) });
+  groups.push({ id, name: folder.name || '(ルート)', options: kids.slice(), active: true, partType: detectPartType(folder.name), folder });
   previewSel.set(id, kids.find(o => !o.hidden) || kids[0]);
 }
 function removeOption(g, o){
@@ -535,21 +652,10 @@ async function loadPsd(f){
   try{
     const parsed = agPsd.readPsd(await f.arrayBuffer());
     resetResults();
-    psd = parsed;
-    groups = []; previewSel = new Map(); excludeRules = [];
-    let gid = 0; manualSeq = 0;
-    (function analyze(node){
-      const kids = node.children;
-      if (!kids) return;
-      const allLeaf = kids.length >= 2 && kids.every(c => !c.children);
-      if (allLeaf){
-        const id = 'g' + (gid++);
-        kids.forEach(c => c.__exclusiveOf = id);
-        node.__groupId = id;
-        groups.push({ id, name: node.name || '(ルート)', options: kids, active: true, partType: detectPartType(node.name) });
-        previewSel.set(id, kids.find(o => !o.hidden) || kids[0]);
-      } else { kids.forEach(analyze); }
-    })(psd);
+    psd = parsed; currentFile = f.name;
+    (function mark(n){ n.__h0 = !!n.hidden; (n.children || []).forEach(mark); })(psd);
+    autoDetect();
+    const restored = restoreSettings();
     sortGroups();
     $('fileNameLabel').textContent = f.name + '  (' + psd.width + '×' + psd.height + 'px)';
     $('treeSearch').value = '';
@@ -560,6 +666,8 @@ async function loadPsd(f){
     populateExclusionSelectors(); renderExclList();
     updatePreview(); updateCombosCount();
     if (!groups.length) err.textContent = '排他グループ(候補が複数並ぶフォルダ)が見つかりませんでした。レイヤー構成をご確認ください。';
+    $('resetSavedBtn').hidden = !restored; updateSizeNote();
+    if (restored) showToast('前回の設定を復元しました');
     $('mainScrollArea').scrollTop = 0;
     if (isNarrow()) setDrawer(false);
   }catch(ex){
@@ -569,6 +677,15 @@ async function loadPsd(f){
     fileInput.value = '';
   }
 }
+
+$('resetSavedBtn').addEventListener('click', () => {
+  if (!psd) return;
+  try{ localStorage.removeItem(fileKey()); }catch(e){}
+  (function f(n){ n.hidden = n.__h0; (n.children || []).forEach(f); })(psd);
+  clearMarks(psd); autoDetect(); excludeRules = [];
+  $('resetSavedBtn').hidden = true;
+  refreshAll(); showToast('自動検出の状態に戻しました');
+});
 
 /* ---- layer tree ---- */
 function highlightName(name, term){
@@ -627,7 +744,7 @@ function nodeRow(node, depth, term){
   eye.type = 'button'; eye.title = '表示/非表示'; eye.setAttribute('aria-label', '表示/非表示');
   const paintEye = () => { eye.className = 'iconBtn' + (node.hidden ? ' off' : ''); eye.innerHTML = ICONS[node.hidden ? 'eyeOff' : 'eye']; };
   paintEye();
-  eye.onclick = ev => { ev.stopPropagation(); node.hidden = !node.hidden; paintEye(); updatePreview(); renderFloatWarning(); };
+  eye.onclick = ev => { ev.stopPropagation(); node.hidden = !node.hidden; paintEye(); updatePreview(); renderFloatWarning(); saveSettings(); };
   row.appendChild(eye);
   if (isFolder){
     const gb = document.createElement('button'); gb.type = 'button';
@@ -858,6 +975,7 @@ function paintNames(){
     r.nmEl.hidden = named && r.keep;
     r.inEl.hidden = !(named && r.keep);
     r.inEl.placeholder = autoName(r);
+    if (r.dupEl){ r.dupEl.hidden = !r.dupOf; if (r.dupOf) r.dupEl.textContent = '重複: ' + (r.dupOf.final || r.dupOf.label) + ' と同じ見た目'; }
   });
 }
 function updateNameSample(){
@@ -866,11 +984,32 @@ function updateNameSample(){
   $('nameSample').textContent = named ? prefix + (results[0] ? autoName(results[0]) : '通常_閉じ') + '.webp' : prefix + '@01.webp';
   $('nameModeNote').textContent = named ? '各差分の名前は、書き出し結果のカードで自由に書き換えられます。' : '書き出さない差分を外すと、番号は詰めて振り直されます。';
 }
-function onNamingChange(){ updateNameSample(); computeNames(); paintNames(); }
+function onNamingChange(){ updateNameSample(); computeNames(); paintNames(); saveSettings(); }
 $('namePrefix').addEventListener('input', onNamingChange);
 document.querySelectorAll('input[name=nameMode]').forEach(r => r.addEventListener('change', onNamingChange));
-$('quality').addEventListener('input', e => { $('qval').textContent = (+e.target.value).toFixed(2); });
+$('quality').addEventListener('input', e => { $('qval').textContent = (+e.target.value).toFixed(2); saveSettings(); });
 updateNameSample();
+function outScale(){
+  if (!psd) return 1;
+  const m = $('sizeMode').value;
+  if (m === 'long'){
+    const px = parseInt($('sizePx').value, 10);
+    return px > 0 ? Math.min(1, px / Math.max(psd.width, psd.height)) : 1;
+  }
+  return (+m) / 100;
+}
+function outDims(){
+  const sc = outScale();
+  return { w: Math.max(1, Math.round(psd.width * sc)), h: Math.max(1, Math.round(psd.height * sc)) };
+}
+function updateSizeNote(){
+  $('sizePxWrap').hidden = $('sizeMode').value !== 'long';
+  if (!psd){ $('sizeNote').textContent = ''; return; }
+  const d = outDims();
+  $('sizeNote').textContent = '出力: ' + d.w + '×' + d.h + 'px(元 ' + psd.width + '×' + psd.height + ')' + ($('sizeMode').value === 'long' && outScale() === 1 ? ' ※元より大きくはしません' : '');
+}
+$('sizeMode').addEventListener('change', () => { updateSizeNote(); saveSettings(); });
+$('sizePx').addEventListener('input', () => { updateSizeNote(); saveSettings(); });
 
 /* ---- compositing ---- */
 const BLEND = {normal:'source-over',multiply:'multiply',screen:'screen',darken:'darken',lighten:'lighten',overlay:'overlay','color dodge':'color-dodge','color burn':'color-burn','hard light':'hard-light','soft light':'soft-light',difference:'difference',exclusion:'exclusion',hue:'hue',saturation:'saturation',color:'color',luminosity:'luminosity'};
@@ -906,6 +1045,36 @@ function* combos(active, idx, chosen){
   const g = active[idx];
   for (const opt of g.options){ chosen.set(g.id, opt); yield* combos(active, idx + 1, chosen); }
 }
+const DEFAULT_RE = /通常|ノーマル|normal|default|標準|基本|デフォルト/i;
+function defaultOpt(g){
+  return g.options.find(o => DEFAULT_RE.test(o.name || '')) || previewSel.get(g.id) || g.options[0];
+}
+/* 並び順: ①全グループが「通常」= @01 → ②通常から変える箇所が少ない順 → ③「その他」種別のグループを変えるものは最後 */
+function* orderedCombos(active, base){
+  const n = active.length;
+  const def = active.map(defaultOpt);
+  const others = active.map((g, i) => g.options.filter(o => o !== def[i]));
+  const isOther = active.map(g => g.partType === 'その他');
+  function* assign(idxs, pos, m){
+    if (pos === idxs.length){ yield new Map(m); return; }
+    const i = idxs[pos], g = active[i];
+    for (const o of others[i]){ m.set(g.id, o); yield* assign(idxs, pos + 1, m); }
+    m.set(g.id, def[i]);
+  }
+  function* subsets(start, k, chosen){
+    if (k === 0){ yield chosen.slice(); return; }
+    for (let i = start; i <= n - k; i++){ chosen.push(i); yield* subsets(i + 1, k - 1, chosen); chosen.pop(); }
+  }
+  for (const pass of [false, true]){
+    for (let k = 0; k <= n; k++){
+      for (const idxs of subsets(0, k, [])){
+        if (idxs.some(i => isOther[i]) !== pass) continue;
+        const m = new Map(base); active.forEach((g, i) => m.set(g.id, def[i]));
+        yield* assign(idxs, 0, m);
+      }
+    }
+  }
+}
 function countCombos(active){
   let n = 0, scanned = 0;
   for (const m of combos(active, 0, buildBase())){
@@ -917,6 +1086,7 @@ function countCombos(active){
 }
 function updateCombosCount(){
   const el = $('countInfo');
+  saveSettings();
   if (!psd){ el.textContent = ''; return; }
   const active = activeGroups();
   if (!active.length){ el.textContent = '使用中のグループがないため、現在のプレビュー1枚を書き出します。'; return; }
@@ -937,11 +1107,11 @@ $('genBtn').addEventListener('click', async () => {
   genBtn.disabled = true; $('zipBtn').disabled = true;
   resetResults();
   const active = activeGroups(), base = buildBase();
-  const quality = +$('quality').value;
+  const quality = +$('quality').value, od = outDims();
   let all = [];
   if (active.length){
     let scanned = 0;
-    for (const m of combos(active, 0, base)){
+    for (const m of orderedCombos(active, base)){
       scanned++;
       if (!violatesRule(m)) all.push(m);
       if (all.length >= 300 || scanned >= 20000) break;
@@ -960,15 +1130,18 @@ $('genBtn').addEventListener('click', async () => {
   try{
     for (let i = 0; i < all.length; i++){
       const selMap = all[i];
-      const cnv = document.createElement('canvas'); cnv.width = psd.width; cnv.height = psd.height;
-      drawNode(cnv.getContext('2d'), psd, selMap);
+      const cnv = document.createElement('canvas'); cnv.width = od.w; cnv.height = od.h;
+      const cx = cnv.getContext('2d'); cx.imageSmoothingEnabled = true; cx.imageSmoothingQuality = 'high';
+      cx.scale(od.w / psd.width, od.h / psd.height);
+      drawNode(cx, psd, selMap);
       const blob = await new Promise(res => cnv.toBlob(res, 'image/webp', quality));
       cnv.width = cnv.height = 0;
       if (!blob) throw new Error('画像の生成に失敗しました');
       const ext = blob.type === 'image/webp' ? 'webp' : (blob.type === 'image/png' ? 'png' : 'img');
       if (ext !== 'webp' && !fallbackNotified){ fallbackNotified = true; showToast('このブラウザはWebP出力に未対応のため、PNGで書き出します'); }
       const label = active.length ? active.map(g => g.name + ':' + (selMap.get(g.id).name || '(無名)')).join(' / ') : '現在のプレビュー';
-      results.push({ parts: active.length ? active.map(g => selMap.get(g.id).name || '(無名)') : ['現在のプレビュー'], custom: '', ext, blob, label, keep: true });
+      const hash = fnvHash(new Uint8Array(await blob.arrayBuffer()));
+      results.push({ hash, parts: active.length ? active.map(g => selMap.get(g.id).name || '(無名)') : ['現在のプレビュー'], custom: '', ext, blob, label, keep: true });
       prog.value = i + 1;
       progText.textContent = '生成中… ' + (i + 1) + ' / ' + all.length + '枚';
     }
@@ -982,16 +1155,40 @@ $('genBtn').addEventListener('click', async () => {
   else progText.textContent = '完了: ' + results.length + '枚 生成しました';
   if (results.length){
     computeNames(); updateNameSample();
+    const dups = markDuplicates();
+    results.forEach(r => { if (r.dupOf) r.keep = false; });
+    computeNames();
     renderResults();
+    if (dups) showToast('見た目が同じ差分 ' + dups + '枚を自動で外しました(重複表示のカードで戻せます)');
     if (isNarrow()) setDrawer(false);
     $('resultCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 });
 
 /* ---- results ---- */
+function fnvHash(u8){
+  let h1 = 0x811c9dc5, h2 = 0x01000193 ^ u8.length;
+  for (let i = 0; i < u8.length; i++){ h1 = Math.imul(h1 ^ u8[i], 16777619); h2 = Math.imul(h2 + u8[i], 2246822519) ^ (h2 >>> 13); }
+  return (h1 >>> 0).toString(16) + '-' + (h2 >>> 0).toString(16) + '-' + u8.length;
+}
+function markDuplicates(){
+  const seen = new Map(); let n = 0;
+  results.forEach(r => {
+    r.dupOf = null;
+    if (seen.has(r.hash)){ r.dupOf = seen.get(r.hash); n++; } else seen.set(r.hash, r);
+  });
+  return n;
+}
+function moveResult(from, to){
+  if (from === to || to < 0 || to >= results.length) return;
+  const [x] = results.splice(from, 1); results.splice(to, 0, x);
+  renderResults();
+}
+let dragIdx = -1;
 function updateSelInfo(){
-  const n = results.filter(r => r.keep).length;
-  $('selInfo').textContent = n + ' / ' + results.length + ' 件を選択中';
+  const n = results.filter(r => r.keep).length, d = results.filter(r => r.dupOf).length;
+  $('selInfo').textContent = n + ' / ' + results.length + ' 件を選択中' + (d ? '(見た目が同じ ' + d + '件)' : '');
+  $('dupOff').hidden = !d;
   $('zipBtn').disabled = n === 0;
 }
 function renderResults(){
@@ -1005,7 +1202,8 @@ function renderResults(){
     const nmEl = document.createElement('b'); nmEl.className = 'nm';
     const inEl = document.createElement('input'); inEl.type = 'text'; inEl.className = 'name-edit'; inEl.value = r.custom || ''; inEl.setAttribute('aria-label', '差分の名前');
     inEl.addEventListener('input', () => { r.custom = inEl.value; computeNames(); paintNames(); });
-    meta.appendChild(nmEl); meta.appendChild(inEl); meta.appendChild(document.createTextNode(r.label));
+    const dupEl = document.createElement('span'); dupEl.className = 'dup'; dupEl.hidden = true; r.dupEl = dupEl;
+    meta.appendChild(dupEl); meta.appendChild(nmEl); meta.appendChild(inEl); meta.appendChild(document.createTextNode(r.label));
     r.nmEl = nmEl; r.inEl = inEl;
     const lbl = document.createElement('label'); lbl.className = 'select-label';
     const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = r.keep;
@@ -1014,6 +1212,17 @@ function renderResults(){
     const apply = () => { r.keep = cb.checked; card.classList.toggle('off', !r.keep); computeNames(); paintNames(); updateSelInfo(); };
     cb.addEventListener('change', apply);
     img.addEventListener('click', () => { cb.checked = !cb.checked; apply(); });
+    const mv = document.createElement('span'); mv.className = 'mv';
+    const grip = document.createElement('span'); grip.className = 'iconBtn grip'; grip.title = 'ドラッグで並べ替え'; grip.innerHTML = ICONS.grip;
+    grip.addEventListener('pointerdown', () => { card.draggable = true; });
+    const mkBtn = (cls, title, delta) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'iconBtn ' + cls; b.title = title; b.setAttribute('aria-label', title); b.innerHTML = ICONS.chevronRight; b.onclick = () => moveResult(results.indexOf(r), results.indexOf(r) + delta); return b; };
+    mv.appendChild(grip); mv.appendChild(mkBtn('l', '前へ', -1)); mv.appendChild(mkBtn('', '後ろへ', 1));
+    lbl.appendChild(mv);
+    card.addEventListener('dragstart', e => { dragIdx = results.indexOf(r); e.dataTransfer.effectAllowed = 'move'; try{ e.dataTransfer.setData('text/plain', String(dragIdx)); }catch(_){} });
+    card.addEventListener('dragend', () => { card.draggable = false; document.querySelectorAll('.thumb.dragover').forEach(c => c.classList.remove('dragover')); });
+    card.addEventListener('dragover', e => { if (dragIdx < 0) return; e.preventDefault(); card.classList.add('dragover'); });
+    card.addEventListener('dragleave', () => card.classList.remove('dragover'));
+    card.addEventListener('drop', e => { e.preventDefault(); const from = dragIdx; dragIdx = -1; moveResult(from, results.indexOf(r)); });
     card.appendChild(img); card.appendChild(meta); card.appendChild(lbl);
     grid.appendChild(card);
   });
@@ -1026,6 +1235,10 @@ function setAllKeep(v){
   computeNames(); paintNames();
   updateSelInfo();
 }
+$('dupOff').addEventListener('click', () => {
+  results.forEach(r => { if (r.dupOf){ r.keep = false; if (r.cb) r.cb.checked = false; if (r.card) r.card.classList.add('off'); } });
+  computeNames(); paintNames(); updateSelInfo();
+});
 $('allOn').addEventListener('click', () => setAllKeep(true));
 $('allOff').addEventListener('click', () => setAllKeep(false));
 
@@ -1049,6 +1262,7 @@ $('zipBtn').addEventListener('click', async () => {
     updateSelInfo();
   }
 });
+loadGlobalSettings(); updateNameSample();
 </script>
 </body>
 </html>
