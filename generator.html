@@ -402,7 +402,7 @@
         <span class="material-symbols-outlined guide-icon">auto_fix_high</span>
         <div class="guide-text">
             <b>6. ルビを振る</b>
-            <p>「漢字《るび》」または「｜範囲《るび》」の形式でふりがなを表示できます。</p>
+            <p>「｜漢字《るび》」の形式でふりがなを表示できます。｜がない《》はそのまま表示されます。</p>
         </div>
     </div>
     <div class="guide-item">
@@ -1438,8 +1438,7 @@ function exportLog() {
         const nameDisplay = isSystem ? '' : char.displayName;
         const safeContent = item.content
             .split('\\n').join('<br>')
-            .replace(/[｜|]([^｜|《》]+)《([^《》]+)》/g, '<ruby>$1<rt>$2</rt></ruby>')
-            .replace(/([^ \n\t｜|《》]+)《([^《》]+)》/g, '<ruby>$1<rt>$2</rt></ruby>');
+            .replace(/[｜|]([^｜|《》]+)《([^《》]+)》/g, '<ruby>$1<rt>$2</rt></ruby>');
 
 
         html += `<div class="log-row ${styleClass}" id="log-${i}"><div class="row-header"><div class="row-name" ${nameStyle}><span class="name-line" ${lineStyle}></span>${nameDisplay}</div><div class="row-tab">${tabNameDisplay}</div></div><hr class="info-separator"><div class="row-content">${safeContent}</div></div>`;
